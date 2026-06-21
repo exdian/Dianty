@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Dianty (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Dianty (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

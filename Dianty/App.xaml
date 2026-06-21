@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Application
+    x:Class="Dianty.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Dianty"
+    xmlns:utils="using:Dianty.Utils"
+    xmlns:views="using:Dianty.Views">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+                <!-- Other merged dictionaries here -->
+            </ResourceDictionary.MergedDictionaries>
+            <!-- Other app resources here -->
+
+            <DataTemplate x:Key="LoadViewTemplate">
+                <views:LoadView/>
+            </DataTemplate>
+
+            <DataTemplate x:Key="MainViewTemplate">
+                <views:MainView DataContext="{Binding}"/>
+            </DataTemplate>
+
+            <utils:LoadViewTemplateSelector
+                x:Key="LoadViewTemplateSelector"
+                LoadTemplate="{StaticResource LoadViewTemplate}" MainTemplate="{StaticResource MainViewTemplate}" />
+
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
