@@ -12,29 +12,28 @@
             <RowDefinition Height="48" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        
+
         <TitleBar
-            x:Name="_titleBar"
-            Title="Dianty" IsBackButtonVisible="False" IsPaneToggleButtonVisible="False"
-            Loaded="TitleBar_Loaded">
+            x:Name="_titleBar" Margin="94,0,0,0"
+            Title="Dianty" IsBackButtonVisible="False" IsPaneToggleButtonVisible="False">
             <TitleBar.Resources>
-                <x:Double x:Key="TitleBarLeftHeaderPaddingWidth">10</x:Double>
+                <x:Double x:Key="TitleBarLeftHeaderPaddingWidth">0</x:Double>
             </TitleBar.Resources>
             <TitleBar.IconSource>
-                <FontIconSource Glyph="&#xE73B;"/>
+                <FontIconSource Glyph="&#xE945;"/>
             </TitleBar.IconSource>
         </TitleBar>
         <NavigationView
             x:Name="_navView" Grid.RowSpan="2"
             Loaded="NavView_Loaded" SelectionChanged="NavView_SelectionChanged" BackRequested="NavView_BackRequested"
-            DisplayModeChanged="NavView_DisplayModeChanged" LayoutUpdated="NavView_LayoutUpdated"
+            LayoutUpdated="NavView_LayoutUpdated"
             OpenPaneLength="120" CompactModeThresholdWidth="500" ExpandedModeThresholdWidth="750"
             IsBackEnabled="{x:Bind _contentFrame.CanGoBack, Mode=OneWay}">
             <NavigationView.Resources>
                 <Thickness x:Key="NavigationViewContentMargin">0,48,0,0</Thickness>
                 <Thickness x:Key="NavigationViewMinimalContentMargin">0,48,0,0</Thickness>
             </NavigationView.Resources>
-            <Frame x:Name="_contentFrame" IsTabStop="True" Navigated="ContentFrame_Navigated"/>
+            <Frame x:Name="_contentFrame" IsTabStop="True" Navigated="ContentFrame_Navigated" Margin="12,0"/>
             <NavigationView.MenuItems>
                 <NavigationViewItem Icon="Home" Content="主页" Tag="{x:Bind HomePage}"/>
                 <NavigationViewItem Content="设备" Tag="{x:Bind DevicesPage}">
@@ -57,5 +56,19 @@
                 <NavigationViewItem Icon="ReportHacked" Content="安全" Tag="{x:Bind SafetyPage}"/>
             </NavigationView.MenuItems>
         </NavigationView>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{x:Bind _navView.CompactModeThresholdWidth}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <!-- NavigationView.DisplayMode != Minimal -->
+                        <Setter Target="_titleBar.Margin" Value="54,0,0,0"/>
+                        <Setter Target="_contentFrame.Margin" Value="24,0"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
     </Grid>
 </UserControl>

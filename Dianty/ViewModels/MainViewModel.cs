@@ -16,7 +16,7 @@ public partial class MainViewModel : ObservableObject
     private readonly DispatcherQueue _dispatcher;
 
     [ObservableProperty]
-    public partial bool IsLoaded { get; set; }
+    public partial bool IsLoaded { get; private set; }
 
     private async void LoadDataAsync()
     {

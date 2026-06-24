@@ -142,31 +142,6 @@ public sealed partial class MainView : UserControl
         }
     }
 
-    private void UpdateViewLayout()
-    {
-        if (!_titleBar.IsLoaded)
-            return;
-
-        if (_navView.DisplayMode == NavigationViewDisplayMode.Minimal)
-        {
-            _titleBar.Margin = new Thickness(84, 0, 0, 0);
-        }
-        else
-        {
-            _titleBar.Margin = new Thickness(44, 0, 0, 0);
-        }
-    }
-
-    private void TitleBar_Loaded(object sender, RoutedEventArgs e)
-    {
-        UpdateViewLayout();
-    }
-
-    private void NavView_DisplayModeChanged(NavigationView sender, NavigationViewDisplayModeChangedEventArgs args)
-    {
-        UpdateViewLayout();
-    }
-
     private void NavView_LayoutUpdated(object sender, object e)
     {
         if (_navView.IsLoaded)
