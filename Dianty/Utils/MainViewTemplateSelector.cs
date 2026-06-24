@@ -10,14 +10,13 @@ internal partial class LoadViewTemplateSelector : DataTemplateSelector
 
     protected override DataTemplate SelectTemplateCore(object item, DependencyObject container)
     {
-        // ContentControl.Content 被赋值为 null 时，不会执行此处代码，因此只能使用字符串
-        if (item is string)
+        if (item is bool isLoaded && isLoaded)
         {
-            return LoadTemplate!;
+            return MainTemplate!;
         }
         else
         {
-            return MainTemplate!;
+            return LoadTemplate!;
         }
     }
 }

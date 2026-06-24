@@ -1,4 +1,5 @@
-﻿using Dianty.ViewModels;
+﻿using Dianty.Services;
+using Dianty.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -44,6 +45,8 @@ public partial class App : Application
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
         var window = new MainWindow();
+        ServiceLocator.Register<ITitleBarService>(window);
+        ServiceLocator.Register<IWindowService>(window);
         window.ViewModel = new MainViewModel(window.DispatcherQueue);
         _window = window;
         _window.Activate();
