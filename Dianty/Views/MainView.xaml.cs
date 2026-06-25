@@ -7,15 +7,11 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Windows.Graphics;
 
 namespace Dianty.Views;
 
-/// <plan>
-/// 当 NavigationView.DisplayMode != NavigationViewDisplayMode.Expanded 时，不穿透打开的面板的空白区域
-/// </plan>
 public sealed partial class MainView : UserControl
 {
     public MainView()
@@ -66,7 +62,6 @@ public sealed partial class MainView : UserControl
                     }
                 }
             }
-            _interactableElements.Add(_contentFrame);
 
             UpdateDragRegion();
             UpdateIconRegion();
@@ -95,10 +90,34 @@ public sealed partial class MainView : UserControl
 
     private void UpdateDragRegion()
     {
-        var passthroughRects = (from element in _interactableElements
-                                let rect = FrameworkElementHelper.GetBounds(element)
-                                where rect.X >= 0 || rect.Y >= 0
-                                select rect).ToArray();
+        var rects = new List<RectInt32>(_interactableElements.Count + 1);
+
+        var rect = FrameworkElementHelper.GetBounds(_contentFrame);
+        if (_navView.DisplayMode != NavigationViewDisplayMode.Expanded && _navView.IsPaneOpen)
+        {
+            // 面板以浮动状态打开时，会遮住部分内容，因此需要裁剪此穿透区域
+            double scale = _contentFrame.XamlRoot.RasterizationScale;
+            var leftBorder = (int)(_navView.OpenPaneLength * scale);
+            if (rect.X < leftBorder)
+            {
+                int newX = leftBorder;
+                int newWidth = rect.Width - (newX - rect.X);
+                rect.X = newX;
+                rect.Width = newWidth < 0 ? 0 : newWidth;
+            }
+        }
+        rects.Add(rect);
+
+        foreach (var element in _interactableElements)
+        {
+            rect = FrameworkElementHelper.GetBounds(element);
+            if (rect.X >= 0 || rect.Y >= 0)
+            {
+                rects.Add(rect);
+            }
+        }
+
+        var passthroughRects = rects.ToArray();
 
         if (passthroughRects.AsSpan().SequenceEqual(_previousPassthroughRects.AsSpan()))
             return;
@@ -125,6 +144,7 @@ public sealed partial class MainView : UserControl
         if ((rect.X < 0 && rect.Y < 0)
             || (_navView.DisplayMode != NavigationViewDisplayMode.Expanded && _navView.IsPaneOpen))
         {
+            // 面板以浮动状态打开时，会遮住标题栏图标
             nonClientPointerSource?.ClearRegionRects(NonClientRegionKind.Icon);
         }
         else
@@ -141,7 +161,6 @@ public sealed partial class MainView : UserControl
 
     private void ActivationListener_InputActivationChanged(InputActivationListener sender, InputActivationListenerActivationChangedEventArgs args)
     {
-        Debug.WriteLine($"状态{sender.State}");
         bool isDeactivated = sender.State == InputActivationState.Deactivated;
         VisualStateManager.GoToState(this, isDeactivated ? "Deactivated" : "Activated", false);
 
