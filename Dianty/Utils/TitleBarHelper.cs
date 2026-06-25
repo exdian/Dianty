@@ -4,6 +4,7 @@ using Windows.UI;
 
 namespace Dianty.Utils;
 
+// 此部分代码来自 https://github.com/microsoft/WinUI-Gallery
 internal partial class TitleBarHelper
 {
     public static void ApplySystemThemeToCaptionButtons(Window window, ElementTheme currentTheme)

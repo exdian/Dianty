@@ -8,23 +8,21 @@
     mc:Ignorable="d">
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="48" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-
-        <TitleBar
-            x:Name="_titleBar" Margin="94,0,0,0"
-            Title="Dianty" IsBackButtonVisible="False" IsPaneToggleButtonVisible="False">
-            <TitleBar.Resources>
-                <x:Double x:Key="TitleBarLeftHeaderPaddingWidth">0</x:Double>
-            </TitleBar.Resources>
-            <TitleBar.IconSource>
-                <FontIconSource Glyph="&#xE945;"/>
-            </TitleBar.IconSource>
-        </TitleBar>
+        <Grid MinHeight="48" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="56,0,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Viewbox x:Name="_appIcon" Width="16" Height="16" Margin="40,0,0,0">
+                <FontIcon Glyph="&#xE945;"/>
+            </Viewbox>
+            <TextBlock
+                x:Name="_titleText" Grid.Column="1"
+                Text="Dianty" Style="{StaticResource CaptionTextBlockStyle}" Margin="16,0,142,0"
+                TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" VerticalAlignment="Center"/>
+        </Grid>
         <NavigationView
-            x:Name="_navView" Grid.RowSpan="2"
+            x:Name="_navView"
             Loaded="NavView_Loaded" SelectionChanged="NavView_SelectionChanged" BackRequested="NavView_BackRequested"
             LayoutUpdated="NavView_LayoutUpdated"
             OpenPaneLength="120" CompactModeThresholdWidth="500" ExpandedModeThresholdWidth="750"
@@ -33,7 +31,7 @@
                 <Thickness x:Key="NavigationViewContentMargin">0,48,0,0</Thickness>
                 <Thickness x:Key="NavigationViewMinimalContentMargin">0,48,0,0</Thickness>
             </NavigationView.Resources>
-            <Frame x:Name="_contentFrame" IsTabStop="True" Navigated="ContentFrame_Navigated" Margin="12,0"/>
+            <Frame x:Name="_contentFrame" IsTabStop="True" Navigated="ContentFrame_Navigated" Padding="12,0"/>
             <NavigationView.MenuItems>
                 <NavigationViewItem Icon="Home" Content="主页" Tag="{x:Bind HomePage}"/>
                 <NavigationViewItem Content="设备" Tag="{x:Bind DevicesPage}">
@@ -64,8 +62,17 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <!-- NavigationView.DisplayMode != Minimal -->
-                        <Setter Target="_titleBar.Margin" Value="54,0,0,0"/>
-                        <Setter Target="_contentFrame.Margin" Value="24,0"/>
+                        <Setter Target="_appIcon.Margin" Value="0"/>
+                        <Setter Target="_contentFrame.Padding" Value="24,0"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+            <VisualStateGroup x:Name="ActivationGroup">
+                <VisualState x:Name="Activated" />
+                <VisualState x:Name="Deactivated">
+                    <VisualState.Setters>
+                        <Setter Target="_appIcon.Opacity" Value="{ThemeResource TitleBarDeactivatedOpacity}" />
+                        <Setter Target="_titleText.Foreground" Value="{ThemeResource TitleBarDeactivatedForegroundBrush}" />
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>

@@ -7,20 +7,14 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Windows.Graphics;
 
 namespace Dianty.Views;
 
 /// <plan>
-/// 将 RootSplitView 设置为标题栏
-/// 穿透 NavigationViewBackButton 区域
-/// 无需穿透 NavigationViewCloseButton 区域，因为与 NavigationViewBackButton 重叠
-/// 穿透 TogglePaneButton 区域
-/// 穿透 MenuItemsScrollViewer 区域
-/// 穿透 FooterItemsScrollViewer 区域
-/// 无需穿透未使用区域：PaneTitlePresenter、AutoSuggestArea、PaneCustomContentBorder、FooterContentBorder
-/// 自行实现 TitleBar 图标以优化效果
+/// 当 NavigationView.DisplayMode != NavigationViewDisplayMode.Expanded 时，不穿透打开的面板的空白区域
 /// </plan>
 public sealed partial class MainView : UserControl
 {
@@ -37,6 +31,9 @@ public sealed partial class MainView : UserControl
     private readonly IWindowService _windowService;
     private readonly List<FrameworkElement> _interactableElements = [];
     private RectInt32[] _previousPassthroughRects = [];
+    private Button? _backButton;
+    private Button? _closePaneButton;
+    private Button? _togglePaneButton;
 
     private Type HomePage => typeof(HomePage);
     private Type DevicesPage => typeof(DevicesPage);
@@ -72,6 +69,27 @@ public sealed partial class MainView : UserControl
             _interactableElements.Add(_contentFrame);
 
             UpdateDragRegion();
+            UpdateIconRegion();
+
+            // 图标区域在窗口发生交互时很可能会被重置，因此需要重新设置
+            var nonClientPointerSource = _windowService.GetInputNonClientPointerSource();
+            if (nonClientPointerSource is not null)
+            {
+                nonClientPointerSource.ExitedMoveSize += MainView_ExitedMoveSize;
+                _appIcon.Unloaded += (_, _) => nonClientPointerSource.ExitedMoveSize -= MainView_ExitedMoveSize;
+            }
+
+            var activationListener = _windowService.GetInputActivationListener();
+            if (activationListener is not null)
+            {
+                activationListener.InputActivationChanged += ActivationListener_InputActivationChanged;
+                _appIcon.Unloaded += (_, _) => activationListener.InputActivationChanged -= ActivationListener_InputActivationChanged;
+            }
+
+            // 获取所有可能位于标题栏区域的元素
+            _backButton = VisualTreeHelperExtension.FindChildByName(_navView, "NavigationViewBackButton") as Button;
+            _closePaneButton = VisualTreeHelperExtension.FindChildByName(_navView, "NavigationViewCloseButton") as Button;
+            _togglePaneButton = VisualTreeHelperExtension.FindChildByName(_navView, "TogglePaneButton") as Button;
         }
     }
 
@@ -89,11 +107,55 @@ public sealed partial class MainView : UserControl
         var nonClientPointerSource = _windowService.GetInputNonClientPointerSource();
         if (passthroughRects.Length > 0)
         {
-            nonClientPointerSource.SetRegionRects(NonClientRegionKind.Passthrough, passthroughRects);
+            nonClientPointerSource?.SetRegionRects(NonClientRegionKind.Passthrough, passthroughRects);
         }
         else
         {
-            nonClientPointerSource.ClearRegionRects(NonClientRegionKind.Passthrough);
+            nonClientPointerSource?.ClearRegionRects(NonClientRegionKind.Passthrough);
+        }
+    }
+
+    private void UpdateIconRegion()
+    {
+        var nonClientPointerSource = _windowService.GetInputNonClientPointerSource();
+        if (nonClientPointerSource is null)
+            return;
+
+        var rect = FrameworkElementHelper.GetBounds(_appIcon);
+        if ((rect.X < 0 && rect.Y < 0)
+            || (_navView.DisplayMode != NavigationViewDisplayMode.Expanded && _navView.IsPaneOpen))
+        {
+            nonClientPointerSource?.ClearRegionRects(NonClientRegionKind.Icon);
+        }
+        else
+        {
+            nonClientPointerSource?.SetRegionRects(NonClientRegionKind.Icon, [rect]);
+        }
+    }
+
+    private void MainView_ExitedMoveSize(InputNonClientPointerSource sender, ExitedMoveSizeEventArgs args)
+    {
+        // 改变窗口位置时
+        UpdateIconRegion();
+    }
+
+    private void ActivationListener_InputActivationChanged(InputActivationListener sender, InputActivationListenerActivationChangedEventArgs args)
+    {
+        Debug.WriteLine($"状态{sender.State}");
+        bool isDeactivated = sender.State == InputActivationState.Deactivated;
+        VisualStateManager.GoToState(this, isDeactivated ? "Deactivated" : "Activated", false);
+
+        // 当窗口处于非活动状态时，所有标题栏元素都应为半透明
+        if (_navView.DisplayMode == NavigationViewDisplayMode.Minimal)
+        {
+            _backButton?.Opacity = isDeactivated ? 0.5 : 1;
+            _closePaneButton?.Opacity = isDeactivated ? 0.5 : 1;
+            _togglePaneButton?.Opacity = isDeactivated ? 0.5 : 1;
+        }
+        else
+        {
+            _backButton?.Opacity = isDeactivated ? 0.5 : 1;
+            _closePaneButton?.Opacity = isDeactivated ? 0.5 : 1;
         }
     }
 
@@ -117,7 +179,10 @@ public sealed partial class MainView : UserControl
         if (_navView.IsPaneOpen
             && (_navView.DisplayMode == NavigationViewDisplayMode.Compact
             || _navView.DisplayMode == NavigationViewDisplayMode.Minimal))
+        {
             return;
+        }
+
         _contentFrame.GoBack();
     }
 
@@ -144,9 +209,7 @@ public sealed partial class MainView : UserControl
 
     private void NavView_LayoutUpdated(object sender, object e)
     {
-        if (_navView.IsLoaded)
-        {
-            UpdateDragRegion();
-        }
+        UpdateDragRegion();
+        UpdateIconRegion();
     }
 }

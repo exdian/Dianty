@@ -13,7 +13,7 @@
     </Window.SystemBackdrop>
 
     <ContentControl
-        x:Name="_rootElement"
+        x:Name="_rootElement" Loaded="RootElement_Loaded" PointerEntered="RootElement_PointerEntered"
         HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
         Content="{x:Bind ViewModel.IsLoaded, Mode=OneWay}" ContentTemplateSelector="{StaticResource LoadViewTemplateSelector}">
         <ContentControl.ContentTransitions>

@@ -4,6 +4,10 @@ using Dianty.ViewModels;
 using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using System;
+using System.Runtime.InteropServices;
+using Windows.Graphics;
+using WinRT.Interop;
 
 namespace Dianty;
 /// <summary>
@@ -16,16 +20,60 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
         InitializeComponent();
         ExtendsContentIntoTitleBar = true;
         AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
-        AppWindow.Resize(new Windows.Graphics.SizeInt32(1200, 800));
-        TitleBarHelper.ApplySystemThemeToCaptionButtons(this, _rootElement.ActualTheme);
-        _rootElement.ActualThemeChanged += (_, _) => TitleBarHelper.ApplySystemThemeToCaptionButtons(this, _rootElement.ActualTheme);
+        SetWindowSize();
     }
 
     public MainViewModel? ViewModel { get; set; }
 
-    public InputNonClientPointerSource GetInputNonClientPointerSource()
+    public InputNonClientPointerSource? GetInputNonClientPointerSource()
     {
+        if (AppWindow is null)
+            return null;
         return InputNonClientPointerSource.GetForWindowId(AppWindow.Id);
+    }
+
+    public InputActivationListener? GetInputActivationListener()
+    {
+        if (AppWindow is null)
+            return null;
+        return InputActivationListener.GetForWindowId(AppWindow.Id);
+    }
+
+    [LibraryImport("user32.dll")]
+    private static partial uint GetDpiForWindow(nint hWnd);
+    private void SetWindowSize()
+    {
+        var hWnd = WindowNative.GetWindowHandle(this);
+        var dpi = GetDpiForWindow(hWnd);
+        if (dpi == 0)
+            return;
+
+        var scale = dpi / 96.0d;
+        var windowWidth = 800 * scale;
+        var windowHeight = 520 * scale;
+        AppWindow.Resize(new SizeInt32((int)windowWidth, (int)windowHeight));
+    }
+
+    private void RootElement_Loaded(object sender, RoutedEventArgs e)
+    {
+        WindowHelper.SetWindowMinSize(this, 285, 56);
+        WindowHelper.SetWindowSize(this, 800, 520);
+        TitleBarHelper.ApplySystemThemeToCaptionButtons(this, _rootElement.ActualTheme);
+        _rootElement.ActualThemeChanged += (_, _) => TitleBarHelper.ApplySystemThemeToCaptionButtons(this, _rootElement.ActualTheme);
+    }
+
+    [LibraryImport("user32.dll", EntryPoint = "PostMessageA")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+    public const uint WM_NCMOUSEMOVE = 0x00A0;
+    public const int HTCAPTION = 2;
+    private void RootElement_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        // 当鼠标指针从标题栏按钮移到非客户区的穿透区域时，标题栏按钮仍会处于指针悬停状态
+        // 因此需要发送消息提醒窗口鼠标指针已离开标题栏按钮
+        // 实测 WM_NCMOUSELEAVE 消息不能解决此问题，可能是因为整个窗口都是非客户区
+        var hWnd = WindowNative.GetWindowHandle(this);
+        PostMessage(hWnd, WM_NCMOUSEMOVE, HTCAPTION, nint.Zero);
     }
 
 #if false

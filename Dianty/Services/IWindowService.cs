@@ -4,5 +4,6 @@ namespace Dianty.Services;
 
 internal interface IWindowService
 {
-    InputNonClientPointerSource GetInputNonClientPointerSource();
+    InputNonClientPointerSource? GetInputNonClientPointerSource();
+    InputActivationListener? GetInputActivationListener();
 }
