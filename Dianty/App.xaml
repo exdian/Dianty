@@ -19,7 +19,7 @@
             </DataTemplate>
 
             <DataTemplate x:Key="MainViewTemplate">
-                <views:MainView DataContext="{Binding}"/>
+                <views:MainView/>
             </DataTemplate>
 
             <utils:LoadViewTemplateSelector
