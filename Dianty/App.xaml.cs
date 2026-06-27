@@ -28,6 +28,7 @@ namespace Dianty;
 public partial class App : Application
 {
     private Window? _window;
+    private MainWindow? _mainWindow;
 
     /// <summary>
     /// Initializes the singleton application object.  This is the first line of authored code
@@ -45,8 +46,25 @@ public partial class App : Application
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
         var window = new MainWindow();
+        ServiceLocator.Init(RegisterService);
         window.ViewModel = new MainViewModel(window);
+        _mainWindow = window;
         _window = window;
         _window.Activate();
+    }
+
+    private void RegisterService()
+    {
+        var serviceLocator = ServiceLocator.Instance;
+        if (serviceLocator is null)
+            return;
+
+        if (_mainWindow is not null)
+        {
+            serviceLocator.Register<ITitleBarService>(_mainWindow);
+            serviceLocator.Register<IWindowService>(_mainWindow);
+            serviceLocator.Register<IQueueService>(_mainWindow);
+            serviceLocator.Register<ITemplateContent>(_mainWindow);
+        }
     }
 }

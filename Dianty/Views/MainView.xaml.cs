@@ -183,13 +183,13 @@ public sealed partial class MainView : UserControl
     {
         if (args.IsSettingsSelected)
         {
-            var viewModel = ServiceLocator.GetViewModel(SettingsPage);
+            var viewModel = ServiceLocator.Instance?.GetViewModel(SettingsPage);
             _contentFrame.Navigate(SettingsPage, viewModel, args.RecommendedNavigationTransitionInfo);
         }
         else if (args.SelectedItemContainer is not null)
         {
             Type navPageType = args.SelectedItemContainer.Tag as Type ?? HomePage;
-            var viewModel = ServiceLocator.GetViewModel(navPageType);
+            var viewModel = ServiceLocator.Instance?.GetViewModel(navPageType);
             _contentFrame.Navigate(navPageType, viewModel, args.RecommendedNavigationTransitionInfo);
         }
     }

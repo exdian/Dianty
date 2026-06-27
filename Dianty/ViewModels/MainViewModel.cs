@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Dianty.Services;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Dianty.ViewModels;
@@ -20,17 +21,24 @@ public partial class MainViewModel : ObservableObject
 
     private async void LoadDataAsync()
     {
-        var task = Task.Delay(300);
+        Task task = Task.CompletedTask;
+        Stopwatch? stopwatch = null;
 
-        // 模拟后台耗时操作
-        await Task.Delay(200);
-        ServiceLocator.RegisterViewModels();
+        // 后台耗时操作
+        await Task.Run(() =>
+        {
+            stopwatch = Stopwatch.StartNew();
+            task = Task.Delay(300);
+            ServiceLocator.Instance?.RegisterDefault();
+        });
+        Debug.WriteLine($"后台加载耗时: {stopwatch?.ElapsedMilliseconds} ms");
 
         // 至少加载 300 毫秒
         await task;
         _queueService.TryEnqueue(() =>
         {
             IsLoaded = true;
+            Debug.WriteLine($"实际加载完成耗时: {stopwatch?.ElapsedMilliseconds} ms");
         });
     }
 }

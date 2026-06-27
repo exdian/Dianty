@@ -25,8 +25,9 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
         SetWindowSize();
     }
 
+    private ITemplateContent TemplateContent => this;
+
     public MainViewModel? ViewModel { get; set; }
-    public ITemplateContent TemplateContent => this;
 
     public InputNonClientPointerSource? GetInputNonClientPointerSource()
     {
