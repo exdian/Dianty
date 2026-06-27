@@ -29,7 +29,7 @@ public partial class MainViewModel : ObservableObject
         {
             stopwatch = Stopwatch.StartNew();
             task = Task.Delay(300);
-            ServiceLocator.Instance?.RegisterDefault();
+            ServiceLocator.RegisterDefault();
         });
         Debug.WriteLine($"后台加载耗时: {stopwatch?.ElapsedMilliseconds} ms");
 

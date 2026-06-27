@@ -4,20 +4,18 @@ using System.Diagnostics;
 
 namespace Dianty.Services;
 
-public class ServiceLocator
+public static class ServiceLocator
 {
-    private readonly Dictionary<Type, object> _services = [];
-    private Action? _register;
-
-    public static ServiceLocator? Instance { get; private set; }
+    private static readonly Dictionary<Type, object> _services = [];
+    private static Action? _register;
 
     public static void Init(Action? register)
     {
-        var instance = new ServiceLocator { _register = register };
-        Instance = instance;
+        _services.Clear();
+        _register = register;
     }
 
-    public void RegisterDefault()
+    public static void RegisterDefault()
     {
         if (_register is null)
             return;
@@ -27,19 +25,19 @@ public class ServiceLocator
         register.Invoke();
     }
 
-    public void Register<T>(T service)
+    public static void Register<T>(T service)
     {
         Debug.Assert(service is not null);
         _services[typeof(T)] = service;
     }
 
-    public void Register<T>(Func<T> getService)
+    public static void Register<T>(Func<T> getService)
     {
         Debug.Assert(getService is not null);
         _services[typeof(T)] = getService;
     }
 
-    public T GetService<T>()
+    public static T GetService<T>()
     {
         var service = _services[typeof(T)];
         if (service is Func<T> func)
@@ -48,14 +46,14 @@ public class ServiceLocator
             return (T)service;
     }
 
-    public void RegisterViewModel(Type pageType, object viewModel)
+    public static void RegisterViewModel(Type pageType, object viewModel)
     {
         Debug.Assert(pageType is not null);
         Debug.Assert(viewModel is not null);
         _services[pageType] = viewModel;
     }
 
-    public object? GetViewModel(Type pageType)
+    public static object? GetViewModel(Type pageType)
     {
         Debug.Assert(pageType is not null);
         if (_services.TryGetValue(pageType, out var viewModel))

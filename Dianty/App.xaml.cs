@@ -55,16 +55,12 @@ public partial class App : Application
 
     private void RegisterService()
     {
-        var serviceLocator = ServiceLocator.Instance;
-        if (serviceLocator is null)
-            return;
-
         if (_mainWindow is not null)
         {
-            serviceLocator.Register<ITitleBarService>(_mainWindow);
-            serviceLocator.Register<IWindowService>(_mainWindow);
-            serviceLocator.Register<IQueueService>(_mainWindow);
-            serviceLocator.Register<ITemplateContent>(_mainWindow);
+            ServiceLocator.Register<ITitleBarService>(_mainWindow);
+            ServiceLocator.Register<IWindowService>(_mainWindow);
+            ServiceLocator.Register<IQueueService>(_mainWindow);
+            ServiceLocator.Register<ITemplateContent>(_mainWindow);
         }
     }
 }
