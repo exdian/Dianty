@@ -24,7 +24,7 @@
         <NavigationView
             x:Name="_navView"
             Loaded="NavView_Loaded" SelectionChanged="NavView_SelectionChanged" BackRequested="NavView_BackRequested"
-            LayoutUpdated="NavView_LayoutUpdated"
+            LayoutUpdated="NavView_LayoutUpdated" PaneClosed="NavView_PaneChanged" PaneOpened="NavView_PaneChanged"
             OpenPaneLength="120" CompactModeThresholdWidth="500" ExpandedModeThresholdWidth="750"
             IsBackEnabled="{x:Bind _contentFrame.CanGoBack, Mode=OneWay}">
             <NavigationView.Resources>

@@ -234,4 +234,10 @@ public sealed partial class MainView : UserControl
         UpdateDragRegion();
         UpdateIconRegion();
     }
+
+    private void NavView_PaneChanged(NavigationView sender, object args)
+    {
+        UpdateDragRegion();
+        UpdateIconRegion();
+    }
 }
