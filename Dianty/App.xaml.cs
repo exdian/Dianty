@@ -45,9 +45,7 @@ public partial class App : Application
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
         var window = new MainWindow();
-        ServiceLocator.Register<ITitleBarService>(window);
-        ServiceLocator.Register<IWindowService>(window);
-        window.ViewModel = new MainViewModel(window.DispatcherQueue);
+        window.ViewModel = new MainViewModel(window);
         _window = window;
         _window.Activate();
     }

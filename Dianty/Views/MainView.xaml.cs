@@ -14,16 +14,17 @@ namespace Dianty.Views;
 
 public sealed partial class MainView : UserControl
 {
-    public MainView()
+    public MainView(ITitleBarService titleBarService, IWindowService windowService)
     {
         InitializeComponent();
+        _titleBarService = titleBarService;
+        _windowService = windowService;
         // 导航按钮不居中，需要手动刷新一下
         _navView.IsPaneOpen = false;
         _navView.IsPaneOpen = true;
-
-        _windowService = ServiceLocator.GetService<IWindowService>();
     }
 
+    private readonly ITitleBarService _titleBarService;
     private readonly IWindowService _windowService;
     private readonly List<FrameworkElement> _interactableElements = [];
     private RectInt32[] _previousPassthroughRects = [];
@@ -36,6 +37,7 @@ public sealed partial class MainView : UserControl
     private Type WavesPage => typeof(WavesPage);
     private Type GamesPage => typeof(GamesPage);
     private Type SafetyPage => typeof(SafetyPage);
+    private static Type SettingsPage => typeof(SettingsPage);
 
     private void NavView_Loaded(object sender, RoutedEventArgs e)
     {
@@ -44,8 +46,7 @@ public sealed partial class MainView : UserControl
         var splitView = VisualTreeHelperExtension.FindChildByName(_navView, "RootSplitView") as SplitView;
         if (splitView is not null)
         {
-            var service = ServiceLocator.GetService<ITitleBarService>();
-            service.SetTitleBar(splitView);
+            _titleBarService.SetTitleBar(splitView);
 
             string[] interactableElementNames =
                 ["NavigationViewBackButton", "TogglePaneButton", "MenuItemsScrollViewer", "FooterItemsScrollViewer"];
@@ -182,12 +183,14 @@ public sealed partial class MainView : UserControl
     {
         if (args.IsSettingsSelected)
         {
-            _contentFrame.Navigate(typeof(SettingsPage), null, args.RecommendedNavigationTransitionInfo);
+            var viewModel = ServiceLocator.GetViewModel(SettingsPage);
+            _contentFrame.Navigate(SettingsPage, viewModel, args.RecommendedNavigationTransitionInfo);
         }
         else if (args.SelectedItemContainer is not null)
         {
             Type navPageType = args.SelectedItemContainer.Tag as Type ?? HomePage;
-            _contentFrame.Navigate(navPageType, null, args.RecommendedNavigationTransitionInfo);
+            var viewModel = ServiceLocator.GetViewModel(navPageType);
+            _contentFrame.Navigate(navPageType, viewModel, args.RecommendedNavigationTransitionInfo);
         }
     }
 
@@ -210,7 +213,7 @@ public sealed partial class MainView : UserControl
         if (_contentFrame.SourcePageType is null)
             return;
 
-        if (_contentFrame.SourcePageType == typeof(SettingsPage))
+        if (_contentFrame.SourcePageType == SettingsPage)
         {
             var selectedItem = (NavigationViewItem)_navView.SettingsItem;
             if (!ReferenceEquals(selectedItem, _navView.SelectedItem))

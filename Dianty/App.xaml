@@ -14,18 +14,6 @@
             </ResourceDictionary.MergedDictionaries>
             <!-- Other app resources here -->
 
-            <DataTemplate x:Key="LoadViewTemplate">
-                <views:LoadView/>
-            </DataTemplate>
-
-            <DataTemplate x:Key="MainViewTemplate">
-                <views:MainView/>
-            </DataTemplate>
-
-            <utils:LoadViewTemplateSelector
-                x:Key="LoadViewTemplateSelector"
-                LoadTemplate="{StaticResource LoadViewTemplate}" MainTemplate="{StaticResource MainViewTemplate}" />
-
         </ResourceDictionary>
     </Application.Resources>
 </Application>

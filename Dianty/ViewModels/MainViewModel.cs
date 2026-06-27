@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.UI.Dispatching;
+using Dianty.Services;
 using System;
 using System.Threading.Tasks;
 
@@ -7,13 +7,13 @@ namespace Dianty.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
-    public MainViewModel(DispatcherQueue dispatcher)
+    public MainViewModel(IQueueService queueService)
     {
-        _dispatcher = dispatcher;
+        _queueService = queueService;
         LoadDataAsync();
     }
 
-    private readonly DispatcherQueue _dispatcher;
+    private readonly IQueueService _queueService;
 
     [ObservableProperty]
     public partial bool IsLoaded { get; private set; }
@@ -24,10 +24,11 @@ public partial class MainViewModel : ObservableObject
 
         // 模拟后台耗时操作
         await Task.Delay(200);
+        ServiceLocator.RegisterViewModels();
 
         // 至少加载 300 毫秒
         await task;
-        _dispatcher.TryEnqueue(() =>
+        _queueService.TryEnqueue(() =>
         {
             IsLoaded = true;
         });

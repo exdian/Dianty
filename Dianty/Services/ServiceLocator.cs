@@ -34,12 +34,18 @@ internal class ServiceLocator
 
     }
 
-    public static T GetViewModel<T>(Type pageType)
+    public static object? GetViewModel(Type pageType)
     {
-        var viewModel = _services[pageType];
-        if (viewModel is Func<T> func)
-            return func();
+        if (_services.TryGetValue(pageType, out var viewModel))
+        {
+            if (viewModel is Func<object> func)
+                return func();
+            else
+                return viewModel;
+        }
         else
-            return (T)viewModel;
+        {
+            return null;
+        }
     }
 }

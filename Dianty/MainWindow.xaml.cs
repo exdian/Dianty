@@ -1,6 +1,8 @@
 using Dianty.Services;
 using Dianty.Utils;
 using Dianty.ViewModels;
+using Dianty.Views;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -13,7 +15,7 @@ namespace Dianty;
 /// <summary>
 /// An empty window that can be used on its own or navigated to within a Frame.
 /// </summary>
-public sealed partial class MainWindow : Window, ITitleBarService, IWindowService
+public sealed partial class MainWindow : Window, ITitleBarService, IWindowService, IQueueService, ITemplateContent
 {
     public MainWindow()
     {
@@ -24,6 +26,7 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
     }
 
     public MainViewModel? ViewModel { get; set; }
+    public ITemplateContent TemplateContent => this;
 
     public InputNonClientPointerSource? GetInputNonClientPointerSource()
     {
@@ -37,6 +40,23 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
         if (AppWindow is null)
             return null;
         return InputActivationListener.GetForWindowId(AppWindow.Id);
+    }
+
+    public bool TryEnqueue(DispatcherQueueHandler callback)
+    {
+        return DispatcherQueue.TryEnqueue(callback);
+    }
+
+    object? ITemplateContent.CreateContent(object? item)
+    {
+        if (item is bool value && value)
+        {
+            return new MainView(this, this);
+        }
+        else
+        {
+            return new LoadView();
+        }
     }
 
     [LibraryImport("user32.dll")]
