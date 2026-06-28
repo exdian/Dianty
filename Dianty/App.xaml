@@ -13,7 +13,7 @@
                 <!-- Other merged dictionaries here -->
             </ResourceDictionary.MergedDictionaries>
             <!-- Other app resources here -->
-
+            <x:Double x:Key="MinimalModeThresholdWidth">500</x:Double>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

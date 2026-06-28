@@ -25,13 +25,13 @@
             x:Name="_navView"
             Loaded="NavView_Loaded" SelectionChanged="NavView_SelectionChanged" BackRequested="NavView_BackRequested"
             LayoutUpdated="NavView_LayoutUpdated" PaneClosed="NavView_PaneChanged" PaneOpened="NavView_PaneChanged"
-            OpenPaneLength="120" CompactModeThresholdWidth="500" ExpandedModeThresholdWidth="750"
+            OpenPaneLength="120" CompactModeThresholdWidth="{StaticResource MinimalModeThresholdWidth}" ExpandedModeThresholdWidth="750"
             IsBackEnabled="{x:Bind _contentFrame.CanGoBack, Mode=OneWay}">
             <NavigationView.Resources>
                 <Thickness x:Key="NavigationViewContentMargin">0,48,0,0</Thickness>
                 <Thickness x:Key="NavigationViewMinimalContentMargin">0,48,0,0</Thickness>
             </NavigationView.Resources>
-            <Frame x:Name="_contentFrame" IsTabStop="True" Navigated="ContentFrame_Navigated" Padding="12,0"/>
+            <Frame x:Name="_contentFrame" IsTabStop="True" Navigated="ContentFrame_Navigated"/>
             <NavigationView.MenuItems>
                 <NavigationViewItem Icon="Home" Content="主页" Tag="{x:Bind HomePage}"/>
                 <NavigationViewItem Content="设备" Tag="{x:Bind DevicesPage}">
@@ -58,12 +58,11 @@
             <VisualStateGroup>
                 <VisualState>
                     <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="{x:Bind _navView.CompactModeThresholdWidth}" />
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource MinimalModeThresholdWidth}" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <!-- NavigationView.DisplayMode != Minimal -->
                         <Setter Target="_appIcon.Margin" Value="0"/>
-                        <Setter Target="_contentFrame.Padding" Value="24,0"/>
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>

@@ -8,17 +8,19 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid RowSpacing="12">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <TextBlock Text="玩法" Style="{StaticResource TitleTextBlockStyle}"/>
+        <TextBlock x:Name="_gamesPageHeader" Text="玩法" Style="{StaticResource TitleTextBlockStyle}" Margin="12,6,12,12"/>
         <ScrollViewer
+            x:Name="_gamesPageContent"
             Grid.Row="1"
+            Padding="12,0"
             VerticalScrollBarVisibility="Auto"
             VerticalScrollMode="Auto">
-            <StackPanel Spacing="4" Margin="0,0,0,24">
+            <StackPanel x:Name="_gamesPageStackPanel" Spacing="4" Margin="0,0,0,24" Loaded="StackPanel_Loaded">
                 <StackPanel.ChildrenTransitions>
                     <RepositionThemeTransition />
                 </StackPanel.ChildrenTransitions>
@@ -72,40 +74,7 @@
                         DisplayMemberPath="DisplayName"
                         SelectedValuePath="Value" />
                 </toolkit:SettingsCard>
-                <TextBlock Text="规则设置" Style="{StaticResource BodyStrongTextBlockStyle}" Margin="1,14,0,4"/>
-                <toolkit:SettingsExpander Header="侠盗猎车手 罪恶都市" Description="包含6项规则">
-                    <toolkit:SettingsExpander.HeaderIcon>
-                        <FontIcon Glyph="&#xE804;"/>
-                    </toolkit:SettingsExpander.HeaderIcon>
-                    <ToggleSwitch/>
-                    <toolkit:SettingsExpander.Items>
-                        <toolkit:SettingsCard IsClickEnabled="True">
-                            <toolkit:SettingsCard.Header>
-                                <ScrollViewer
-                                    VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto"
-                                    VerticalScrollMode="Disabled" HorizontalScrollMode="Auto"
-                                    Padding="0,12">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="每损失" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
-                                        <NumberBox
-                                            SpinButtonPlacementMode="Inline"
-                                            Value="1" SmallChange="1" LargeChange="20" Minimum="-200" Maximum="200"/>
-                                        <TextBlock Text="生命值，惩罚强度" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
-                                        <NumberBox
-                                            SpinButtonPlacementMode="Inline"
-                                            Value="1" SmallChange="1" LargeChange="20" Minimum="-200" Maximum="200"/>
-                                    </StackPanel>
-                                </ScrollViewer>
-                            </toolkit:SettingsCard.Header>
-                            <ToggleSwitch/>
-                            <toolkit:SettingsCard.ActionIcon>
-                                <!-- 当 IsClickEnabled=True 时，有默认图标，此处替换为空白 -->
-                                <PathIcon Data="M0 0L1 1"/>
-                            </toolkit:SettingsCard.ActionIcon>
-                        </toolkit:SettingsCard>
-                    </toolkit:SettingsExpander.Items>
-                </toolkit:SettingsExpander>
-
+                <TextBlock Text="规则" Style="{StaticResource BodyStrongTextBlockStyle}" Margin="1,14,0,4"/>
                 <toolkit:SettingsExpander Header="敬请期待">
                     <toolkit:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE897;"/>
@@ -121,5 +90,19 @@
                 </toolkit:SettingsExpander>
             </StackPanel>
         </ScrollViewer>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource MinimalModeThresholdWidth}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <!-- NavigationView.DisplayMode != Minimal -->
+                        <Setter Target="_gamesPageHeader.Margin" Value="24,12"/>
+                        <Setter Target="_gamesPageContent.Padding" Value="24,0"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
     </Grid>
 </Page>

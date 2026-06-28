@@ -1,6 +1,6 @@
 ﻿namespace Dianty.Models;
 
-internal class GameManager
+public class GameManager
 {
     public class Game
     {

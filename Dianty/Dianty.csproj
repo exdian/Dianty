@@ -15,6 +15,7 @@
   <ItemGroup>
     <None Remove="LoadView.xaml" />
     <None Remove="MainView.xaml" />
+    <None Remove="Views\Controls\GtaVcRulesCard.xaml" />
     <None Remove="Views\Pages\DevicesPage.xaml" />
     <None Remove="Views\Pages\GamesPage.xaml" />
     <None Remove="Views\Pages\HomePage.xaml" />
@@ -64,6 +65,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\DiantyCore\GameMonitor\GameMonitor.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Controls\GtaVcRulesCard.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\Pages\SafetyPage.xaml">

@@ -48,6 +48,11 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
         return DispatcherQueue.TryEnqueue(callback);
     }
 
+    public bool TryEnqueue(DispatcherQueuePriority priority, DispatcherQueueHandler callback)
+    {
+        return DispatcherQueue.TryEnqueue(priority, callback);
+    }
+
     object? ITemplateContent.CreateContent(object? item)
     {
         if (item is bool value && value)

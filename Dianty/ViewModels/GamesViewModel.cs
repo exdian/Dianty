@@ -3,7 +3,7 @@ using static Dianty.Models.GameManager;
 
 namespace Dianty.ViewModels;
 
-internal partial class GamesViewModel : ObservableObject
+public partial class GamesViewModel : ObservableObject
 {
     public GamesViewModel()
     {

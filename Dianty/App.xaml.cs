@@ -45,6 +45,8 @@ public partial class App : Application
             ServiceLocator.Register<ITemplateContent>(_mainWindow);
         }
 
-        ServiceLocator.RegisterViewModel(typeof(GamesPage), new GamesViewModel());
+        ServiceLocator.RegisterViewModel(typeof(GamesPage), new GamesPage.RequiredParameter(
+            new GamesViewModel(),
+            ServiceLocator.GetService<IQueueService>()));
     }
 }

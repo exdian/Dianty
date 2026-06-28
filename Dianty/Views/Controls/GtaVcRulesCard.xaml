@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="Dianty.Views.Controls.GtaVcRulesCard"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <toolkit:SettingsExpander Header="侠盗飞车 罪恶都市" Description="包含6项规则">
+        <toolkit:SettingsExpander.HeaderIcon>
+            <FontIcon Glyph="&#xE804;"/>
+        </toolkit:SettingsExpander.HeaderIcon>
+        <ToggleSwitch/>
+        <toolkit:SettingsExpander.Items>
+            <toolkit:SettingsCard IsClickEnabled="True">
+                <toolkit:SettingsCard.Header>
+                    <ScrollViewer
+                        VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto"
+                        VerticalScrollMode="Disabled" HorizontalScrollMode="Auto"
+                        Padding="0,12">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="每损失" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
+                            <NumberBox
+                                SpinButtonPlacementMode="Inline"
+                                Value="1" SmallChange="1" LargeChange="20" Minimum="-200" Maximum="200"/>
+                            <TextBlock Text="生命值，惩罚强度" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
+                            <NumberBox
+                                SpinButtonPlacementMode="Inline"
+                                Value="1" SmallChange="1" LargeChange="20" Minimum="-200" Maximum="200"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </toolkit:SettingsCard.Header>
+                <ToggleSwitch/>
+                <toolkit:SettingsCard.ActionIcon>
+                    <!-- 当 IsClickEnabled=True 时，有默认图标，此处替换为空白 -->
+                    <PathIcon Data="M0 0L1 1"/>
+                </toolkit:SettingsCard.ActionIcon>
+            </toolkit:SettingsCard>
+        </toolkit:SettingsExpander.Items>
+    </toolkit:SettingsExpander>
+</UserControl>

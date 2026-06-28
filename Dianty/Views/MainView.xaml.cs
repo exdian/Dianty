@@ -19,6 +19,7 @@ public sealed partial class MainView : UserControl
         InitializeComponent();
         _titleBarService = titleBarService;
         _windowService = windowService;
+
         // 导航按钮不居中，需要手动刷新一下
         _navView.IsPaneOpen = false;
         _navView.IsPaneOpen = true;
