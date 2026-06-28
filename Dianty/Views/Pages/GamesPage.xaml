@@ -71,8 +71,8 @@
                         PlaceholderText="选择处理模式"
                         ItemsSource="{x:Bind ViewModel.StrengthModes}"
                         SelectedItem="{x:Bind ViewModel.CurrentGamesStrengthMode, Mode=TwoWay}"
-                        DisplayMemberPath="DisplayName"
-                        SelectedValuePath="Value" />
+                        SelectedValuePath="Key"
+                        DisplayMemberPath="Value" />
                 </toolkit:SettingsCard>
                 <TextBlock Text="规则" Style="{StaticResource BodyStrongTextBlockStyle}" Margin="1,14,0,4"/>
                 <toolkit:SettingsExpander Header="敬请期待">

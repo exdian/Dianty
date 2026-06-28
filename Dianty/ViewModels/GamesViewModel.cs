@@ -1,4 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System.Collections.Generic;
+using System.Linq;
 using static Dianty.Models.GameManager;
 
 namespace Dianty.ViewModels;
@@ -7,18 +9,20 @@ public partial class GamesViewModel : ObservableObject
 {
     public GamesViewModel()
     {
-        StrengthModes =
-            [new StrengthModeItem { Value = Mode.Max, DisplayName = "取最大值" },
-            new StrengthModeItem { Value = Mode.Add, DisplayName = "叠加强度" }];
+        StrengthModes = new Dictionary<Mode, string>
+        {
+            [Mode.Max] = "取最大值",
+            [Mode.Add] = "叠加强度"
+        }.ToArray();
 
-        CurrentGamesStrengthMode = StrengthModes[0];
-        CurrentGtaVcStrengthMode = StrengthModes[0];
+        CurrentGamesStrengthMode = StrengthModes.First();
+        CurrentGtaVcStrengthMode = StrengthModes.First();
     }
 
-    public StrengthModeItem[] StrengthModes { get; }
+    public KeyValuePair<Mode, string>[] StrengthModes { get; }
 
     [ObservableProperty]
-    public partial StrengthModeItem CurrentGamesStrengthMode { get; set; }
+    public partial KeyValuePair<Mode, string> CurrentGamesStrengthMode { get; set; }
 
     [ObservableProperty]
     public partial int OutputStrength { get; private set; }
@@ -27,7 +31,5 @@ public partial class GamesViewModel : ObservableObject
     public partial int EnableGameCount { get; private set; }
 
     [ObservableProperty]
-    public partial StrengthModeItem CurrentGtaVcStrengthMode { get; set; }
-
-    public readonly record struct StrengthModeItem(Mode Value, string DisplayName);
+    public partial KeyValuePair<Mode, string> CurrentGtaVcStrengthMode { get; set; }
 }

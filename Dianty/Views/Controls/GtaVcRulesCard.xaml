@@ -22,8 +22,8 @@
                     PlaceholderText="选择处理模式"
                     ItemsSource="{x:Bind ViewModel.StrengthModes}"
                     SelectedItem="{x:Bind ViewModel.CurrentGtaVcStrengthMode, Mode=TwoWay}"
-                    DisplayMemberPath="DisplayName"
-                    SelectedValuePath="Value" />
+                    SelectedValuePath="Key"
+                    DisplayMemberPath="Value" />
             </toolkit:SettingsCard>
             <toolkit:SettingsCard IsClickEnabled="True">
                 <toolkit:SettingsCard.Header>
