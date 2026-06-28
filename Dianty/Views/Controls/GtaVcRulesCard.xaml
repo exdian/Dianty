@@ -8,12 +8,23 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <toolkit:SettingsExpander Header="侠盗飞车 罪恶都市" Description="包含6项规则">
+    <toolkit:SettingsExpander Header="侠盗飞车 罪恶都市" Description="包含6条规则">
         <toolkit:SettingsExpander.HeaderIcon>
             <FontIcon Glyph="&#xE804;"/>
         </toolkit:SettingsExpander.HeaderIcon>
         <ToggleSwitch/>
         <toolkit:SettingsExpander.Items>
+            <toolkit:SettingsCard Header="此玩法的规则强度模式" Description="多条规则同时生效时">
+                <toolkit:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE9E9;"/>
+                </toolkit:SettingsCard.HeaderIcon>
+                <ComboBox
+                    PlaceholderText="选择处理模式"
+                    ItemsSource="{x:Bind ViewModel.StrengthModes}"
+                    SelectedItem="{x:Bind ViewModel.CurrentGtaVcStrengthMode, Mode=TwoWay}"
+                    DisplayMemberPath="DisplayName"
+                    SelectedValuePath="Value" />
+            </toolkit:SettingsCard>
             <toolkit:SettingsCard IsClickEnabled="True">
                 <toolkit:SettingsCard.Header>
                     <ScrollViewer

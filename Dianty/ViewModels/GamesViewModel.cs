@@ -11,13 +11,14 @@ public partial class GamesViewModel : ObservableObject
             [new StrengthModeItem { Value = Mode.Max, DisplayName = "取最大值" },
             new StrengthModeItem { Value = Mode.Add, DisplayName = "叠加强度" }];
 
-        CurrentStrengthMode = StrengthModes[0];
+        CurrentGamesStrengthMode = StrengthModes[0];
+        CurrentGtaVcStrengthMode = StrengthModes[0];
     }
 
     public StrengthModeItem[] StrengthModes { get; }
 
     [ObservableProperty]
-    public partial StrengthModeItem CurrentStrengthMode { get; set; }
+    public partial StrengthModeItem CurrentGamesStrengthMode { get; set; }
 
     [ObservableProperty]
     public partial int OutputStrength { get; private set; }
@@ -25,9 +26,8 @@ public partial class GamesViewModel : ObservableObject
     [ObservableProperty]
     public partial int EnableGameCount { get; private set; }
 
-    public class StrengthModeItem
-    {
-        public Mode Value { get; set; }
-        public string? DisplayName { get; set; }
-    }
+    [ObservableProperty]
+    public partial StrengthModeItem CurrentGtaVcStrengthMode { get; set; }
+
+    public readonly record struct StrengthModeItem(Mode Value, string DisplayName);
 }

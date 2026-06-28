@@ -38,11 +38,11 @@ public sealed partial class GamesPage : Page
 
         _queueService.TryEnqueue(DispatcherQueuePriority.Low, () =>
         {
-            var rulesCard = new GtaVcRulesCard();
+            var rulesCard = new GtaVcRulesCard(ViewModel);
             var collection = _gamesPageStackPanel.Children;
             collection.Insert(collection.Count - 1, rulesCard);
         });
     }
 
-    public record struct RequiredParameter(GamesViewModel ViewModel, IQueueService QueueService);
+    public readonly record struct RequiredParameter(GamesViewModel ViewModel, IQueueService QueueService);
 }

@@ -70,7 +70,7 @@
                     <ComboBox
                         PlaceholderText="选择处理模式"
                         ItemsSource="{x:Bind ViewModel.StrengthModes}"
-                        SelectedItem="{x:Bind ViewModel.CurrentStrengthMode, Mode=TwoWay}"
+                        SelectedItem="{x:Bind ViewModel.CurrentGamesStrengthMode, Mode=TwoWay}"
                         DisplayMemberPath="DisplayName"
                         SelectedValuePath="Value" />
                 </toolkit:SettingsCard>
