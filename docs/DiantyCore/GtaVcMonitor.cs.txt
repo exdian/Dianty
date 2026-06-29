@@ -1,0 +1,82 @@
+﻿namespace GameMonitor;
+
+public class GtaVcMonitor  
+{
+    public GtaVcMonitor(IMemoryService memoryService);
+    public int? CurrentPid { get; }
+    public bool IsReplaying { get; }
+    public uint PlayingTime { get; }
+    public PlayerState CurrentPlayerState { get; }
+    public int PlayerWantedLevel { get; }
+    public float CurrentHealth { get; }
+    public float CurrentArmor { get; }
+    public event EventHandler<PlayerTookDamageEventArgs>? PlayerTookDamage;
+    public event EventHandler<PlayerBustedEventArgs>? PlayerBusted;
+    public event EventHandler<PlayerWastedEventArgs>? PlayerWasted;
+    public event EventHandler<PlayerWantedLevelChangedEventArgs>? PlayerWantedLevelChanged;
+    public event EventHandler<PlayerFellOffBikeEventArgs>? PlayerFellOffBike;
+    public void Start();
+    public void Stop();
+    public class PlayerTookDamageEventArgs(float damage) : EventArgs 
+    {
+        public float Damage { get; }
+    }
+    public class PlayerBustedEventArgs(int level) : EventArgs 
+    {
+        public int Level { get; }
+    }
+    public class PlayerWastedEventArgs(bool isMiTang) : EventArgs 
+    {
+        public bool IsMiTang { get; }
+    }
+    public class PlayerWantedLevelChangedEventArgs(int diff) : EventArgs 
+    {
+        public int Diff { get; }
+    }
+    public class PlayerFellOffBikeEventArgs(VehicleId vehicleId) : EventArgs 
+    {
+        public VehicleId BikeType { get; }
+    }
+    public enum PlayerState : int
+    {
+        Unknown,
+        Stand = 1,
+        WalkingAnimation = 6,
+        AimingDownSights = 12,
+        UseWeapon = 16,
+        Fight = 17,
+        RaiseGun = 22,
+        AutoPathfinding = 24,
+        AnswerPhone = 36,
+        Jumping = 41,
+        FallDown = 42,
+        GettingUp = 43,
+        InVehicle = 50,
+        DeathAnimation = 54,
+        Wasted = 55,
+        RoughlyGetVehicle = 56,
+        DraggedOutOfVehicle = 57,
+        FriendlyGetVehicle = 58,
+        GetOutOfVehicle = 60,
+        Busted = 62,
+    }
+    public enum VehicleId : short
+    {
+        Unknown,
+        Angel = 166,
+        PizzaBoy = 178,
+        PCJ600 = 191,
+        Faggio = 192,
+        Freeway = 193,
+        Sanchez = 198,
+    }
+    public enum VehicleType : byte
+    {
+        Unknown,
+        Bike = 0x40,
+        Car = 0x41,
+        HelicoptersOrBigVehicle = 0x42,
+        BoatOrTank = 0x43,
+    }
+}
+

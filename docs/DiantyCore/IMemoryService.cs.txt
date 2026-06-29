@@ -1,0 +1,11 @@
+﻿namespace GameMonitor;
+
+public interface IMemoryService  
+{
+    bool HasAccessed { get; }
+    nint BaseAddress { get; }
+    bool TryAccessProcess(string processName, string moduleName, out int pid);
+    bool TryReadMemory<T>(nint address, out T value) where T : struct;
+    bool TryReadMemory<T>(nint address, int[] offsets, out T value) where T : struct;
+}
+
