@@ -2,6 +2,7 @@
 using Dianty.ViewModels;
 using Dianty.Views.Pages;
 using Microsoft.UI.Xaml;
+using System;
 
 namespace Dianty;
 /// <summary>
@@ -29,6 +30,7 @@ public partial class App : Application
     {
         var window = new MainWindow();
         ServiceLocator.Init(RegisterService);
+        ResourceLoader.Init(MergedDictionaries);
         window.ViewModel = new MainViewModel(window);
         _mainWindow = window;
         _window = window;
@@ -48,5 +50,13 @@ public partial class App : Application
         ServiceLocator.RegisterViewModel(typeof(GamesPage), new GamesPage.RequiredParameter(
             new GamesViewModel(),
             ServiceLocator.GetService<IQueueService>()));
+
+    }
+
+    private void MergedDictionaries()
+    {
+        var newDictionary = new ResourceDictionary();
+        LoadComponent(newDictionary, new Uri("ms-appx:///AppResourceDictionary.xaml", UriKind.Absolute));
+        Resources.MergedDictionaries.Add(newDictionary);
     }
 }
