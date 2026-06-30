@@ -12,7 +12,7 @@
         <toolkit:SettingsExpander.HeaderIcon>
             <FontIcon Glyph="&#xE804;"/>
         </toolkit:SettingsExpander.HeaderIcon>
-        <ToggleSwitch/>
+        <ToggleSwitch IsOn="{x:Bind ViewModel.GtaVcEnable, Mode=TwoWay}"/>
         <toolkit:SettingsExpander.Items>
             <toolkit:SettingsCard Header="此玩法的规则强度模式" Description="多条规则同时生效时">
                 <toolkit:SettingsCard.HeaderIcon>
@@ -21,7 +21,7 @@
                 <ComboBox
                     PlaceholderText="选择处理模式"
                     ItemsSource="{x:Bind ViewModel.StrengthModes}"
-                    SelectedItem="{x:Bind ViewModel.CurrentGtaVcStrengthMode, Mode=TwoWay}"
+                    SelectedItem="{x:Bind ViewModel.GtaVcStrengthMode, Mode=TwoWay}"
                     SelectedValuePath="Key"
                     DisplayMemberPath="Value" />
             </toolkit:SettingsCard>
@@ -32,18 +32,20 @@
                         VerticalScrollMode="Disabled" HorizontalScrollMode="Auto"
                         Padding="0,12">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="每损失" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
+                            <TextBlock Text="每受到" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
                             <NumberBox
-                                SpinButtonPlacementMode="Inline"
-                                Value="1" SmallChange="1" LargeChange="20" Minimum="-200" Maximum="200"/>
-                            <TextBlock Text="生命值，惩罚强度" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
+                                SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
+                                Value="{x:Bind ViewModel.GtaVcDamageRuleThreshold, Mode=TwoWay}"
+                                SmallChange="1" LargeChange="20" Minimum="-200" Maximum="200"/>
+                            <TextBlock Text="伤害，惩罚强度" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
                             <NumberBox
-                                SpinButtonPlacementMode="Inline"
-                                Value="1" SmallChange="1" LargeChange="20" Minimum="-200" Maximum="200"/>
+                                SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
+                                Value="{x:Bind ViewModel.GtaVcDamageRuleStrength, Mode=TwoWay}"
+                                SmallChange="1" LargeChange="20" Minimum="-200" Maximum="200"/>
                         </StackPanel>
                     </ScrollViewer>
                 </toolkit:SettingsCard.Header>
-                <ToggleSwitch/>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.GtaVcDamageRuleEnable, Mode=TwoWay}"/>
                 <toolkit:SettingsCard.ActionIcon>
                     <!-- 当 IsClickEnabled=True 时，有默认图标，此处替换为空白 -->
                     <PathIcon Data="M0 0L1 1"/>

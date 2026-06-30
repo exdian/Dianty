@@ -1,35 +1,71 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Dianty.Models;
+using GameMonitor;
 using System.Collections.Generic;
 using System.Linq;
-using static Dianty.Models.GameManager;
+using static Dianty.Models.AutomaticStrength;
 
 namespace Dianty.ViewModels;
 
 public partial class GamesViewModel : ObservableObject
 {
-    public GamesViewModel()
+    public GamesViewModel(IMemoryService memoryService)
     {
+        _gameManager = new GameManager(memoryService);
+
         StrengthModes = new Dictionary<Mode, string>
         {
             [Mode.Max] = "取最大值",
-            [Mode.Add] = "叠加强度"
+            [Mode.Sum] = "叠加强度"
         }.ToArray();
 
-        CurrentGamesStrengthMode = StrengthModes.First();
-        CurrentGtaVcStrengthMode = StrengthModes.First();
+        GamesStrengthMode = StrengthModes.First();
+        GtaVcStrengthMode = StrengthModes.First();
     }
+
+    private readonly GameManager _gameManager;
 
     public KeyValuePair<Mode, string>[] StrengthModes { get; }
 
+    // 概况
     [ObservableProperty]
-    public partial KeyValuePair<Mode, string> CurrentGamesStrengthMode { get; set; }
+    public partial int EnableGameCount { get; private set; }
 
     [ObservableProperty]
     public partial int OutputStrength { get; private set; }
 
     [ObservableProperty]
-    public partial int EnableGameCount { get; private set; }
+    public partial KeyValuePair<Mode, string> GamesStrengthMode { get; set; }
+
+    // 规则
+    // 罪恶都市
+    [ObservableProperty]
+    public partial bool GtaVcEnable { get; set; }
 
     [ObservableProperty]
-    public partial KeyValuePair<Mode, string> CurrentGtaVcStrengthMode { get; set; }
+    public partial KeyValuePair<Mode, string> GtaVcStrengthMode { get; set; }
+
+    [ObservableProperty]
+    public partial bool GtaVcDamageRuleEnable { get; set; }
+
+    [ObservableProperty]
+    public partial double GtaVcDamageRuleThreshold { get; set; }
+
+    [ObservableProperty]
+    public partial double GtaVcDamageRuleStrength { get; set; }
+
+    partial void OnGamesStrengthModeChanged(KeyValuePair<Mode, string> value)
+    {
+        _gameManager.StrengthMode = value.Key;
+    }
+
+    partial void OnGtaVcEnableChanged(bool value)
+    {
+        _gameManager.GtaVcGameRule.IsEnable = value;
+    }
+
+    partial void OnGtaVcStrengthModeChanged(KeyValuePair<Mode, string> value)
+    {
+        _gameManager.GtaVcGameRule.StrengthMode = value.Key;
+    }
 }

@@ -1,18 +1,61 @@
-﻿namespace Dianty.Models;
+﻿using GameMonitor;
+using System.Collections.Generic;
 
-public class GameManager
+namespace Dianty.Models;
+
+public class GameManager : AutomaticStrength
 {
-    public class Game
+    public GameManager(IMemoryService memoryService)
     {
-        public string? Name { get; set; }
-        public string? Description { get; set; }
-        public bool IsEnable { get; set; }
-        public Mode StrengthMode { get; set; }
-        public int OutputStrength { get; set; }
+        GtaVcGameRule = new GtaVcGameRule(memoryService);
+        GtaVcGameRule.OutputStrengthChanged += GtaVcGameRule_OutputStrengthChanged;
+
+        _gameRules.Add(GtaVcGameRule);
     }
 
-    public enum Mode
+    private readonly List<GameRule> _gameRules = [];
+
+    public GtaVcGameRule GtaVcGameRule { get; }
+
+    private void GtaVcGameRule_OutputStrengthChanged(object? sender, OutputStrengthChangedEventArgs e)
     {
-        Max, Add
+        ComputeOutputStrength();
+    }
+
+    protected override int GetMaxStrength()
+    {
+        int result = 0;
+        for (int i = 0; i < _gameRules.Count; i++)
+        {
+            var gameRulerule = _gameRules[i];
+            if (gameRulerule.IsEnable && gameRulerule.OutputStrength > result)
+            {
+                result = gameRulerule.OutputStrength;
+            }
+        }
+        return result;
+    }
+
+    protected override int SumStrength()
+    {
+        int result = 0;
+        for (int i = 0; i < _gameRules.Count; i++)
+        {
+            var gameRulerule = _gameRules[i];
+            if (gameRulerule.IsEnable && gameRulerule.OutputStrength > 0)
+            {
+                result = result + gameRulerule.OutputStrength;
+            }
+        }
+        return result;
+    }
+
+    public abstract class GameRule : AutomaticStrength
+    {
+        public string Name { get; set; } = string.Empty;
+
+        public string Description { get; set; } = string.Empty;
+
+        public virtual bool IsEnable { get; set; }
     }
 }

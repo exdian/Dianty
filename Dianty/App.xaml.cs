@@ -1,6 +1,8 @@
-﻿using Dianty.Services;
+﻿using Dianty.Models;
+using Dianty.Services;
 using Dianty.ViewModels;
 using Dianty.Views.Pages;
+using GameMonitor;
 using Microsoft.UI.Xaml;
 using System;
 
@@ -47,8 +49,10 @@ public partial class App : Application
             ServiceLocator.Register<ITemplateContent>(_mainWindow);
         }
 
+        ServiceLocator.Register<IMemoryService>(static () => new MemoryService());
+
         ServiceLocator.RegisterViewModel(typeof(GamesPage), new GamesPage.RequiredParameter(
-            new GamesViewModel(),
+            new GamesViewModel(ServiceLocator.GetService<IMemoryService>()),
             ServiceLocator.GetService<IQueueService>()));
 
     }
