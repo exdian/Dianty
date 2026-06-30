@@ -22,28 +22,33 @@
                     PlaceholderText="选择处理模式"
                     ItemsSource="{x:Bind ViewModel.StrengthModes}"
                     SelectedItem="{x:Bind ViewModel.GtaVcStrengthMode, Mode=TwoWay}"
-                    SelectedValuePath="Key"
-                    DisplayMemberPath="Value" />
+                    SelectedValuePath="Key" DisplayMemberPath="Value" />
             </toolkit:SettingsCard>
             <toolkit:SettingsCard IsClickEnabled="True">
                 <toolkit:SettingsCard.Header>
-                    <ScrollViewer
-                        VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto"
-                        VerticalScrollMode="Disabled" HorizontalScrollMode="Auto"
-                        Padding="0,12">
+                    <StackPanel Spacing="{StaticResource CommonCardSpacing}">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="每受到" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
+                            <TextBlock Text="每累计受到伤害" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
                             <NumberBox
                                 SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
                                 Value="{x:Bind ViewModel.GtaVcDamageRuleThreshold, Mode=TwoWay}"
                                 SmallChange="1" LargeChange="20" Minimum="-200" Maximum="200"/>
-                            <TextBlock Text="伤害，惩罚强度" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="惩罚强度" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
                             <NumberBox
                                 SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
                                 Value="{x:Bind ViewModel.GtaVcDamageRuleStrength, Mode=TwoWay}"
                                 SmallChange="1" LargeChange="20" Minimum="-200" Maximum="200"/>
                         </StackPanel>
-                    </ScrollViewer>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="持续时间（秒）" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
+                            <NumberBox
+                                SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
+                                Value="{x:Bind ViewModel.GtaVcDamageRuleDuration, Mode=TwoWay}"
+                                SmallChange="1" LargeChange="10" Minimum="0" Maximum="200"/>
+                        </StackPanel>
+                    </StackPanel>
                 </toolkit:SettingsCard.Header>
                 <ToggleSwitch IsOn="{x:Bind ViewModel.GtaVcDamageRuleEnable, Mode=TwoWay}"/>
                 <toolkit:SettingsCard.ActionIcon>

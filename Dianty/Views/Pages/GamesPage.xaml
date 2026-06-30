@@ -15,12 +15,9 @@
         </Grid.RowDefinitions>
         <TextBlock x:Name="_gamesPageHeader" Text="玩法" Style="{StaticResource TitleTextBlockStyle}" Margin="12,6,12,12"/>
         <ScrollViewer
-            x:Name="_gamesPageContent"
-            Grid.Row="1"
-            Padding="12,0"
-            VerticalScrollBarVisibility="Auto"
-            VerticalScrollMode="Auto">
-            <StackPanel x:Name="_gamesPageStackPanel" Spacing="4" Margin="0,0,0,24" Loaded="StackPanel_Loaded">
+            x:Name="_gamesPageContent" Grid.Row="1" Padding="12,0"
+            VerticalScrollBarVisibility="Auto" VerticalScrollMode="Auto">
+            <StackPanel x:Name="_gamesPageStackPanel" Spacing="{StaticResource CommonCardSpacing}" Margin="0,0,0,24" Loaded="StackPanel_Loaded">
                 <StackPanel.ChildrenTransitions>
                     <RepositionThemeTransition />
                 </StackPanel.ChildrenTransitions>
@@ -44,24 +41,20 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock
                         Grid.Row="0" Grid.Column="0"
-                        Text="生效玩法"
-                        FontWeight="SemiBold"
+                        Text="生效玩法" FontWeight="SemiBold"
                         Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                     <TextBlock
                         Grid.Row="1" Grid.Column="0"
                         Text="{x:Bind ViewModel.EnableGameCount, Mode=OneWay}"
-                        FontSize="20"
-                        FontWeight="Bold" />
+                        FontSize="20" FontWeight="Bold" />
                     <TextBlock
                         Grid.Row="0" Grid.Column="1"
-                        Text="输出强度"
-                        FontWeight="SemiBold"
+                        Text="输出强度" FontWeight="SemiBold"
                         Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                     <TextBlock
                         Grid.Row="1" Grid.Column="1"
                         Text="{x:Bind ViewModel.OutputStrength, Mode=OneWay}"
-                        FontSize="20"
-                        FontWeight="Bold" />
+                        FontSize="20" FontWeight="Bold" />
                 </Grid>
                 <toolkit:SettingsCard Header="强度模式" Description="多个玩法同时生效时">
                     <toolkit:SettingsCard.HeaderIcon>
@@ -71,8 +64,7 @@
                         PlaceholderText="选择处理模式"
                         ItemsSource="{x:Bind ViewModel.StrengthModes}"
                         SelectedItem="{x:Bind ViewModel.GamesStrengthMode, Mode=TwoWay}"
-                        SelectedValuePath="Key"
-                        DisplayMemberPath="Value" />
+                        SelectedValuePath="Key" DisplayMemberPath="Value" />
                 </toolkit:SettingsCard>
                 <TextBlock Text="规则" Style="{StaticResource BodyStrongTextBlockStyle}" Margin="1,14,0,4"/>
                 <toolkit:SettingsExpander Header="敬请期待">

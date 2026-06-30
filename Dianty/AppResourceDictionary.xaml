@@ -6,6 +6,7 @@
     xmlns:format="using:Windows.Globalization.NumberFormatting">
 
     <x:Double x:Key="MinimalModeThresholdWidth">500</x:Double>
+    <x:Double x:Key="CommonCardSpacing">4</x:Double>
 
     <format:DecimalFormatter x:Key="DecimalIntegerFormatter" IntegerDigits="1" FractionDigits="0">
         <format:DecimalFormatter.NumberRounder>

@@ -1,5 +1,7 @@
 ﻿using GameMonitor;
 using System;
+using System.Diagnostics;
+using System.Linq;
 using static Dianty.Models.GameManager;
 using static GameMonitor.GtaVcMonitor;
 
@@ -10,6 +12,8 @@ public class GtaVcGameRule : GameRule
     public GtaVcGameRule(IMemoryService memoryService)
     {
         _monitor = new GtaVcMonitor(memoryService);
+        _stopwatch = Stopwatch.StartNew();
+        _monitor.PlayerTookDamage += Monitor_PlayerTookDamage;
         _monitor.PlayerBusted += Monitor_PlayerBusted;
         _monitor.PlayerWasted += Monitor_PlayerWasted;
         _monitor.PlayerWantedLevelChanged += Monitor_PlayerWantedLevelChanged;
@@ -19,11 +23,13 @@ public class GtaVcGameRule : GameRule
     ~GtaVcGameRule()
     {
         _monitor.Stop();
+        _stopwatch.Stop();
     }
 
     private readonly GtaVcMonitor _monitor;
+    private readonly Stopwatch _stopwatch;
     private float _playerTookDamageTotal;
-    private int _damageRuleOutputStrength;
+    private long _damageRuleStart;
 
     public override bool IsEnable
     {
@@ -46,12 +52,9 @@ public class GtaVcGameRule : GameRule
             if (field != value)
             {
                 field = value;
-                if (value)
-                    _monitor.PlayerTookDamage += Monitor_PlayerTookDamage;
-                else
-                    _monitor.PlayerTookDamage -= Monitor_PlayerTookDamage;
                 _playerTookDamageTotal = 0;
-                _damageRuleOutputStrength = 0;
+                DamageRuleOutputStrength = 0;
+                ComputeOutputStrength();
             }
         }
     }
@@ -68,8 +71,31 @@ public class GtaVcGameRule : GameRule
 
     public int DamageRuleStrength { get; set; }
 
+    public int DamageRuleDuration { get; set; }
+
+    public int DamageRuleOutputStrength
+    {
+        get
+        {
+            var now = _stopwatch.ElapsedTicks;
+            var duration = DamageRuleDuration * TimeSpan.TicksPerSecond;
+            if (now >= _damageRuleStart + duration)
+                field = 0;
+            return field;
+        }
+
+        set
+        {
+            field = value;
+            _damageRuleStart = _stopwatch.ElapsedTicks;
+        }
+    }
+
     private void Monitor_PlayerTookDamage(object? sender, PlayerTookDamageEventArgs e)
     {
+        if (!DamageRuleEnable)
+            return;
+
         var damage = e.Damage;
         if (DamageRuleThreshold > 0 && damage > 0)
         {
@@ -115,17 +141,28 @@ public class GtaVcGameRule : GameRule
 
     protected override int GetMaxStrength()
     {
-        int result = 0;
-        if (_damageRuleOutputStrength > result)
-            result = _damageRuleOutputStrength;
-        return result;
+        int[] strengths =
+        [
+            0, DamageRuleOutputStrength
+        ];
+        return strengths.Max();
     }
 
     protected override int SumStrength()
     {
         int result = 0;
-        if (_damageRuleOutputStrength > 0)
-            result = result + _damageRuleOutputStrength;
+        int[] strengths =
+        [
+            DamageRuleOutputStrength
+        ];
+        for (var i = 0; i < strengths.Length; i++)
+        {
+            var strength = strengths[i];
+            if (strength > 0)
+            {
+                result = result + strength;
+            }
+        }
         return result;
     }
 
@@ -133,14 +170,14 @@ public class GtaVcGameRule : GameRule
     {
         if (!IsEnable || !DamageRuleEnable)
         {
-            _damageRuleOutputStrength = 0;
+            DamageRuleOutputStrength = 0;
         }
         else if ((DamageRuleThreshold > 0 && _playerTookDamageTotal > DamageRuleThreshold)
             || (DamageRuleThreshold < 0 && _playerTookDamageTotal < DamageRuleThreshold))
         {
             var multiple = _playerTookDamageTotal / DamageRuleThreshold;
             _playerTookDamageTotal %= DamageRuleThreshold;
-            _damageRuleOutputStrength = _damageRuleOutputStrength + (int)(multiple * DamageRuleStrength);
+            DamageRuleOutputStrength = DamageRuleOutputStrength + (int)(multiple * DamageRuleStrength);
         }
         else
         {

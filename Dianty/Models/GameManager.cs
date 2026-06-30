@@ -1,5 +1,4 @@
 ﻿using GameMonitor;
-using System.Collections.Generic;
 
 namespace Dianty.Models;
 
@@ -10,10 +9,10 @@ public class GameManager : AutomaticStrength
         GtaVcGameRule = new GtaVcGameRule(memoryService);
         GtaVcGameRule.OutputStrengthChanged += GtaVcGameRule_OutputStrengthChanged;
 
-        _gameRules.Add(GtaVcGameRule);
+        _gameRules = [GtaVcGameRule];
     }
 
-    private readonly List<GameRule> _gameRules = [];
+    private readonly GameRule[] _gameRules;
 
     public GtaVcGameRule GtaVcGameRule { get; }
 
@@ -25,7 +24,7 @@ public class GameManager : AutomaticStrength
     protected override int GetMaxStrength()
     {
         int result = 0;
-        for (int i = 0; i < _gameRules.Count; i++)
+        for (int i = 0; i < _gameRules.Length; i++)
         {
             var gameRulerule = _gameRules[i];
             if (gameRulerule.IsEnable && gameRulerule.OutputStrength > result)
@@ -39,7 +38,7 @@ public class GameManager : AutomaticStrength
     protected override int SumStrength()
     {
         int result = 0;
-        for (int i = 0; i < _gameRules.Count; i++)
+        for (int i = 0; i < _gameRules.Length; i++)
         {
             var gameRulerule = _gameRules[i];
             if (gameRulerule.IsEnable && gameRulerule.OutputStrength > 0)

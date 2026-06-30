@@ -54,6 +54,9 @@ public partial class GamesViewModel : ObservableObject
     [ObservableProperty]
     public partial double GtaVcDamageRuleStrength { get; set; }
 
+    [ObservableProperty]
+    public partial double GtaVcDamageRuleDuration { get; set; }
+
     partial void OnGamesStrengthModeChanged(KeyValuePair<Mode, string> value)
     {
         _gameManager.StrengthMode = value.Key;
@@ -67,5 +70,25 @@ public partial class GamesViewModel : ObservableObject
     partial void OnGtaVcStrengthModeChanged(KeyValuePair<Mode, string> value)
     {
         _gameManager.GtaVcGameRule.StrengthMode = value.Key;
+    }
+
+    partial void OnGtaVcDamageRuleEnableChanged(bool value)
+    {
+        _gameManager.GtaVcGameRule.DamageRuleEnable = value;
+    }
+
+    partial void OnGtaVcDamageRuleThresholdChanged(double value)
+    {
+        _gameManager.GtaVcGameRule.DamageRuleThreshold = (int)value;
+    }
+
+    partial void OnGtaVcDamageRuleStrengthChanged(double value)
+    {
+        _gameManager.GtaVcGameRule.DamageRuleStrength = (int)value;
+    }
+
+    partial void OnGtaVcDamageRuleDurationChanged(double value)
+    {
+        _gameManager.GtaVcGameRule.DamageRuleDuration = (int)value;
     }
 }
