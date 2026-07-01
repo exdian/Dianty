@@ -7,5 +7,7 @@ public interface IMemoryService
     bool TryAccessProcess(string processName, string moduleName, out int pid);
     bool TryReadMemory<T>(nint address, out T value) where T : struct;
     bool TryReadMemory<T>(nint address, int[] offsets, out T value) where T : struct;
+    bool TryReadUtf16Le(nint address, int maxChars, out string text);
+    bool TryReadUtf16Le(nint address, int[] offsets, int maxChars, out string text);
 }
 

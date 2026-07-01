@@ -33,15 +33,18 @@ public class GtaVcMonitor
     {
         public int Diff { get; }
     }
-    public class PlayerFellOffBikeEventArgs(VehicleId vehicleId) : EventArgs 
+    public class PlayerFellOffBikeEventArgs(VehicleId vehicleId, VehicleType vehicleType, string vehicleName) : EventArgs 
     {
-        public VehicleId BikeType { get; }
+        public VehicleId VehicleId { get; }
+        public VehicleType VehicleType { get; }
+        public string VehicleName { get; }
     }
     public enum PlayerState : int
     {
         Unknown,
         Stand = 1,
         WalkingAnimation = 6,
+        WalkingAnimation2 = 11,
         AimingDownSights = 12,
         UseWeapon = 16,
         Fight = 17,
