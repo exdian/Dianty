@@ -4,6 +4,7 @@ using Dianty.Views.Pages;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
@@ -243,6 +244,11 @@ public sealed partial class MainView : UserControl
     private void NavView_PaneChanged(NavigationView sender, object args)
     {
         UpdateDragRegion();
+        UpdateIconRegion();
+    }
+
+    private void RootElement_PointerPressed(object sender, PointerRoutedEventArgs e)
+    {
         UpdateIconRegion();
     }
 }
