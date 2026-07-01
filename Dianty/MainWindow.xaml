@@ -15,6 +15,7 @@
 
     <controls:TemplateContentControl
         x:Name="_rootElement" Loaded="RootElement_Loaded" PointerEntered="RootElement_PointerEntered"
+        PointerPressed="RootElement_PointerPressed"
         HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
         TemplateContent="{x:Bind TemplateContent}" SelectedTemplate="{x:Bind ViewModel.IsLoaded, Mode=OneWay}">
         <controls:TemplateContentControl.ContentTransitions>

@@ -24,7 +24,7 @@
                     SelectedItem="{x:Bind ViewModel.GtaVcStrengthMode, Mode=TwoWay}"
                     SelectedValuePath="Key" DisplayMemberPath="Value" />
             </toolkit:SettingsCard>
-            <toolkit:SettingsCard IsClickEnabled="True">
+            <toolkit:SettingsCard>
                 <toolkit:SettingsCard.Header>
                     <StackPanel Spacing="{StaticResource CommonCardSpacing}">
                         <StackPanel Orientation="Horizontal">
@@ -51,10 +51,6 @@
                     </StackPanel>
                 </toolkit:SettingsCard.Header>
                 <ToggleSwitch IsOn="{x:Bind ViewModel.GtaVcDamageRuleEnable, Mode=TwoWay}"/>
-                <toolkit:SettingsCard.ActionIcon>
-                    <!-- 当 IsClickEnabled=True 时，有默认图标，此处替换为空白 -->
-                    <PathIcon Data="M0 0L1 1"/>
-                </toolkit:SettingsCard.ActionIcon>
             </toolkit:SettingsCard>
         </toolkit:SettingsExpander.Items>
     </toolkit:SettingsExpander>

@@ -6,6 +6,8 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using System;
 using System.Runtime.InteropServices;
 using Windows.Graphics;
@@ -93,13 +95,21 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
     private static partial bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
     public const uint WM_NCMOUSEMOVE = 0x00A0;
     public const int HTCAPTION = 2;
-    private void RootElement_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    private void RootElement_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
         // 当鼠标指针从标题栏按钮移到非客户区的穿透区域时，标题栏按钮仍会处于指针悬停状态
         // 因此需要发送消息提醒窗口鼠标指针已离开标题栏按钮
         // 实测 WM_NCMOUSELEAVE 消息不能解决此问题，可能是因为整个窗口都是非客户区
         var hWnd = WindowNative.GetWindowHandle(this);
         PostMessage(hWnd, WM_NCMOUSEMOVE, HTCAPTION, nint.Zero);
+    }
+
+    private void RootElement_PointerPressed(object sender, PointerRoutedEventArgs e)
+    {
+        if (FocusManager.GetFocusedElement(Content.XamlRoot) is TextBox)
+        {
+            _rootElement.Focus(FocusState.Programmatic);
+        }
     }
 
 #if false
