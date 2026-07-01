@@ -25,9 +25,14 @@ public class GtaVcGameRule : GameRule
         _monitor.PlayerWantedLevelChanged += Monitor_PlayerWantedLevelChanged;
         _monitor.PlayerFellOffBike += Monitor_PlayerFellOffBike;
 
-        _dueTime = new Dictionary<string, long>
+        _dueTime = new Dictionary<Rule, long>
         {
-            [nameof(DamageRuleDuration)] = 0
+            [Rule.Damage] = 0,
+            [Rule.Busted] = 0,
+            [Rule.Wasted] = 0,
+            [Rule.MiTang] = 0,
+            [Rule.WantedLevel] = 0,
+            [Rule.FellOffBike] = 0,
         };
     }
 
@@ -47,9 +52,10 @@ public class GtaVcGameRule : GameRule
     private readonly GtaVcMonitor _monitor;
     private readonly Stopwatch _stopwatch;
     private readonly Timer _timer;
-    private readonly Dictionary<string, long> _dueTime;
+    private readonly Dictionary<Rule, long> _dueTime;
     private float _playerTookDamageTotal;
     private long _damageRuleStart;
+    private long _bustedRuleStart;
 
     public override bool IsEnable
     {
@@ -96,7 +102,7 @@ public class GtaVcGameRule : GameRule
         set
         {
             field = value;
-            TryRecoverDamageRuleOutputStrength(value);
+            TryRecoverRuleOutputStrength(_damageRuleStart, value, Rule.Damage, s => DamageRuleOutputStrength = s);
             ChangeTimer();
         }
     }
@@ -112,7 +118,52 @@ public class GtaVcGameRule : GameRule
                 if (value != 0)
                 {
                     _damageRuleStart = _stopwatch.ElapsedTicks;
-                    _dueTime[nameof(DamageRuleDuration)] = DamageRuleDuration * TimeSpan.TicksPerSecond;
+                    _dueTime[Rule.Damage] = DamageRuleDuration * TimeSpan.TicksPerSecond;
+                    ChangeTimer();
+                }
+                ComputeOutputStrength();
+            }
+        }
+    }
+
+    public bool BustedRuleEnable
+    {
+        get;
+        set
+        {
+            if (field != value)
+            {
+                field = value;
+                BustedRuleOutputStrength = 0;
+            }
+        }
+    }
+
+    public int BustedRuleStrength { get; set; }
+
+    public int BustedRuleDuration
+    {
+        get;
+        set
+        {
+            field = value;
+            TryRecoverRuleOutputStrength(_bustedRuleStart, value, Rule.Busted, s => BustedRuleOutputStrength = s);
+            ChangeTimer();
+        }
+    }
+
+    public int BustedRuleOutputStrength
+    {
+        get;
+        private set
+        {
+            if (field != value)
+            {
+                field = value;
+                if (value != 0)
+                {
+                    _bustedRuleStart = _stopwatch.ElapsedTicks;
+                    _dueTime[Rule.Busted] = BustedRuleDuration * TimeSpan.TicksPerSecond;
                     ChangeTimer();
                 }
                 ComputeOutputStrength();
@@ -122,7 +173,8 @@ public class GtaVcGameRule : GameRule
 
     private void RecoverStrength(object? state)
     {
-        TryRecoverDamageRuleOutputStrength(DamageRuleDuration);
+        TryRecoverRuleOutputStrength(_damageRuleStart, DamageRuleDuration, Rule.Damage, s => DamageRuleOutputStrength = s);
+        TryRecoverRuleOutputStrength(_bustedRuleStart, BustedRuleDuration, Rule.Busted, s => BustedRuleOutputStrength = s);
 
         ChangeTimer();
     }
@@ -141,6 +193,17 @@ public class GtaVcGameRule : GameRule
         {
             _timer.Change(min / TimeSpan.TicksPerMillisecond, Timeout.Infinite);
         }
+    }
+
+    private void TryRecoverRuleOutputStrength(long ruleStartTick, int seconds, Rule rule, Action<int> setOutputStrength)
+    {
+        if (ruleStartTick == 0)
+            return;
+
+        var dueTime = ruleStartTick - _stopwatch.ElapsedTicks + seconds * TimeSpan.TicksPerSecond;
+        if (dueTime <= 0)
+            setOutputStrength.Invoke(0);
+        _dueTime[rule] = dueTime;
     }
 
     private void Monitor_PlayerTookDamage(object? sender, PlayerTookDamageEventArgs e)
@@ -177,6 +240,15 @@ public class GtaVcGameRule : GameRule
     {
         var level = e.WantedLevel;
         WeakReferenceMessenger.Default.Send(new Log($"汤米被抓了，痛失{level}枚好市民勋章"));
+
+        if (!IsEnable || !BustedRuleEnable || BustedRuleDuration <= 0)
+        {
+            BustedRuleOutputStrength = 0;
+        }
+        else
+        {
+            BustedRuleOutputStrength = BustedRuleOutputStrength + level * BustedRuleStrength;
+        }
     }
 
     private void Monitor_PlayerWasted(object? sender, PlayerWastedEventArgs e)
@@ -203,7 +275,7 @@ public class GtaVcGameRule : GameRule
     {
         int[] strengths =
         [
-            0, DamageRuleOutputStrength
+            0, DamageRuleOutputStrength, BustedRuleOutputStrength
         ];
         return strengths.Max();
     }
@@ -213,7 +285,7 @@ public class GtaVcGameRule : GameRule
         int result = 0;
         int[] strengths =
         [
-            DamageRuleOutputStrength
+            DamageRuleOutputStrength, BustedRuleOutputStrength
         ];
         for (var i = 0; i < strengths.Length; i++)
         {
@@ -246,14 +318,8 @@ public class GtaVcGameRule : GameRule
         }
     }
 
-    private void TryRecoverDamageRuleOutputStrength(int seconds)
+    private enum Rule
     {
-        if (_damageRuleStart == 0)
-            return;
-
-        var dueTime = _damageRuleStart - _stopwatch.ElapsedTicks + seconds * TimeSpan.TicksPerSecond;
-        if (dueTime <= 0)
-            DamageRuleOutputStrength = 0;
-        _dueTime[nameof(DamageRuleDuration)] = dueTime;
+        Damage, Busted, Wasted, MiTang, WantedLevel, FellOffBike
     }
 }

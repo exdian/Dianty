@@ -69,6 +69,15 @@ public partial class GamesPageViewModel : ObservableObject
     [ObservableProperty]
     public partial double GtaVcDamageRuleDuration { get; set; }
 
+    [ObservableProperty]
+    public partial bool GtaVcBustedRuleEnable { get; set; }
+
+    [ObservableProperty]
+    public partial double GtaVcBustedRuleStrength { get; set; }
+
+    [ObservableProperty]
+    public partial double GtaVcBustedRuleDuration { get; set; }
+
     private void GameManager_OutputStrengthChanged(object? sender, EventArgs e)
     {
         var outputStrength = _gameManager.OutputStrength;
@@ -116,5 +125,20 @@ public partial class GamesPageViewModel : ObservableObject
     partial void OnGtaVcDamageRuleDurationChanged(double value)
     {
         _gameManager.GtaVcGameRule.DamageRuleDuration = (int)value;
+    }
+
+    partial void OnGtaVcBustedRuleEnableChanged(bool value)
+    {
+        _gameManager.GtaVcGameRule.BustedRuleEnable = value;
+    }
+
+    partial void OnGtaVcBustedRuleStrengthChanged(double value)
+    {
+        _gameManager.GtaVcGameRule.BustedRuleStrength = (int)value;
+    }
+
+    partial void OnGtaVcBustedRuleDurationChanged(double value)
+    {
+        _gameManager.GtaVcGameRule.BustedRuleDuration = (int)value;
     }
 }
