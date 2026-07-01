@@ -54,8 +54,10 @@ public class GtaVcGameRule : GameRule
     private readonly Timer _timer;
     private readonly Dictionary<Rule, long> _dueTime;
     private float _playerTookDamageTotal;
-    private long _damageRuleStart;
-    private long _bustedRuleStart;
+    private long _damageRuleStartTick;
+    private long _bustedRuleStartTick;
+    private long _wastedRuleStartTick;
+    private long _miTangRuleStartTick;
 
     public override bool IsEnable
     {
@@ -102,7 +104,7 @@ public class GtaVcGameRule : GameRule
         set
         {
             field = value;
-            TryRecoverRuleOutputStrength(_damageRuleStart, value, Rule.Damage, s => DamageRuleOutputStrength = s);
+            TryRecoverRuleOutputStrength(_damageRuleStartTick, value, Rule.Damage, s => DamageRuleOutputStrength = s);
             ChangeTimer();
         }
     }
@@ -117,7 +119,7 @@ public class GtaVcGameRule : GameRule
                 field = value;
                 if (value != 0)
                 {
-                    _damageRuleStart = _stopwatch.ElapsedTicks;
+                    _damageRuleStartTick = _stopwatch.ElapsedTicks;
                     _dueTime[Rule.Damage] = DamageRuleDuration * TimeSpan.TicksPerSecond;
                     ChangeTimer();
                 }
@@ -147,7 +149,7 @@ public class GtaVcGameRule : GameRule
         set
         {
             field = value;
-            TryRecoverRuleOutputStrength(_bustedRuleStart, value, Rule.Busted, s => BustedRuleOutputStrength = s);
+            TryRecoverRuleOutputStrength(_bustedRuleStartTick, value, Rule.Busted, s => BustedRuleOutputStrength = s);
             ChangeTimer();
         }
     }
@@ -162,8 +164,98 @@ public class GtaVcGameRule : GameRule
                 field = value;
                 if (value != 0)
                 {
-                    _bustedRuleStart = _stopwatch.ElapsedTicks;
+                    _bustedRuleStartTick = _stopwatch.ElapsedTicks;
                     _dueTime[Rule.Busted] = BustedRuleDuration * TimeSpan.TicksPerSecond;
+                    ChangeTimer();
+                }
+                ComputeOutputStrength();
+            }
+        }
+    }
+
+    public bool WastedRuleEnable
+    {
+        get;
+        set
+        {
+            if (field != value)
+            {
+                field = value;
+                WastedRuleOutputStrength = 0;
+            }
+        }
+    }
+
+    public int WastedRuleStrength { get; set; }
+
+    public int WastedRuleDuration
+    {
+        get;
+        set
+        {
+            field = value;
+            TryRecoverRuleOutputStrength(_wastedRuleStartTick, value, Rule.Wasted, s => WastedRuleOutputStrength = s);
+            ChangeTimer();
+        }
+    }
+
+    public int WastedRuleOutputStrength
+    {
+        get;
+        private set
+        {
+            if (field != value)
+            {
+                field = value;
+                if (value != 0)
+                {
+                    _wastedRuleStartTick = _stopwatch.ElapsedTicks;
+                    _dueTime[Rule.Wasted] = WastedRuleDuration * TimeSpan.TicksPerSecond;
+                    ChangeTimer();
+                }
+                ComputeOutputStrength();
+            }
+        }
+    }
+
+    public bool MiTangRuleEnable
+    {
+        get;
+        set
+        {
+            if (field != value)
+            {
+                field = value;
+                MiTangRuleOutputStrength = 0;
+            }
+        }
+    }
+
+    public int MiTangRuleStrength { get; set; }
+
+    public int MiTangRuleDuration
+    {
+        get;
+        set
+        {
+            field = value;
+            TryRecoverRuleOutputStrength(_miTangRuleStartTick, value, Rule.MiTang, s => MiTangRuleOutputStrength = s);
+            ChangeTimer();
+        }
+    }
+
+    public int MiTangRuleOutputStrength
+    {
+        get;
+        private set
+        {
+            if (field != value)
+            {
+                field = value;
+                if (value != 0)
+                {
+                    _miTangRuleStartTick = _stopwatch.ElapsedTicks;
+                    _dueTime[Rule.MiTang] = MiTangRuleDuration * TimeSpan.TicksPerSecond;
                     ChangeTimer();
                 }
                 ComputeOutputStrength();
@@ -173,8 +265,10 @@ public class GtaVcGameRule : GameRule
 
     private void RecoverStrength(object? state)
     {
-        TryRecoverRuleOutputStrength(_damageRuleStart, DamageRuleDuration, Rule.Damage, s => DamageRuleOutputStrength = s);
-        TryRecoverRuleOutputStrength(_bustedRuleStart, BustedRuleDuration, Rule.Busted, s => BustedRuleOutputStrength = s);
+        TryRecoverRuleOutputStrength(_damageRuleStartTick, DamageRuleDuration, Rule.Damage, s => DamageRuleOutputStrength = s);
+        TryRecoverRuleOutputStrength(_bustedRuleStartTick, BustedRuleDuration, Rule.Busted, s => BustedRuleOutputStrength = s);
+        TryRecoverRuleOutputStrength(_wastedRuleStartTick, WastedRuleDuration, Rule.Wasted, s => WastedRuleOutputStrength = s);
+        TryRecoverRuleOutputStrength(_miTangRuleStartTick, MiTangRuleDuration, Rule.MiTang, s => MiTangRuleOutputStrength = s);
 
         ChangeTimer();
     }
@@ -204,6 +298,53 @@ public class GtaVcGameRule : GameRule
         if (dueTime <= 0)
             setOutputStrength.Invoke(0);
         _dueTime[rule] = dueTime;
+    }
+
+    protected override int GetMaxStrength()
+    {
+        int[] strengths =
+        [
+            0, DamageRuleOutputStrength, BustedRuleOutputStrength, WastedRuleOutputStrength, MiTangRuleOutputStrength
+        ];
+        return strengths.Max();
+    }
+
+    protected override int SumStrength()
+    {
+        int result = 0;
+        int[] strengths =
+        [
+            DamageRuleOutputStrength, BustedRuleOutputStrength, WastedRuleOutputStrength, MiTangRuleOutputStrength
+        ];
+        for (var i = 0; i < strengths.Length; i++)
+        {
+            var strength = strengths[i];
+            if (strength > 0)
+            {
+                result = result + strength;
+            }
+        }
+        return result;
+    }
+
+    private void ComputeDamageRuleOutputStrength()
+    {
+        if (!IsEnable || !DamageRuleEnable)
+        {
+            DamageRuleOutputStrength = 0;
+        }
+        else if ((DamageRuleThreshold > 0 && _playerTookDamageTotal > DamageRuleThreshold)
+            || (DamageRuleThreshold < 0 && _playerTookDamageTotal < DamageRuleThreshold))
+        {
+            int multiple = (int)(_playerTookDamageTotal / DamageRuleThreshold);
+            _playerTookDamageTotal %= DamageRuleThreshold;
+            int delta = multiple * DamageRuleStrength;
+            DamageRuleOutputStrength = DamageRuleOutputStrength + delta;
+        }
+        else
+        {
+            return;
+        }
     }
 
     private void Monitor_PlayerTookDamage(object? sender, PlayerTookDamageEventArgs e)
@@ -255,6 +396,29 @@ public class GtaVcGameRule : GameRule
     {
         var isMiTang = e.IsMiTang;
         WeakReferenceMessenger.Default.Send(new Log(isMiTang ? "汤米变成了米汤" : "汤米浪费了"));
+
+        if (isMiTang)
+        {
+            if (!IsEnable || !MiTangRuleEnable || MiTangRuleDuration <= 0)
+            {
+                MiTangRuleOutputStrength = 0;
+            }
+            else
+            {
+                MiTangRuleOutputStrength = MiTangRuleOutputStrength + MiTangRuleStrength;
+            }
+        }
+        else
+        {
+            if (!IsEnable || !WastedRuleEnable || WastedRuleDuration <= 0)
+            {
+                WastedRuleOutputStrength = 0;
+            }
+            else
+            {
+                WastedRuleOutputStrength = WastedRuleOutputStrength + WastedRuleStrength;
+            }
+        }
     }
 
     private void Monitor_PlayerWantedLevelChanged(object? sender, PlayerWantedLevelChangedEventArgs e)
@@ -269,53 +433,6 @@ public class GtaVcGameRule : GameRule
         var vehicleType = e.VehicleType;
         var vehicleName = e.VehicleName;
         WeakReferenceMessenger.Default.Send(new Log($"汤米从{vehicleName}上摔下来了。{(short)vehicleId} 0x{(byte)vehicleType: X}"));
-    }
-
-    protected override int GetMaxStrength()
-    {
-        int[] strengths =
-        [
-            0, DamageRuleOutputStrength, BustedRuleOutputStrength
-        ];
-        return strengths.Max();
-    }
-
-    protected override int SumStrength()
-    {
-        int result = 0;
-        int[] strengths =
-        [
-            DamageRuleOutputStrength, BustedRuleOutputStrength
-        ];
-        for (var i = 0; i < strengths.Length; i++)
-        {
-            var strength = strengths[i];
-            if (strength > 0)
-            {
-                result = result + strength;
-            }
-        }
-        return result;
-    }
-
-    private void ComputeDamageRuleOutputStrength()
-    {
-        if (!IsEnable || !DamageRuleEnable)
-        {
-            DamageRuleOutputStrength = 0;
-        }
-        else if ((DamageRuleThreshold > 0 && _playerTookDamageTotal > DamageRuleThreshold)
-            || (DamageRuleThreshold < 0 && _playerTookDamageTotal < DamageRuleThreshold))
-        {
-            int multiple = (int)(_playerTookDamageTotal / DamageRuleThreshold);
-            _playerTookDamageTotal %= DamageRuleThreshold;
-            int delta = multiple * DamageRuleStrength;
-            DamageRuleOutputStrength = DamageRuleOutputStrength + delta;
-        }
-        else
-        {
-            return;
-        }
     }
 
     private enum Rule

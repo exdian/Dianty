@@ -78,6 +78,24 @@ public partial class GamesPageViewModel : ObservableObject
     [ObservableProperty]
     public partial double GtaVcBustedRuleDuration { get; set; }
 
+    [ObservableProperty]
+    public partial bool GtaVcWastedRuleEnable { get; set; }
+
+    [ObservableProperty]
+    public partial double GtaVcWastedRuleStrength { get; set; }
+
+    [ObservableProperty]
+    public partial double GtaVcWastedRuleDuration { get; set; }
+
+    [ObservableProperty]
+    public partial bool GtaVcMiTangRuleEnable { get; set; }
+
+    [ObservableProperty]
+    public partial double GtaVcMiTangRuleStrength { get; set; }
+
+    [ObservableProperty]
+    public partial double GtaVcMiTangRuleDuration { get; set; }
+
     private void GameManager_OutputStrengthChanged(object? sender, EventArgs e)
     {
         var outputStrength = _gameManager.OutputStrength;
@@ -140,5 +158,35 @@ public partial class GamesPageViewModel : ObservableObject
     partial void OnGtaVcBustedRuleDurationChanged(double value)
     {
         _gameManager.GtaVcGameRule.BustedRuleDuration = (int)value;
+    }
+
+    partial void OnGtaVcWastedRuleEnableChanged(bool value)
+    {
+        _gameManager.GtaVcGameRule.WastedRuleEnable = value;
+    }
+
+    partial void OnGtaVcWastedRuleStrengthChanged(double value)
+    {
+        _gameManager.GtaVcGameRule.WastedRuleStrength = (int)value;
+    }
+
+    partial void OnGtaVcWastedRuleDurationChanged(double value)
+    {
+        _gameManager.GtaVcGameRule.WastedRuleDuration = (int)value;
+    }
+
+    partial void OnGtaVcMiTangRuleEnableChanged(bool value)
+    {
+        _gameManager.GtaVcGameRule.MiTangRuleEnable = value;
+    }
+
+    partial void OnGtaVcMiTangRuleStrengthChanged(double value)
+    {
+        _gameManager.GtaVcGameRule.MiTangRuleStrength = (int)value;
+    }
+
+    partial void OnGtaVcMiTangRuleDurationChanged(double value)
+    {
+        _gameManager.GtaVcGameRule.MiTangRuleDuration = (int)value;
     }
 }
