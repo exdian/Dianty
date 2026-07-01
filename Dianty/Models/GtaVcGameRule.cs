@@ -59,6 +59,7 @@ public class GtaVcGameRule : GameRule
     private long _wastedRuleStartTick;
     private long _miTangRuleStartTick;
     private long _wantedLevelRuleStartTick;
+    private long _fellOffBikeRuleStartTick;
 
     public override bool IsEnable
     {
@@ -309,6 +310,51 @@ public class GtaVcGameRule : GameRule
         }
     }
 
+    public bool FellOffBikeRuleEnable
+    {
+        get;
+        set
+        {
+            if (field != value)
+            {
+                field = value;
+                FellOffBikeRuleOutputStrength = 0;
+            }
+        }
+    }
+
+    public int FellOffBikeRuleStrength { get; set; }
+
+    public int FellOffBikeRuleDuration
+    {
+        get;
+        set
+        {
+            field = value;
+            TryRecoverRuleOutputStrength(_fellOffBikeRuleStartTick, value, Rule.FellOffBike, s => FellOffBikeRuleOutputStrength = s);
+            ChangeTimer();
+        }
+    }
+
+    public int FellOffBikeRuleOutputStrength
+    {
+        get;
+        private set
+        {
+            if (field != value)
+            {
+                field = value;
+                if (value != 0)
+                {
+                    _fellOffBikeRuleStartTick = _stopwatch.ElapsedTicks;
+                    _dueTime[Rule.FellOffBike] = FellOffBikeRuleDuration * TimeSpan.TicksPerSecond;
+                    ChangeTimer();
+                }
+                ComputeOutputStrength();
+            }
+        }
+    }
+
     private void RecoverStrength(object? state)
     {
         TryRecoverRuleOutputStrength(_damageRuleStartTick, DamageRuleDuration, Rule.Damage, s => DamageRuleOutputStrength = s);
@@ -316,6 +362,7 @@ public class GtaVcGameRule : GameRule
         TryRecoverRuleOutputStrength(_wastedRuleStartTick, WastedRuleDuration, Rule.Wasted, s => WastedRuleOutputStrength = s);
         TryRecoverRuleOutputStrength(_miTangRuleStartTick, MiTangRuleDuration, Rule.MiTang, s => MiTangRuleOutputStrength = s);
         TryRecoverRuleOutputStrength(_wantedLevelRuleStartTick, WantedLevelRuleDuration, Rule.WantedLevel, s => WantedLevelRuleOutputStrength = s);
+        TryRecoverRuleOutputStrength(_fellOffBikeRuleStartTick, FellOffBikeRuleDuration, Rule.FellOffBike, s => FellOffBikeRuleOutputStrength = s);
 
         ChangeTimer();
     }
@@ -352,7 +399,7 @@ public class GtaVcGameRule : GameRule
         int[] strengths =
         [
             0, DamageRuleOutputStrength, BustedRuleOutputStrength, WastedRuleOutputStrength, MiTangRuleOutputStrength,
-            WantedLevelRuleOutputStrength
+            WantedLevelRuleOutputStrength, FellOffBikeRuleOutputStrength
         ];
         return strengths.Max();
     }
@@ -363,7 +410,7 @@ public class GtaVcGameRule : GameRule
         int[] strengths =
         [
             DamageRuleOutputStrength, BustedRuleOutputStrength, WastedRuleOutputStrength, MiTangRuleOutputStrength,
-            WantedLevelRuleOutputStrength
+            WantedLevelRuleOutputStrength, FellOffBikeRuleOutputStrength
         ];
         for (var i = 0; i < strengths.Length; i++)
         {
@@ -493,7 +540,16 @@ public class GtaVcGameRule : GameRule
         var vehicleId = e.VehicleId;
         var vehicleType = e.VehicleType;
         var vehicleName = e.VehicleName;
-        WeakReferenceMessenger.Default.Send(new Log($"汤米从{vehicleName}上摔下来了。{(short)vehicleId} 0x{(byte)vehicleType: X}"));
+        WeakReferenceMessenger.Default.Send(new Log($"汤米从{vehicleName}上摔下来了。{(short)vehicleId} 0x{(byte)vehicleType:X2}"));
+
+        if (!IsEnable || !FellOffBikeRuleEnable || FellOffBikeRuleDuration <= 0)
+        {
+            FellOffBikeRuleOutputStrength = 0;
+        }
+        else
+        {
+            FellOffBikeRuleOutputStrength = FellOffBikeRuleOutputStrength + FellOffBikeRuleStrength;
+        }
     }
 
     private enum Rule

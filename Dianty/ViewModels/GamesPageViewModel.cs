@@ -105,6 +105,15 @@ public partial class GamesPageViewModel : ObservableObject
     [ObservableProperty]
     public partial double GtaVcWantedLevelRuleDuration { get; set; }
 
+    [ObservableProperty]
+    public partial bool GtaVcFellOffBikeRuleEnable { get; set; }
+
+    [ObservableProperty]
+    public partial double GtaVcFellOffBikeRuleStrength { get; set; }
+
+    [ObservableProperty]
+    public partial double GtaVcFellOffBikeRuleDuration { get; set; }
+
     private void GameManager_OutputStrengthChanged(object? sender, EventArgs e)
     {
         var outputStrength = _gameManager.OutputStrength;
@@ -212,5 +221,20 @@ public partial class GamesPageViewModel : ObservableObject
     partial void OnGtaVcWantedLevelRuleDurationChanged(double value)
     {
         _gameManager.GtaVcGameRule.WantedLevelRuleDuration = (int)value;
+    }
+
+    partial void OnGtaVcFellOffBikeRuleEnableChanged(bool value)
+    {
+        _gameManager.GtaVcGameRule.FellOffBikeRuleEnable = value;
+    }
+
+    partial void OnGtaVcFellOffBikeRuleStrengthChanged(double value)
+    {
+        _gameManager.GtaVcGameRule.FellOffBikeRuleStrength = (int)value;
+    }
+
+    partial void OnGtaVcFellOffBikeRuleDurationChanged(double value)
+    {
+        _gameManager.GtaVcGameRule.FellOffBikeRuleDuration = (int)value;
     }
 }
