@@ -4,9 +4,26 @@ using System.Diagnostics;
 
 namespace Dianty.Services;
 
-internal class ServiceLocator
+public static class ServiceLocator
 {
     private static readonly Dictionary<Type, object> _services = [];
+    private static Action? _register;
+
+    public static void Init(Action? register)
+    {
+        _services.Clear();
+        _register = register;
+    }
+
+    public static void RegisterDefault()
+    {
+        if (_register is null)
+            return;
+
+        var register = _register;
+        _register = null;
+        register.Invoke();
+    }
 
     public static void Register<T>(T service)
     {
@@ -29,17 +46,26 @@ internal class ServiceLocator
             return (T)service;
     }
 
-    public static void RegisterViewModels()
+    public static void RegisterViewModel(Type pageType, object viewModel)
     {
-
+        Debug.Assert(pageType is not null);
+        Debug.Assert(viewModel is not null);
+        _services[pageType] = viewModel;
     }
 
-    public static T GetViewModel<T>(Type pageType)
+    public static object? GetViewModel(Type pageType)
     {
-        var viewModel = _services[pageType];
-        if (viewModel is Func<T> func)
-            return func();
+        Debug.Assert(pageType is not null);
+        if (_services.TryGetValue(pageType, out var viewModel))
+        {
+            if (viewModel is Func<object> func)
+                return func();
+            else
+                return viewModel;
+        }
         else
-            return (T)viewModel;
+        {
+            return null;
+        }
     }
 }

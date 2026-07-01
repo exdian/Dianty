@@ -1,35 +1,47 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Dianty.Services;
 using Microsoft.UI.Dispatching;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Dianty.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
-    public MainViewModel(DispatcherQueue dispatcher)
+    public MainViewModel(IQueueService queueService)
     {
-        _dispatcher = dispatcher;
-        LoadDataAsync();
+        _queueService = queueService;
+        _queueService.TryEnqueue(DispatcherQueuePriority.Low, LoadDataAsync);
     }
 
-    private readonly DispatcherQueue _dispatcher;
+    private readonly IQueueService _queueService;
 
     [ObservableProperty]
     public partial bool IsLoaded { get; private set; }
 
     private async void LoadDataAsync()
     {
-        var task = Task.Delay(300);
+        var stopwatch = Stopwatch.StartNew();
+        var task = Task.CompletedTask;
 
-        // 模拟后台耗时操作
-        await Task.Delay(200);
+        // 后台耗时操作
+        await Task.Run(() =>
+        {
+            task = Task.Delay(300);
+            ServiceLocator.RegisterDefault();
+        });
+        Debug.WriteLine($"后台加载耗时: {stopwatch.ElapsedMilliseconds} ms");
+
+        // 必须在 UI 线程的操作
+        _queueService.TryEnqueue(ResourceLoader.Load);
 
         // 至少加载 300 毫秒
         await task;
-        _dispatcher.TryEnqueue(() =>
+        _queueService.TryEnqueue(() =>
         {
             IsLoaded = true;
+            Debug.WriteLine($"总加载耗时: {stopwatch.ElapsedMilliseconds} ms");
         });
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Dianty.Services;
 
-internal interface ITitleBarService
+public interface ITitleBarService
 {
     void SetTitleBar(UIElement titleBar);
 }

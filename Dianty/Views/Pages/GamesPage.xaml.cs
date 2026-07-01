@@ -1,20 +1,9 @@
-using Microsoft.UI.Xaml;
+using Dianty.Services;
+using Dianty.ViewModels;
+using Dianty.Views.Controls;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace Dianty.Views.Pages;
 /// <summary>
@@ -26,4 +15,34 @@ public sealed partial class GamesPage : Page
     {
         InitializeComponent();
     }
+
+    private IQueueService? _queueService;
+
+    private GamesPageViewModel? ViewModel { get; set; }
+
+    protected override void OnNavigatedTo(NavigationEventArgs e)
+    {
+        base.OnNavigatedTo(e);
+        if (e.Parameter is RequiredParameter requiredParameter)
+        {
+            ViewModel = requiredParameter.ViewModel;
+            _queueService = requiredParameter.QueueService;
+        }
+    }
+
+    private void StackPanel_Loaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        // 实测该元素更晚触发 Loaded 事件
+        if (_queueService is null)
+            return;
+
+        _queueService.TryEnqueue(DispatcherQueuePriority.Low, () =>
+        {
+            var rulesCard = new GtaVcRulesCard(ViewModel);
+            var collection = _gamesPageStackPanel.Children;
+            collection.Insert(collection.Count - 1, rulesCard);
+        });
+    }
+
+    public readonly record struct RequiredParameter(GamesPageViewModel ViewModel, IQueueService QueueService);
 }

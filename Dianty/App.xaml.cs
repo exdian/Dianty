@@ -1,25 +1,10 @@
-﻿using Dianty.Services;
+﻿using Dianty.Models;
+using Dianty.Services;
 using Dianty.ViewModels;
+using Dianty.Views.Pages;
+using GameMonitor;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using Microsoft.UI.Xaml.Shapes;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.ApplicationModel;
-using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace Dianty;
 /// <summary>
@@ -28,6 +13,7 @@ namespace Dianty;
 public partial class App : Application
 {
     private Window? _window;
+    private MainWindow? _mainWindow;
 
     /// <summary>
     /// Initializes the singleton application object.  This is the first line of authored code
@@ -45,10 +31,39 @@ public partial class App : Application
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
         var window = new MainWindow();
-        ServiceLocator.Register<ITitleBarService>(window);
-        ServiceLocator.Register<IWindowService>(window);
-        window.ViewModel = new MainViewModel(window.DispatcherQueue);
+        ServiceLocator.Init(RegisterService);
+        ResourceLoader.Init(MergedDictionaries);
+        window.ViewModel = new MainViewModel(window);
+        _mainWindow = window;
         _window = window;
         _window.Activate();
+    }
+
+    private void RegisterService()
+    {
+        if (_mainWindow is null)
+            return;
+
+        ITitleBarService titleBarService = _mainWindow;
+        IWindowService windowService = _mainWindow;
+        IQueueService queueService = _mainWindow;
+        ITemplateContent templateContent = _mainWindow;
+        ServiceLocator.Register(titleBarService);
+        ServiceLocator.Register(windowService);
+        ServiceLocator.Register(queueService);
+        ServiceLocator.Register(templateContent);
+        ServiceLocator.Register<IMemoryService>(static () => new MemoryService());
+
+        ServiceLocator.RegisterViewModel(typeof(DebugPage), new DebugPageViewModel(queueService));
+        ServiceLocator.RegisterViewModel(typeof(GamesPage), new GamesPage.RequiredParameter(
+            new GamesPageViewModel(ServiceLocator.GetService<IMemoryService>(), queueService),
+            queueService));
+    }
+
+    private void MergedDictionaries()
+    {
+        var newDictionary = new ResourceDictionary();
+        LoadComponent(newDictionary, new Uri("ms-appx:///AppResourceDictionary.xaml", UriKind.Absolute));
+        Resources.MergedDictionaries.Add(newDictionary);
     }
 }

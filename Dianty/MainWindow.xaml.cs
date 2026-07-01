@@ -1,9 +1,13 @@
 using Dianty.Services;
 using Dianty.Utils;
 using Dianty.ViewModels;
+using Dianty.Views;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using System;
 using System.Runtime.InteropServices;
 using Windows.Graphics;
@@ -13,7 +17,7 @@ namespace Dianty;
 /// <summary>
 /// An empty window that can be used on its own or navigated to within a Frame.
 /// </summary>
-public sealed partial class MainWindow : Window, ITitleBarService, IWindowService
+public sealed partial class MainWindow : Window, ITitleBarService, IWindowService, IQueueService, ITemplateContent
 {
     public MainWindow()
     {
@@ -22,6 +26,8 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
         AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
         SetWindowSize();
     }
+
+    private ITemplateContent TemplateContent => this;
 
     public MainViewModel? ViewModel { get; set; }
 
@@ -37,6 +43,28 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
         if (AppWindow is null)
             return null;
         return InputActivationListener.GetForWindowId(AppWindow.Id);
+    }
+
+    public bool TryEnqueue(DispatcherQueueHandler callback)
+    {
+        return DispatcherQueue.TryEnqueue(callback);
+    }
+
+    public bool TryEnqueue(DispatcherQueuePriority priority, DispatcherQueueHandler callback)
+    {
+        return DispatcherQueue.TryEnqueue(priority, callback);
+    }
+
+    object? ITemplateContent.CreateContent(object? item)
+    {
+        if (item is bool value && value)
+        {
+            return new MainView(this, this);
+        }
+        else
+        {
+            return new LoadView();
+        }
     }
 
     [LibraryImport("user32.dll")]
@@ -67,13 +95,21 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
     private static partial bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
     public const uint WM_NCMOUSEMOVE = 0x00A0;
     public const int HTCAPTION = 2;
-    private void RootElement_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    private void RootElement_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
         // 当鼠标指针从标题栏按钮移到非客户区的穿透区域时，标题栏按钮仍会处于指针悬停状态
         // 因此需要发送消息提醒窗口鼠标指针已离开标题栏按钮
         // 实测 WM_NCMOUSELEAVE 消息不能解决此问题，可能是因为整个窗口都是非客户区
         var hWnd = WindowNative.GetWindowHandle(this);
         PostMessage(hWnd, WM_NCMOUSEMOVE, HTCAPTION, nint.Zero);
+    }
+
+    private void RootElement_PointerPressed(object sender, PointerRoutedEventArgs e)
+    {
+        if (FocusManager.GetFocusedElement(Content.XamlRoot) is TextBox)
+        {
+            _rootElement.Focus(FocusState.Programmatic);
+        }
     }
 
 #if false
