@@ -23,6 +23,10 @@ public sealed partial class MainView : UserControl
         // 导航按钮不居中，需要手动刷新一下
         _navView.IsPaneOpen = false;
         _navView.IsPaneOpen = true;
+
+#if DEBUG
+        _navView.MenuItems.Add(DebugPage.GetNavigationViewItem());
+#endif
     }
 
     private readonly ITitleBarService _titleBarService;

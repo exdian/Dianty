@@ -18,7 +18,7 @@ public sealed partial class GamesPage : Page
 
     private IQueueService? _queueService;
 
-    private GamesViewModel? ViewModel { get; set; }
+    private GamesPageViewModel? ViewModel { get; set; }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
@@ -44,5 +44,5 @@ public sealed partial class GamesPage : Page
         });
     }
 
-    public readonly record struct RequiredParameter(GamesViewModel ViewModel, IQueueService QueueService);
+    public readonly record struct RequiredParameter(GamesPageViewModel ViewModel, IQueueService QueueService);
 }

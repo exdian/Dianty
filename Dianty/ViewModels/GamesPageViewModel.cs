@@ -7,9 +7,9 @@ using static Dianty.Models.AutomaticStrength;
 
 namespace Dianty.ViewModels;
 
-public partial class GamesViewModel : ObservableObject
+public partial class GamesPageViewModel : ObservableObject
 {
-    public GamesViewModel(IMemoryService memoryService)
+    public GamesPageViewModel(IMemoryService memoryService)
     {
         _gameManager = new GameManager(memoryService);
 
