@@ -96,7 +96,7 @@ public class GtaVcGameRule : GameRule
     private void Monitor_PlayerTookDamage(object? sender, PlayerTookDamageEventArgs e)
     {
         var damage = e.Damage;
-        WeakReferenceMessenger.Default.Send(new LogMessage($"汤米受到了{damage:F2}点伤害"));
+        WeakReferenceMessenger.Default.Send(new Log($"汤米受到了{damage:F2}点伤害"));
 
         if (!DamageRuleEnable)
             return;
@@ -126,19 +126,19 @@ public class GtaVcGameRule : GameRule
     private void Monitor_PlayerBusted(object? sender, PlayerBustedEventArgs e)
     {
         var level = e.WantedLevel;
-        WeakReferenceMessenger.Default.Send(new LogMessage($"汤米被抓了，痛失{level}枚好市民勋章"));
+        WeakReferenceMessenger.Default.Send(new Log($"汤米被抓了，痛失{level}枚好市民勋章"));
     }
 
     private void Monitor_PlayerWasted(object? sender, PlayerWastedEventArgs e)
     {
         var isMiTang = e.IsMiTang;
-        WeakReferenceMessenger.Default.Send(new LogMessage(isMiTang ? "汤米变成了米汤" : "汤米浪费了"));
+        WeakReferenceMessenger.Default.Send(new Log(isMiTang ? "汤米变成了米汤" : "汤米浪费了"));
     }
 
     private void Monitor_PlayerWantedLevelChanged(object? sender, PlayerWantedLevelChangedEventArgs e)
     {
         var diff = e.Diff;
-        WeakReferenceMessenger.Default.Send(new LogMessage(diff > 0 ? $"汤米获得了{diff}枚好市民勋章" : $"汤米丢失了{-diff}枚好市民勋章"));
+        WeakReferenceMessenger.Default.Send(new Log(diff > 0 ? $"汤米获得了{diff}枚好市民勋章" : $"汤米丢失了{-diff}枚好市民勋章"));
     }
 
     private void Monitor_PlayerFellOffBike(object? sender, PlayerFellOffBikeEventArgs e)
@@ -146,7 +146,7 @@ public class GtaVcGameRule : GameRule
         var vehicleId = e.VehicleId;
         var vehicleType = e.VehicleType;
         var vehicleName = e.VehicleName;
-        WeakReferenceMessenger.Default.Send(new LogMessage($"汤米从{vehicleName}上摔下来了。{(short)vehicleId} 0x{(byte)vehicleType: X}"));
+        WeakReferenceMessenger.Default.Send(new Log($"汤米从{vehicleName}上摔下来了。{(short)vehicleId} 0x{(byte)vehicleType: X}"));
     }
 
     protected override int GetMaxStrength()

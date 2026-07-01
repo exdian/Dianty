@@ -21,7 +21,7 @@
             x:Name="_logListView" Grid.Row="1" Padding="9,0"
             SelectionMode="Extended" ItemsSource="{x:Bind ViewModel.Logs}">
             <ListView.ItemTemplate>
-                <DataTemplate x:DataType="utils:LogEntry">
+                <DataTemplate x:DataType="utils:Log">
                     <TextBlock 
                         Text="{x:Bind ToString()}" FontFamily="Consolas, Courier New, monospace"
                         TextWrapping="Wrap" Margin="0,10"/>

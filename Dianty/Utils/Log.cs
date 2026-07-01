@@ -2,14 +2,14 @@
 
 namespace Dianty.Utils;
 
-public class LogEntry
+public class Log
 {
     public string Timestamp { get; set; } = string.Empty;
     public string Message { get; set; } = string.Empty;
 
-    public LogEntry() { }
+    public Log() { }
 
-    public LogEntry(string message)
+    public Log(string message)
     {
         Timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
         Message = message;
@@ -17,3 +17,5 @@ public class LogEntry
 
     public override string ToString() => $"[{Timestamp}] {Message}";
 }
+
+public class LogAppendedMessage { }

@@ -14,21 +14,26 @@ public partial class DebugPageViewModel : ObservableObject
     {
         _queueService = queueService;
 
-        WeakReferenceMessenger.Default.Register<LogMessage>(this, (r, m) =>
+        WeakReferenceMessenger.Default.Register<Log>(this, (r, l) =>
         {
-            AppendLog(m.Content);
+            AppendLog(l);
         });
     }
 
     private readonly IQueueService _queueService;
 
-    public ObservableCollection<LogEntry> Logs { get; } = [];
+    public ObservableCollection<Log> Logs { get; } = [];
 
     public void AppendLog(string message)
     {
+        AppendLog(new Log(message));
+    }
+
+    public void AppendLog(Log log)
+    {
         _queueService.TryEnqueue(DispatcherQueuePriority.Low, () =>
         {
-            Logs.Add(new LogEntry(message));
+            Logs.Add(log);
             if (Logs.Count > 5000)
             {
                 for (int i = 0; i < 2000 && Logs.Count > 0; i++)
