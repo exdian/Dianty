@@ -1,4 +1,5 @@
 ﻿using GameMonitor;
+using System;
 
 namespace Dianty.Models;
 
@@ -12,13 +13,18 @@ public class GameManager : AutomaticStrength
         _gameRules = [GtaVcGameRule];
     }
 
+    ~GameManager()
+    {
+        GtaVcGameRule.OutputStrengthChanged -= GtaVcGameRule_OutputStrengthChanged;
+    }
+
     private readonly GameRule[] _gameRules;
 
     public GtaVcGameRule GtaVcGameRule { get; }
 
-    private void GtaVcGameRule_OutputStrengthChanged(object? sender, OutputStrengthChangedEventArgs e)
+    private void GtaVcGameRule_OutputStrengthChanged(object? sender, EventArgs e)
     {
-        ComputeOutputStrength();
+        OnOutputStrengthChanged();
     }
 
     protected override int GetMaxStrength()
@@ -26,10 +32,14 @@ public class GameManager : AutomaticStrength
         int result = 0;
         for (int i = 0; i < _gameRules.Length; i++)
         {
-            var gameRulerule = _gameRules[i];
-            if (gameRulerule.IsEnable && gameRulerule.OutputStrength > result)
+            var gameRule = _gameRules[i];
+            if (gameRule.IsEnable)
             {
-                result = gameRulerule.OutputStrength;
+                var outputStrength = gameRule.ComputeOutputStrength();
+                if (outputStrength > result)
+                {
+                    result = outputStrength;
+                }
             }
         }
         return result;
@@ -40,10 +50,14 @@ public class GameManager : AutomaticStrength
         int result = 0;
         for (int i = 0; i < _gameRules.Length; i++)
         {
-            var gameRulerule = _gameRules[i];
-            if (gameRulerule.IsEnable && gameRulerule.OutputStrength > 0)
+            var gameRule = _gameRules[i];
+            if (gameRule.IsEnable)
             {
-                result = result + gameRulerule.OutputStrength;
+                var outputStrength = gameRule.ComputeOutputStrength();
+                if (outputStrength > result)
+                {
+                    result = result + outputStrength;
+                }
             }
         }
         return result;

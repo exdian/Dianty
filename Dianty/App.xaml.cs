@@ -41,23 +41,23 @@ public partial class App : Application
 
     private void RegisterService()
     {
-        if (_mainWindow is not null)
-        {
-            ServiceLocator.Register<ITitleBarService>(_mainWindow);
-            ServiceLocator.Register<IWindowService>(_mainWindow);
-            ServiceLocator.Register<IQueueService>(_mainWindow);
-            ServiceLocator.Register<ITemplateContent>(_mainWindow);
-        }
+        if (_mainWindow is null)
+            return;
 
-        ServiceLocator.RegisterViewModel(typeof(DebugPage),
-            new DebugPageViewModel(ServiceLocator.GetService<IQueueService>()));
-
+        ITitleBarService titleBarService = _mainWindow;
+        IWindowService windowService = _mainWindow;
+        IQueueService queueService = _mainWindow;
+        ITemplateContent templateContent = _mainWindow;
+        ServiceLocator.Register(titleBarService);
+        ServiceLocator.Register(windowService);
+        ServiceLocator.Register(queueService);
+        ServiceLocator.Register(templateContent);
         ServiceLocator.Register<IMemoryService>(static () => new MemoryService());
 
+        ServiceLocator.RegisterViewModel(typeof(DebugPage), new DebugPageViewModel(queueService));
         ServiceLocator.RegisterViewModel(typeof(GamesPage), new GamesPage.RequiredParameter(
-            new GamesPageViewModel(ServiceLocator.GetService<IMemoryService>()),
-            ServiceLocator.GetService<IQueueService>()));
-
+            new GamesPageViewModel(ServiceLocator.GetService<IMemoryService>(), queueService),
+            queueService));
     }
 
     private void MergedDictionaries()

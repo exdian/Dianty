@@ -1,6 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 using Dianty.Models;
+using Dianty.Services;
+using Dianty.Utils;
 using GameMonitor;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using static Dianty.Models.AutomaticStrength;
@@ -9,9 +13,11 @@ namespace Dianty.ViewModels;
 
 public partial class GamesPageViewModel : ObservableObject
 {
-    public GamesPageViewModel(IMemoryService memoryService)
+    public GamesPageViewModel(IMemoryService memoryService, IQueueService queueService)
     {
         _gameManager = new GameManager(memoryService);
+        _gameManager.OutputStrengthChanged += GameManager_OutputStrengthChanged;
+        _queueService = queueService;
 
         StrengthModes = new Dictionary<Mode, string>
         {
@@ -23,7 +29,13 @@ public partial class GamesPageViewModel : ObservableObject
         GtaVcStrengthMode = StrengthModes.First();
     }
 
+    ~GamesPageViewModel()
+    {
+        _gameManager.OutputStrengthChanged -= GameManager_OutputStrengthChanged;
+    }
+
     private readonly GameManager _gameManager;
+    private readonly IQueueService _queueService;
 
     public KeyValuePair<Mode, string>[] StrengthModes { get; }
 
@@ -57,6 +69,16 @@ public partial class GamesPageViewModel : ObservableObject
     [ObservableProperty]
     public partial double GtaVcDamageRuleDuration { get; set; }
 
+    private void GameManager_OutputStrengthChanged(object? sender, EventArgs e)
+    {
+        var outputStrength = _gameManager.ComputeOutputStrength();
+        _queueService.TryEnqueue(() =>
+        {
+            OutputStrength = outputStrength;
+        });
+        WeakReferenceMessenger.Default.Send(new Log($"总强度发生变化：{outputStrength}"));
+    }
+
     partial void OnGamesStrengthModeChanged(KeyValuePair<Mode, string> value)
     {
         _gameManager.StrengthMode = value.Key;
@@ -64,6 +86,10 @@ public partial class GamesPageViewModel : ObservableObject
 
     partial void OnGtaVcEnableChanged(bool value)
     {
+        if (value)
+            EnableGameCount++;
+        else
+            EnableGameCount--;
         _gameManager.GtaVcGameRule.IsEnable = value;
     }
 

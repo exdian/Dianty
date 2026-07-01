@@ -20,6 +20,11 @@ public partial class DebugPageViewModel : ObservableObject
         });
     }
 
+    ~DebugPageViewModel()
+    {
+        WeakReferenceMessenger.Default.Unregister<Log>(this);
+    }
+
     private readonly IQueueService _queueService;
 
     public ObservableCollection<Log> Logs { get; } = [];

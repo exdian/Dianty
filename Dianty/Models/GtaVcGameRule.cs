@@ -2,8 +2,10 @@
 using Dianty.Utils;
 using GameMonitor;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using static Dianty.Models.GameManager;
 using static GameMonitor.GtaVcMonitor;
 
@@ -15,21 +17,37 @@ public class GtaVcGameRule : GameRule
     {
         _monitor = new GtaVcMonitor(memoryService);
         _stopwatch = Stopwatch.StartNew();
+        _timer = new Timer(RecoverStrength, null, Timeout.Infinite, Timeout.Infinite);
+
         _monitor.PlayerTookDamage += Monitor_PlayerTookDamage;
         _monitor.PlayerBusted += Monitor_PlayerBusted;
         _monitor.PlayerWasted += Monitor_PlayerWasted;
         _monitor.PlayerWantedLevelChanged += Monitor_PlayerWantedLevelChanged;
         _monitor.PlayerFellOffBike += Monitor_PlayerFellOffBike;
+
+        _dueTime = new Dictionary<string, long>
+        {
+            [nameof(DamageRuleDuration)] = 0
+        };
     }
 
     ~GtaVcGameRule()
     {
         _monitor.Stop();
         _stopwatch.Stop();
+        _timer.Dispose();
+
+        _monitor.PlayerTookDamage -= Monitor_PlayerTookDamage;
+        _monitor.PlayerBusted -= Monitor_PlayerBusted;
+        _monitor.PlayerWasted -= Monitor_PlayerWasted;
+        _monitor.PlayerWantedLevelChanged -= Monitor_PlayerWantedLevelChanged;
+        _monitor.PlayerFellOffBike -= Monitor_PlayerFellOffBike;
     }
 
     private readonly GtaVcMonitor _monitor;
     private readonly Stopwatch _stopwatch;
+    private readonly Timer _timer;
+    private readonly Dictionary<string, long> _dueTime;
     private float _playerTookDamageTotal;
     private long _damageRuleStart;
 
@@ -56,7 +74,6 @@ public class GtaVcGameRule : GameRule
                 field = value;
                 _playerTookDamageTotal = 0;
                 DamageRuleOutputStrength = 0;
-                ComputeOutputStrength();
             }
         }
     }
@@ -67,29 +84,62 @@ public class GtaVcGameRule : GameRule
         set
         {
             field = value;
-            ComputePlayerTookDamageOutputStrength();
+            ComputeDamageRuleOutputStrength();
         }
     }
 
     public int DamageRuleStrength { get; set; }
 
-    public int DamageRuleDuration { get; set; }
-
-    public int DamageRuleOutputStrength
+    public int DamageRuleDuration
     {
-        get
-        {
-            var now = _stopwatch.ElapsedTicks;
-            var duration = DamageRuleDuration * TimeSpan.TicksPerSecond;
-            if (now >= _damageRuleStart + duration)
-                field = 0;
-            return field;
-        }
-
+        get;
         set
         {
             field = value;
-            _damageRuleStart = _stopwatch.ElapsedTicks;
+            TryRecoverDamageRuleOutputStrength(value);
+            ChangeTimer();
+        }
+    }
+
+    public int DamageRuleOutputStrength
+    {
+        get;
+        set
+        {
+            if (field != value)
+            {
+                field = value;
+                if (value != 0)
+                {
+                    _damageRuleStart = _stopwatch.ElapsedTicks;
+                    _dueTime[nameof(DamageRuleDuration)] = DamageRuleDuration * TimeSpan.TicksPerSecond;
+                    ChangeTimer();
+                }
+                OnOutputStrengthChanged();
+            }
+        }
+    }
+
+    private void RecoverStrength(object? state)
+    {
+        TryRecoverDamageRuleOutputStrength(DamageRuleDuration);
+
+        ChangeTimer();
+    }
+
+    private void ChangeTimer()
+    {
+        long min = long.MaxValue;
+        foreach (var value in _dueTime.Values)
+        {
+            if (value > 0 && value < min)
+            {
+                min = value;
+            }
+        }
+        if (min != long.MaxValue)
+        {
+            _timer.Change(min / TimeSpan.TicksPerMillisecond, Timeout.Infinite);
         }
     }
 
@@ -98,7 +148,7 @@ public class GtaVcGameRule : GameRule
         var damage = e.Damage;
         WeakReferenceMessenger.Default.Send(new Log($"汤米受到了{damage:F2}点伤害"));
 
-        if (!DamageRuleEnable)
+        if (!DamageRuleEnable || DamageRuleDuration <= 0)
             return;
 
         if (DamageRuleThreshold > 0 && damage > 0)
@@ -120,7 +170,7 @@ public class GtaVcGameRule : GameRule
             return;
         }
         _playerTookDamageTotal = _playerTookDamageTotal + damage;
-        ComputePlayerTookDamageOutputStrength();
+        ComputeDamageRuleOutputStrength();
     }
 
     private void Monitor_PlayerBusted(object? sender, PlayerBustedEventArgs e)
@@ -176,7 +226,7 @@ public class GtaVcGameRule : GameRule
         return result;
     }
 
-    private void ComputePlayerTookDamageOutputStrength()
+    private void ComputeDamageRuleOutputStrength()
     {
         if (!IsEnable || !DamageRuleEnable)
         {
@@ -185,14 +235,26 @@ public class GtaVcGameRule : GameRule
         else if ((DamageRuleThreshold > 0 && _playerTookDamageTotal > DamageRuleThreshold)
             || (DamageRuleThreshold < 0 && _playerTookDamageTotal < DamageRuleThreshold))
         {
-            var multiple = _playerTookDamageTotal / DamageRuleThreshold;
+            int multiple = (int)(_playerTookDamageTotal / DamageRuleThreshold);
             _playerTookDamageTotal %= DamageRuleThreshold;
-            DamageRuleOutputStrength = DamageRuleOutputStrength + (int)(multiple * DamageRuleStrength);
+            int delta = multiple * DamageRuleStrength;
+            DamageRuleOutputStrength = DamageRuleOutputStrength + delta;
+            WeakReferenceMessenger.Default.Send(new Log($"罪恶都市伤害规则触发，强度{delta}"));
         }
         else
         {
             return;
         }
-        ComputeOutputStrength();
+    }
+
+    private void TryRecoverDamageRuleOutputStrength(int seconds)
+    {
+        if (_damageRuleStart == 0)
+            return;
+
+        var dueTime = _damageRuleStart - _stopwatch.ElapsedTicks + seconds * TimeSpan.TicksPerSecond;
+        if (dueTime <= 0)
+            DamageRuleOutputStrength = 0;
+        _dueTime[nameof(DamageRuleDuration)] = dueTime;
     }
 }
