@@ -96,6 +96,15 @@ public partial class GamesPageViewModel : ObservableObject
     [ObservableProperty]
     public partial double GtaVcMiTangRuleDuration { get; set; }
 
+    [ObservableProperty]
+    public partial bool GtaVcWantedLevelRuleEnable { get; set; }
+
+    [ObservableProperty]
+    public partial double GtaVcWantedLevelRuleStrength { get; set; }
+
+    [ObservableProperty]
+    public partial double GtaVcWantedLevelRuleDuration { get; set; }
+
     private void GameManager_OutputStrengthChanged(object? sender, EventArgs e)
     {
         var outputStrength = _gameManager.OutputStrength;
@@ -188,5 +197,20 @@ public partial class GamesPageViewModel : ObservableObject
     partial void OnGtaVcMiTangRuleDurationChanged(double value)
     {
         _gameManager.GtaVcGameRule.MiTangRuleDuration = (int)value;
+    }
+
+    partial void OnGtaVcWantedLevelRuleEnableChanged(bool value)
+    {
+        _gameManager.GtaVcGameRule.WantedLevelRuleEnable = value;
+    }
+
+    partial void OnGtaVcWantedLevelRuleStrengthChanged(double value)
+    {
+        _gameManager.GtaVcGameRule.WantedLevelRuleStrength = (int)value;
+    }
+
+    partial void OnGtaVcWantedLevelRuleDurationChanged(double value)
+    {
+        _gameManager.GtaVcGameRule.WantedLevelRuleDuration = (int)value;
     }
 }

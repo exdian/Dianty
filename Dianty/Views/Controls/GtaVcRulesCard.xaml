@@ -118,6 +118,28 @@
                 </toolkit:SettingsCard.Header>
                 <ToggleSwitch IsOn="{x:Bind ViewModel.GtaVcMiTangRuleEnable, Mode=TwoWay}"/>
             </toolkit:SettingsCard>
+            <toolkit:SettingsCard>
+                <toolkit:SettingsCard.Header>
+                    <StackPanel Spacing="{StaticResource CommonCardSpacing}">
+                        <TextBlock Text="每获得1枚好市民勋章" Style="{StaticResource BodyTextBlockStyle}" Margin="0,7"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="惩罚强度" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
+                            <NumberBox
+                                SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
+                                Value="{x:Bind ViewModel.GtaVcWantedLevelRuleStrength, Mode=TwoWay}"
+                                SmallChange="1" LargeChange="20" Minimum="-200" Maximum="200"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="持续时间（秒）" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
+                            <NumberBox
+                                SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
+                                Value="{x:Bind ViewModel.GtaVcWantedLevelRuleDuration, Mode=TwoWay}"
+                                SmallChange="1" LargeChange="10" Minimum="0" Maximum="200"/>
+                        </StackPanel>
+                    </StackPanel>
+                </toolkit:SettingsCard.Header>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.GtaVcWantedLevelRuleEnable, Mode=TwoWay}"/>
+            </toolkit:SettingsCard>
         </toolkit:SettingsExpander.Items>
     </toolkit:SettingsExpander>
 </UserControl>

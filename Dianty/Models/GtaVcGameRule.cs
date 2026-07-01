@@ -58,6 +58,7 @@ public class GtaVcGameRule : GameRule
     private long _bustedRuleStartTick;
     private long _wastedRuleStartTick;
     private long _miTangRuleStartTick;
+    private long _wantedLevelRuleStartTick;
 
     public override bool IsEnable
     {
@@ -263,12 +264,58 @@ public class GtaVcGameRule : GameRule
         }
     }
 
+    public bool WantedLevelRuleEnable
+    {
+        get;
+        set
+        {
+            if (field != value)
+            {
+                field = value;
+                WantedLevelRuleOutputStrength = 0;
+            }
+        }
+    }
+
+    public int WantedLevelRuleStrength { get; set; }
+
+    public int WantedLevelRuleDuration
+    {
+        get;
+        set
+        {
+            field = value;
+            TryRecoverRuleOutputStrength(_wantedLevelRuleStartTick, value, Rule.WantedLevel, s => WantedLevelRuleOutputStrength = s);
+            ChangeTimer();
+        }
+    }
+
+    public int WantedLevelRuleOutputStrength
+    {
+        get;
+        private set
+        {
+            if (field != value)
+            {
+                field = value;
+                if (value != 0)
+                {
+                    _wantedLevelRuleStartTick = _stopwatch.ElapsedTicks;
+                    _dueTime[Rule.WantedLevel] = WantedLevelRuleDuration * TimeSpan.TicksPerSecond;
+                    ChangeTimer();
+                }
+                ComputeOutputStrength();
+            }
+        }
+    }
+
     private void RecoverStrength(object? state)
     {
         TryRecoverRuleOutputStrength(_damageRuleStartTick, DamageRuleDuration, Rule.Damage, s => DamageRuleOutputStrength = s);
         TryRecoverRuleOutputStrength(_bustedRuleStartTick, BustedRuleDuration, Rule.Busted, s => BustedRuleOutputStrength = s);
         TryRecoverRuleOutputStrength(_wastedRuleStartTick, WastedRuleDuration, Rule.Wasted, s => WastedRuleOutputStrength = s);
         TryRecoverRuleOutputStrength(_miTangRuleStartTick, MiTangRuleDuration, Rule.MiTang, s => MiTangRuleOutputStrength = s);
+        TryRecoverRuleOutputStrength(_wantedLevelRuleStartTick, WantedLevelRuleDuration, Rule.WantedLevel, s => WantedLevelRuleOutputStrength = s);
 
         ChangeTimer();
     }
@@ -304,7 +351,8 @@ public class GtaVcGameRule : GameRule
     {
         int[] strengths =
         [
-            0, DamageRuleOutputStrength, BustedRuleOutputStrength, WastedRuleOutputStrength, MiTangRuleOutputStrength
+            0, DamageRuleOutputStrength, BustedRuleOutputStrength, WastedRuleOutputStrength, MiTangRuleOutputStrength,
+            WantedLevelRuleOutputStrength
         ];
         return strengths.Max();
     }
@@ -314,7 +362,8 @@ public class GtaVcGameRule : GameRule
         int result = 0;
         int[] strengths =
         [
-            DamageRuleOutputStrength, BustedRuleOutputStrength, WastedRuleOutputStrength, MiTangRuleOutputStrength
+            DamageRuleOutputStrength, BustedRuleOutputStrength, WastedRuleOutputStrength, MiTangRuleOutputStrength,
+            WantedLevelRuleOutputStrength
         ];
         for (var i = 0; i < strengths.Length; i++)
         {
@@ -425,6 +474,18 @@ public class GtaVcGameRule : GameRule
     {
         var diff = e.Diff;
         WeakReferenceMessenger.Default.Send(new Log(diff > 0 ? $"汤米获得了{diff}枚好市民勋章" : $"汤米丢失了{-diff}枚好市民勋章"));
+
+        if (diff > 0)
+        {
+            if (!IsEnable || !WantedLevelRuleEnable || WantedLevelRuleDuration <= 0)
+            {
+                WantedLevelRuleOutputStrength = 0;
+            }
+            else
+            {
+                WantedLevelRuleOutputStrength = WantedLevelRuleOutputStrength + diff * WantedLevelRuleStrength;
+            }
+        }
     }
 
     private void Monitor_PlayerFellOffBike(object? sender, PlayerFellOffBikeEventArgs e)
