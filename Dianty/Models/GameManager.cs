@@ -24,7 +24,7 @@ public class GameManager : AutomaticStrength
 
     private void GtaVcGameRule_OutputStrengthChanged(object? sender, EventArgs e)
     {
-        OnOutputStrengthChanged();
+        ComputeOutputStrength();
     }
 
     protected override int GetMaxStrength()
@@ -35,7 +35,7 @@ public class GameManager : AutomaticStrength
             var gameRule = _gameRules[i];
             if (gameRule.IsEnable)
             {
-                var outputStrength = gameRule.ComputeOutputStrength();
+                var outputStrength = gameRule.OutputStrength;
                 if (outputStrength > result)
                 {
                     result = outputStrength;
@@ -53,7 +53,7 @@ public class GameManager : AutomaticStrength
             var gameRule = _gameRules[i];
             if (gameRule.IsEnable)
             {
-                var outputStrength = gameRule.ComputeOutputStrength();
+                var outputStrength = gameRule.OutputStrength;
                 if (outputStrength > result)
                 {
                     result = result + outputStrength;

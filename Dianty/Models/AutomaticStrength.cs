@@ -6,17 +6,30 @@ public abstract class AutomaticStrength
 {
     public Mode StrengthMode { get; set; }
 
-    public event EventHandler? OutputStrengthChanged;
+    public int OutputStrength
+    {
+        get;
+        private set
+        {
+            if (field != value)
+            {
+                field = value;
+                OnOutputStrengthChanged(value);
+            }
+        }
+    }
 
-    public int ComputeOutputStrength()
+    public event EventHandler<OutputStrengthChangedEventArgs>? OutputStrengthChanged;
+
+    protected void ComputeOutputStrength()
     {
         if (StrengthMode == Mode.Max)
         {
-            return GetMaxStrength();
+            OutputStrength = GetMaxStrength();
         }
         else
         {
-            return SumStrength();
+            OutputStrength = SumStrength();
         }
     }
 
@@ -24,9 +37,15 @@ public abstract class AutomaticStrength
 
     protected abstract int SumStrength();
 
-    protected void OnOutputStrengthChanged()
+    protected void OnOutputStrengthChanged(int strength)
     {
-        OutputStrengthChanged?.Invoke(this, EventArgs.Empty);
+        var args = new OutputStrengthChangedEventArgs(strength);
+        OutputStrengthChanged?.Invoke(this, args);
+    }
+
+    public class OutputStrengthChangedEventArgs(int strength) : EventArgs
+    {
+        public int Strength { get; } = strength;
     }
 
     public enum Mode

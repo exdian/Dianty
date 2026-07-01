@@ -104,7 +104,7 @@ public class GtaVcGameRule : GameRule
     public int DamageRuleOutputStrength
     {
         get;
-        set
+        private set
         {
             if (field != value)
             {
@@ -115,7 +115,7 @@ public class GtaVcGameRule : GameRule
                     _dueTime[nameof(DamageRuleDuration)] = DamageRuleDuration * TimeSpan.TicksPerSecond;
                     ChangeTimer();
                 }
-                OnOutputStrengthChanged();
+                ComputeOutputStrength();
             }
         }
     }
@@ -239,7 +239,6 @@ public class GtaVcGameRule : GameRule
             _playerTookDamageTotal %= DamageRuleThreshold;
             int delta = multiple * DamageRuleStrength;
             DamageRuleOutputStrength = DamageRuleOutputStrength + delta;
-            WeakReferenceMessenger.Default.Send(new Log($"罪恶都市伤害规则触发，强度{delta}"));
         }
         else
         {

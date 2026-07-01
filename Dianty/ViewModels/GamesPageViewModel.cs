@@ -71,7 +71,7 @@ public partial class GamesPageViewModel : ObservableObject
 
     private void GameManager_OutputStrengthChanged(object? sender, EventArgs e)
     {
-        var outputStrength = _gameManager.ComputeOutputStrength();
+        var outputStrength = _gameManager.OutputStrength;
         _queueService.TryEnqueue(() =>
         {
             OutputStrength = outputStrength;
