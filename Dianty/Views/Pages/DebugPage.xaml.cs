@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.Messaging;
+using Dianty.Utils;
 using Dianty.ViewModels;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
@@ -21,11 +22,6 @@ public sealed partial class DebugPage : Page
                 _logListView.ScrollIntoView(ViewModel.Logs[^1]);
             }
         });
-
-        Loaded += (s, e) =>
-        {
-            ViewModel?.AppendLog("调试页面已加载");
-        };
 
         Unloaded += (s, e) =>
         {

@@ -1,4 +1,6 @@
-﻿using GameMonitor;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using Dianty.Utils;
+using GameMonitor;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -93,10 +95,12 @@ public class GtaVcGameRule : GameRule
 
     private void Monitor_PlayerTookDamage(object? sender, PlayerTookDamageEventArgs e)
     {
+        var damage = e.Damage;
+        WeakReferenceMessenger.Default.Send(new LogMessage($"汤米受到了{damage:F2}点伤害"));
+
         if (!DamageRuleEnable)
             return;
 
-        var damage = e.Damage;
         if (DamageRuleThreshold > 0 && damage > 0)
         {
             if (_playerTookDamageTotal < 0)
@@ -121,22 +125,28 @@ public class GtaVcGameRule : GameRule
 
     private void Monitor_PlayerBusted(object? sender, PlayerBustedEventArgs e)
     {
-        throw new NotImplementedException();
+        var level = e.WantedLevel;
+        WeakReferenceMessenger.Default.Send(new LogMessage($"汤米被抓了，痛失{level}枚好市民勋章"));
     }
 
     private void Monitor_PlayerWasted(object? sender, PlayerWastedEventArgs e)
     {
-        throw new NotImplementedException();
+        var isMiTang = e.IsMiTang;
+        WeakReferenceMessenger.Default.Send(new LogMessage(isMiTang ? "汤米变成了米汤" : "汤米浪费了"));
     }
 
     private void Monitor_PlayerWantedLevelChanged(object? sender, PlayerWantedLevelChangedEventArgs e)
     {
-        throw new NotImplementedException();
+        var diff = e.Diff;
+        WeakReferenceMessenger.Default.Send(new LogMessage(diff > 0 ? $"汤米获得了{diff}枚好市民勋章" : $"汤米丢失了{-diff}枚好市民勋章"));
     }
 
     private void Monitor_PlayerFellOffBike(object? sender, PlayerFellOffBikeEventArgs e)
     {
-        throw new NotImplementedException();
+        var vehicleId = e.VehicleId;
+        var vehicleType = e.VehicleType;
+        var vehicleName = e.VehicleName;
+        WeakReferenceMessenger.Default.Send(new LogMessage($"汤米从{vehicleName}上摔下来了。{(short)vehicleId} 0x{(byte)vehicleType: X}"));
     }
 
     protected override int GetMaxStrength()

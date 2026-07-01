@@ -48,5 +48,3 @@ public partial class DebugPageViewModel : ObservableObject
         Logs.Clear();
     }
 }
-
-public class LogAppendedMessage { }
