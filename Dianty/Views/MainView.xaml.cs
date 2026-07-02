@@ -1,6 +1,8 @@
+using CommunityToolkit.Mvvm.Messaging;
 using Dianty.Services;
 using Dianty.Utils;
 using Dianty.Views.Pages;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -15,24 +17,29 @@ namespace Dianty.Views;
 
 public sealed partial class MainView : UserControl
 {
-    public MainView(ITitleBarService titleBarService, IWindowService windowService)
+    public MainView(ITitleBarService titleBarService, IWindowService windowService, IQueueService queueService)
     {
         InitializeComponent();
         _titleBarService = titleBarService;
         _windowService = windowService;
+        _queueService = queueService;
 
         // 导航按钮不居中，需要手动刷新一下
         _navView.IsPaneOpen = false;
         _navView.IsPaneOpen = true;
 
-#if DEBUG
-        _navView.MenuItems.Add(DebugPage.GetNavigationViewItem());
-#endif
+        _debugMenuItem = DebugPage.GetNavigationViewItem();
+        _keySequenceTrigger.AddKeySequence("debug", ToggleDebugMenuItem);
+        Loaded += MainView_Loaded;
+        Unloaded += MainView_Unloaded;
     }
 
     private readonly ITitleBarService _titleBarService;
     private readonly IWindowService _windowService;
+    private readonly IQueueService _queueService;
     private readonly List<FrameworkElement> _interactableElements = [];
+    private readonly KeySequenceTrigger _keySequenceTrigger = new();
+    private readonly NavigationViewItem _debugMenuItem;
     private RectInt32[] _previousPassthroughRects = [];
     private Button? _backButton;
     private Button? _closePaneButton;
@@ -44,6 +51,37 @@ public sealed partial class MainView : UserControl
     private Type GamesPage => typeof(GamesPage);
     private Type SafetyPage => typeof(SafetyPage);
     private static Type SettingsPage => typeof(SettingsPage);
+
+    private void MainView_Loaded(object sender, RoutedEventArgs e)
+    {
+        WeakReferenceMessenger.Default.Register<KeyDownMessage>(this, ProcessKey);
+    }
+
+    private void MainView_Unloaded(object sender, RoutedEventArgs e)
+    {
+        WeakReferenceMessenger.Default.Unregister<KeyDownMessage>(this);
+    }
+
+    private void ProcessKey(object recipient, KeyDownMessage message)
+    {
+        _keySequenceTrigger.ProcessKey(message.Key);
+    }
+
+    private void ToggleDebugMenuItem()
+    {
+        _queueService.TryEnqueue(DispatcherQueuePriority.Low, () =>
+        {
+            if (_navView.MenuItems.Contains(_debugMenuItem))
+            {
+                _navView.MenuItems.Remove(_debugMenuItem);
+                NavView_BackRequested(null!, null!);
+            }
+            else
+            {
+                _navView.MenuItems.Add(_debugMenuItem);
+            }
+        });
+    }
 
     private void NavView_Loaded(object sender, RoutedEventArgs e)
     {

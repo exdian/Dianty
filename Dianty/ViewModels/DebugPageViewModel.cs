@@ -4,11 +4,12 @@ using CommunityToolkit.Mvvm.Messaging;
 using Dianty.Services;
 using Dianty.Utils;
 using Microsoft.UI.Dispatching;
+using System;
 using System.Collections.ObjectModel;
 
 namespace Dianty.ViewModels;
 
-public partial class DebugPageViewModel : ObservableObject
+public partial class DebugPageViewModel : ObservableObject, IDisposable
 {
     public DebugPageViewModel(IQueueService queueService)
     {
@@ -22,7 +23,7 @@ public partial class DebugPageViewModel : ObservableObject
 
     ~DebugPageViewModel()
     {
-        WeakReferenceMessenger.Default.Unregister<Log>(this);
+        Dispose();
     }
 
     private readonly IQueueService _queueService;
@@ -56,5 +57,11 @@ public partial class DebugPageViewModel : ObservableObject
     private void ClearLog()
     {
         Logs.Clear();
+    }
+
+    public void Dispose()
+    {
+        WeakReferenceMessenger.Default.Unregister<Log>(this);
+        GC.SuppressFinalize(this);
     }
 }
