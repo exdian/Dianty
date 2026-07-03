@@ -56,6 +56,14 @@
         </NavigationView>
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
+                <!-- 在小窗口尺寸下加载页面仍会触发 MinWindowWidth="{StaticResource MinimalModeThresholdWidth}" 的
+                AdaptiveTrigger，即使不使用资源，直接写 MinWindowWidth="500"，问题也依旧存在，原因不明。
+                但是加上另一个 MinWindowWidth="1" 的 AdaptiveTrigger 后问题解决了 -->
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1" />
+                    </VisualState.StateTriggers>
+                </VisualState>
                 <VisualState>
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="{StaticResource MinimalModeThresholdWidth}" />
