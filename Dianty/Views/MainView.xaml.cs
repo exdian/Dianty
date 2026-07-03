@@ -8,10 +8,13 @@ using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
+using Microsoft.UI.Xaml.Shapes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Windows.Foundation;
 using Windows.Graphics;
 
 namespace Dianty.Views;
@@ -131,6 +134,17 @@ public sealed partial class MainView : UserControl
             _backButton = VisualTreeHelperExtension.FindChildByName(_navView, "NavigationViewBackButton") as Button;
             _closePaneButton = VisualTreeHelperExtension.FindChildByName(_navView, "NavigationViewCloseButton") as Button;
             _togglePaneButton = VisualTreeHelperExtension.FindChildByName(_navView, "TogglePaneButton") as Button;
+
+            // 面板浮动打开时的透明矩形
+            var rectangle = VisualTreeHelperExtension.FindChildByName(splitView, "LightDismissLayer") as Rectangle;
+            if (rectangle is not null)
+            {
+                var clip = new RectangleGeometry
+                {
+                    Rect = new Rect(0, 48, float.MaxValue, float.MaxValue)
+                };
+                rectangle.Clip = clip;
+            }
         }
     }
 
@@ -243,10 +257,9 @@ public sealed partial class MainView : UserControl
     {
         if (!_contentFrame.CanGoBack)
             return;
-        if (_navView.IsPaneOpen
-            && (_navView.DisplayMode == NavigationViewDisplayMode.Compact
-            || _navView.DisplayMode == NavigationViewDisplayMode.Minimal))
+        if (_navView.IsPaneOpen && (_navView.DisplayMode is NavigationViewDisplayMode.Compact or NavigationViewDisplayMode.Minimal))
         {
+            _navView.IsPaneOpen = false;
             return;
         }
 
@@ -289,5 +302,13 @@ public sealed partial class MainView : UserControl
     private void RootElement_PointerPressed(object sender, PointerRoutedEventArgs e)
     {
         UpdateIconRegion();
+    }
+
+    private void TitleBar_PointerPressed(object sender, PointerRoutedEventArgs e)
+    {
+        if (_navView.IsPaneOpen && (_navView.DisplayMode is NavigationViewDisplayMode.Compact or NavigationViewDisplayMode.Minimal))
+        {
+            _navView.IsPaneOpen = false;
+        }
     }
 }

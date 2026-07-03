@@ -8,7 +8,9 @@
     mc:Ignorable="d">
 
     <Grid PointerPressed="RootElement_PointerPressed">
-        <Grid MinHeight="48" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="56,0,0,0">
+        <Grid
+            MinHeight="48" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="56,0,144,0"
+            Background="Transparent" PointerPressed="TitleBar_PointerPressed">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
@@ -18,7 +20,7 @@
             </Viewbox>
             <TextBlock
                 x:Name="_titleText" Grid.Column="1"
-                Text="Dianty" Style="{StaticResource CaptionTextBlockStyle}" Margin="16,0,142,0"
+                Text="Dianty" Style="{StaticResource CaptionTextBlockStyle}" Margin="16,0,0,0"
                 TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" VerticalAlignment="Center"/>
         </Grid>
         <NavigationView
