@@ -13,4 +13,13 @@
         </format:DecimalFormatter.NumberRounder>
     </format:DecimalFormatter>
 
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Name="Default">
+            <SolidColorBrush x:Key="NavigationViewDefaultPaneBackground" Color="#F02C2C2C"/>
+        </ResourceDictionary>
+        <ResourceDictionary x:Name="Light">
+            <SolidColorBrush x:Key="NavigationViewDefaultPaneBackground" Color="#F0F9F9F9"/>
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+
 </ResourceDictionary>
