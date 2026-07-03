@@ -2,7 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Dianty.Services;
-using Dianty.Utils;
+using Dianty.Utils.Messages;
 using Microsoft.UI.Dispatching;
 using System;
 using System.Collections.ObjectModel;

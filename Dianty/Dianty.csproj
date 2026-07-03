@@ -13,9 +13,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="AppResourceDictionary.xaml" />
     <None Remove="LoadView.xaml" />
     <None Remove="MainView.xaml" />
+    <None Remove="Resources\AppResourceDictionary.xaml" />
     <None Remove="Views\Controls\GtaVcRulesCard.xaml" />
     <None Remove="Views\Pages\DebugPage.xaml" />
     <None Remove="Views\Pages\DevicesPage.xaml" />
@@ -69,12 +69,12 @@
     <ProjectReference Include="..\..\DiantyCore\GameMonitor\GameMonitor.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Pages\DebugPage.xaml">
+    <Page Update="Resources\AppResourceDictionary.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="AppResourceDictionary.xaml">
+    <Page Update="Views\Pages\DebugPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

@@ -1,5 +1,5 @@
 using CommunityToolkit.Mvvm.Messaging;
-using Dianty.Utils;
+using Dianty.Utils.Messages;
 using Dianty.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;

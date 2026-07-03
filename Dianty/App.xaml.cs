@@ -1,4 +1,5 @@
 ﻿using Dianty.Models;
+using Dianty.Resources;
 using Dianty.Services;
 using Dianty.ViewModels;
 using Dianty.Views.Pages;
@@ -63,7 +64,7 @@ public partial class App : Application
     private void MergedDictionaries()
     {
         var newDictionary = new ResourceDictionary();
-        LoadComponent(newDictionary, new Uri("ms-appx:///AppResourceDictionary.xaml", UriKind.Absolute));
+        LoadComponent(newDictionary, new Uri("ms-appx:///Resources/AppResourceDictionary.xaml", UriKind.Absolute));
         Resources.MergedDictionaries.Add(newDictionary);
     }
 }

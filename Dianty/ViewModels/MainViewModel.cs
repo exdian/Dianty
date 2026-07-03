@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Dianty.Resources;
 using Dianty.Services;
 using Microsoft.UI.Dispatching;
 using System;

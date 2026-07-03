@@ -2,7 +2,6 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Dianty"
     xmlns:format="using:Windows.Globalization.NumberFormatting">
 
     <x:Double x:Key="MinimalModeThresholdWidth">500</x:Double>
@@ -13,5 +12,5 @@
             <format:IncrementNumberRounder Increment="1" RoundingAlgorithm="RoundHalfUp" />
         </format:DecimalFormatter.NumberRounder>
     </format:DecimalFormatter>
-    
+
 </ResourceDictionary>

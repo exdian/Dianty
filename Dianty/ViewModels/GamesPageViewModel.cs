@@ -2,7 +2,7 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Dianty.Models;
 using Dianty.Services;
-using Dianty.Utils;
+using Dianty.Utils.Messages;
 using GameMonitor;
 using System;
 using System.Collections.Generic;

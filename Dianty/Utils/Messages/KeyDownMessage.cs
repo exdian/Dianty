@@ -1,6 +1,6 @@
 ﻿using Windows.System;
 
-namespace Dianty.Utils;
+namespace Dianty.Utils.Messages;
 
 public class KeyDownMessage
 {

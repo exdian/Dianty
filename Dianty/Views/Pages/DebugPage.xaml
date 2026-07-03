@@ -3,7 +3,7 @@
     x:Class="Dianty.Views.Pages.DebugPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:utils="using:Dianty.Utils"
+    xmlns:msg="using:Dianty.Utils.Messages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -21,7 +21,7 @@
             x:Name="_logListView" Grid.Row="1" Padding="9,0"
             SelectionMode="Extended" ItemsSource="{x:Bind ViewModel.Logs}">
             <ListView.ItemTemplate>
-                <DataTemplate x:DataType="utils:Log">
+                <DataTemplate x:DataType="msg:Log">
                     <TextBlock 
                         Text="{x:Bind ToString()}" FontFamily="Consolas, Courier New, monospace"
                         TextWrapping="Wrap" Margin="0,10"/>

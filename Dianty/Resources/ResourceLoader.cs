@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Dianty;
+namespace Dianty.Resources;
 
 internal static class ResourceLoader
 {
