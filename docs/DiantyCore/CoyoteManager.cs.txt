@@ -1,0 +1,17 @@
+﻿namespace DungeonToolkit.Coyote;
+
+public class CoyoteManager  
+{
+    public CoyoteManager();
+    public WaveQueue ChannelA { get; }
+    public WaveQueue ChannelB { get; }
+    public int WebSocketWaveFlow { get; set; }
+    public int Strength { get; set; }
+    public void AddCoyote(CoyoteBLE coyote);
+    public void AddCoyote(CoyoteWS coyote);
+    public bool RemoveCoyote(CoyoteBLE coyote);
+    public bool RemoveCoyote(CoyoteWS coyote);
+    public void StartOutput();
+    public void StopOutput();
+}
+

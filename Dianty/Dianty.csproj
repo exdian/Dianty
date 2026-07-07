@@ -66,6 +66,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\DiantyCore\DungeonToolkit\DungeonToolkit.csproj" />
     <ProjectReference Include="..\..\DiantyCore\GameMonitor\GameMonitor.csproj" />
   </ItemGroup>
   <ItemGroup>

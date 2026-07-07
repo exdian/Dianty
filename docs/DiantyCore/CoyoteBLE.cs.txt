@@ -1,0 +1,35 @@
+﻿namespace DungeonToolkit.Coyote;
+
+public class CoyoteBLE  
+{
+    public CoyoteBLE();
+    public string DeviceName { get; set; }
+    public bool IsEnabled { get; set; }
+    public byte MaxStrengthA { get; set; }
+    public byte MaxStrengthB { get; set; }
+    public bool IsGentle { get; set; }
+    public byte BfFrequencyParamA { get; set; }
+    public byte BfFrequencyParamB { get; set; }
+    public byte BfStrengthParamA { get; set; }
+    public byte BfStrengthParamB { get; set; }
+    public bool IsConnected { get; }
+    public byte BatteryLevel { get; }
+    public byte CurrentStrengthA { get; }
+    public byte CurrentStrengthB { get; }
+    public int TargetStrengthA { get; set; }
+    public int TargetStrengthB { get; set; }
+    public event EventHandler? Disconnected;
+    public event EventHandler<StrengthChangedEventArgs>? StrengthChanged;
+    public async Task<bool> ConnectNewAsync(ICoyoteBLEDetector coyoteDetector, CancellationToken token);
+    public async Task<bool> ReconnectingAsync(ICoyoteBLEDetector coyoteDetector, CancellationToken token);
+    public async Task<bool> SendB0CommandAsync();
+    public async Task<bool> SendBfCommandAsync();
+    public async Task<bool> UpdateBatteryLevelAsync();
+    public void UpdatePulseData(PulseData pulseA, PulseData pulseB);
+    public class StrengthChangedEventArgs(byte currentStrengthA, byte currentStrengthB) : EventArgs 
+    {
+        public byte CurrentStrengthA { get; }
+        public byte CurrentStrengthB { get; }
+    }
+}
+

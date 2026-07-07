@@ -1,0 +1,40 @@
+﻿namespace DungeonToolkit.Coyote;
+
+public class CoyoteWS  
+{
+    public string DeviceName { get; set; }
+    public bool IsEnabled { get; set; }
+    public string ClientId { get; }
+    public bool IsConnected { get; }
+    public byte CurrentStrengthA { get; }
+    public byte CurrentStrengthB { get; }
+    public byte StrengthCapA { get; set; }
+    public byte StrengthCapB { get; set; }
+    public event EventHandler? Disconnected;
+    public event EventHandler<ClientIdChangedEventArgs>? ClientIdChanged;
+    public event EventHandler? BindingSucceed;
+    public event EventHandler<StrengthChangedEventArgs>? StrengthChanged;
+    public event EventHandler<FeedbackReceivedEventArgs>? FeedbackReceived;
+    public async Task<bool> TryConnectAsync(CancellationToken token);
+    public async Task DisconnectAsync();
+    public async Task<bool> SetStrengthAsync(int strength, Channel channel);
+    public bool AddPulseList(PulseData pulseA, PulseData pulseB);
+    public async Task<bool> SendPulseDataAsync();
+    public async Task<bool> ClearPulseListAsync(Channel channel);
+    public class ClientIdChangedEventArgs(string clientId) : EventArgs 
+    {
+        public string ClientId { get; }
+    }
+    public class StrengthChangedEventArgs(byte currentStrengthA, byte currentStrengthB, byte maxStrengthA, byte maxStrengthB) : EventArgs 
+    {
+        public byte CurrentStrengthA { get; }
+        public byte CurrentStrengthB { get; }
+        public byte MaxStrengthA { get; }
+        public byte MaxStrengthB { get; }
+    }
+    public class FeedbackReceivedEventArgs(int feedback) : EventArgs 
+    {
+        public int Feedback { get; }
+    }
+}
+

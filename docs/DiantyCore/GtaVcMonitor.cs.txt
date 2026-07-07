@@ -21,9 +21,9 @@ public class GtaVcMonitor
     {
         public float Damage { get; }
     }
-    public class PlayerBustedEventArgs(int level) : EventArgs 
+    public class PlayerBustedEventArgs(int wantedLevel) : EventArgs 
     {
-        public int Level { get; }
+        public int WantedLevel { get; }
     }
     public class PlayerWastedEventArgs(bool isMiTang) : EventArgs 
     {
