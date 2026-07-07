@@ -33,7 +33,7 @@ public class GameManager : AutomaticStrength
         for (int i = 0; i < _gameRules.Length; i++)
         {
             var gameRule = _gameRules[i];
-            if (gameRule.IsEnable)
+            if (gameRule.IsEnabled)
             {
                 var outputStrength = gameRule.OutputStrength;
                 if (outputStrength > result)
@@ -51,7 +51,7 @@ public class GameManager : AutomaticStrength
         for (int i = 0; i < _gameRules.Length; i++)
         {
             var gameRule = _gameRules[i];
-            if (gameRule.IsEnable)
+            if (gameRule.IsEnabled)
             {
                 var outputStrength = gameRule.OutputStrength;
                 if (outputStrength > result)
@@ -69,6 +69,6 @@ public class GameManager : AutomaticStrength
 
         public string Description { get; set; } = string.Empty;
 
-        public virtual bool IsEnable { get; set; }
+        public virtual bool IsEnabled { get; set; }
     }
 }

@@ -61,7 +61,7 @@ public class GtaVcGameRule : GameRule
     private long _wantedLevelRuleStartTick;
     private long _fellOffBikeRuleStartTick;
 
-    public override bool IsEnable
+    public override bool IsEnabled
     {
         get;
         set
@@ -74,7 +74,7 @@ public class GtaVcGameRule : GameRule
         }
     }
 
-    public bool DamageRuleEnable
+    public bool DamageRuleEnabled
     {
         get;
         set
@@ -130,7 +130,7 @@ public class GtaVcGameRule : GameRule
         }
     }
 
-    public bool BustedRuleEnable
+    public bool BustedRuleEnabled
     {
         get;
         set
@@ -175,7 +175,7 @@ public class GtaVcGameRule : GameRule
         }
     }
 
-    public bool WastedRuleEnable
+    public bool WastedRuleEnabled
     {
         get;
         set
@@ -220,7 +220,7 @@ public class GtaVcGameRule : GameRule
         }
     }
 
-    public bool MiTangRuleEnable
+    public bool MiTangRuleEnabled
     {
         get;
         set
@@ -265,7 +265,7 @@ public class GtaVcGameRule : GameRule
         }
     }
 
-    public bool WantedLevelRuleEnable
+    public bool WantedLevelRuleEnabled
     {
         get;
         set
@@ -310,7 +310,7 @@ public class GtaVcGameRule : GameRule
         }
     }
 
-    public bool FellOffBikeRuleEnable
+    public bool FellOffBikeRuleEnabled
     {
         get;
         set
@@ -425,7 +425,7 @@ public class GtaVcGameRule : GameRule
 
     private void ComputeDamageRuleOutputStrength()
     {
-        if (!IsEnable || !DamageRuleEnable)
+        if (!IsEnabled || !DamageRuleEnabled)
         {
             DamageRuleOutputStrength = 0;
         }
@@ -448,7 +448,7 @@ public class GtaVcGameRule : GameRule
         var damage = e.Damage;
         WeakReferenceMessenger.Default.Send(new Log($"汤米受到了{damage:F2}点伤害"));
 
-        if (!DamageRuleEnable || DamageRuleDuration <= 0)
+        if (!DamageRuleEnabled || DamageRuleDuration <= 0)
             return;
 
         if (DamageRuleThreshold > 0 && damage > 0)
@@ -478,7 +478,7 @@ public class GtaVcGameRule : GameRule
         var level = e.WantedLevel;
         WeakReferenceMessenger.Default.Send(new Log($"汤米被抓了，痛失{level}枚好市民勋章"));
 
-        if (!IsEnable || !BustedRuleEnable || BustedRuleDuration <= 0)
+        if (!IsEnabled || !BustedRuleEnabled || BustedRuleDuration <= 0)
         {
             BustedRuleOutputStrength = 0;
         }
@@ -495,7 +495,7 @@ public class GtaVcGameRule : GameRule
 
         if (isMiTang)
         {
-            if (!IsEnable || !MiTangRuleEnable || MiTangRuleDuration <= 0)
+            if (!IsEnabled || !MiTangRuleEnabled || MiTangRuleDuration <= 0)
             {
                 MiTangRuleOutputStrength = 0;
             }
@@ -506,7 +506,7 @@ public class GtaVcGameRule : GameRule
         }
         else
         {
-            if (!IsEnable || !WastedRuleEnable || WastedRuleDuration <= 0)
+            if (!IsEnabled || !WastedRuleEnabled || WastedRuleDuration <= 0)
             {
                 WastedRuleOutputStrength = 0;
             }
@@ -524,7 +524,7 @@ public class GtaVcGameRule : GameRule
 
         if (diff > 0)
         {
-            if (!IsEnable || !WantedLevelRuleEnable || WantedLevelRuleDuration <= 0)
+            if (!IsEnabled || !WantedLevelRuleEnabled || WantedLevelRuleDuration <= 0)
             {
                 WantedLevelRuleOutputStrength = 0;
             }
@@ -542,7 +542,7 @@ public class GtaVcGameRule : GameRule
         var vehicleName = e.VehicleName;
         WeakReferenceMessenger.Default.Send(new Log($"汤米从{vehicleName}上摔下来了。{(short)vehicleId} 0x{(byte)vehicleType:X2}"));
 
-        if (!IsEnable || !FellOffBikeRuleEnable || FellOffBikeRuleDuration <= 0)
+        if (!IsEnabled || !FellOffBikeRuleEnabled || FellOffBikeRuleDuration <= 0)
         {
             FellOffBikeRuleOutputStrength = 0;
         }

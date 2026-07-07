@@ -235,6 +235,7 @@ public sealed partial class MainView : UserControl
         {
             _backButton?.Opacity = isDeactivated ? 0.5 : 1;
             _closePaneButton?.Opacity = isDeactivated ? 0.5 : 1;
+            _togglePaneButton?.Opacity = 1;
         }
     }
 

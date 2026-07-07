@@ -41,7 +41,7 @@ public partial class GamesPageViewModel : ObservableObject
 
     // 概况
     [ObservableProperty]
-    public partial int EnableGameCount { get; private set; }
+    public partial int EnabledGameCount { get; private set; }
 
     [ObservableProperty]
     public partial int OutputStrength { get; private set; }
@@ -52,13 +52,13 @@ public partial class GamesPageViewModel : ObservableObject
     // 规则
     // 罪恶都市
     [ObservableProperty]
-    public partial bool GtaVcEnable { get; set; }
+    public partial bool GtaVcEnabled { get; set; }
 
     [ObservableProperty]
     public partial KeyValuePair<Mode, string> GtaVcStrengthMode { get; set; }
 
     [ObservableProperty]
-    public partial bool GtaVcDamageRuleEnable { get; set; }
+    public partial bool GtaVcDamageRuleEnabled { get; set; }
 
     [ObservableProperty]
     public partial double GtaVcDamageRuleThreshold { get; set; }
@@ -70,7 +70,7 @@ public partial class GamesPageViewModel : ObservableObject
     public partial double GtaVcDamageRuleDuration { get; set; }
 
     [ObservableProperty]
-    public partial bool GtaVcBustedRuleEnable { get; set; }
+    public partial bool GtaVcBustedRuleEnabled { get; set; }
 
     [ObservableProperty]
     public partial double GtaVcBustedRuleStrength { get; set; }
@@ -79,7 +79,7 @@ public partial class GamesPageViewModel : ObservableObject
     public partial double GtaVcBustedRuleDuration { get; set; }
 
     [ObservableProperty]
-    public partial bool GtaVcWastedRuleEnable { get; set; }
+    public partial bool GtaVcWastedRuleEnabled { get; set; }
 
     [ObservableProperty]
     public partial double GtaVcWastedRuleStrength { get; set; }
@@ -88,7 +88,7 @@ public partial class GamesPageViewModel : ObservableObject
     public partial double GtaVcWastedRuleDuration { get; set; }
 
     [ObservableProperty]
-    public partial bool GtaVcMiTangRuleEnable { get; set; }
+    public partial bool GtaVcMiTangRuleEnabled { get; set; }
 
     [ObservableProperty]
     public partial double GtaVcMiTangRuleStrength { get; set; }
@@ -97,7 +97,7 @@ public partial class GamesPageViewModel : ObservableObject
     public partial double GtaVcMiTangRuleDuration { get; set; }
 
     [ObservableProperty]
-    public partial bool GtaVcWantedLevelRuleEnable { get; set; }
+    public partial bool GtaVcWantedLevelRuleEnabled { get; set; }
 
     [ObservableProperty]
     public partial double GtaVcWantedLevelRuleStrength { get; set; }
@@ -106,7 +106,7 @@ public partial class GamesPageViewModel : ObservableObject
     public partial double GtaVcWantedLevelRuleDuration { get; set; }
 
     [ObservableProperty]
-    public partial bool GtaVcFellOffBikeRuleEnable { get; set; }
+    public partial bool GtaVcFellOffBikeRuleEnabled { get; set; }
 
     [ObservableProperty]
     public partial double GtaVcFellOffBikeRuleStrength { get; set; }
@@ -129,13 +129,13 @@ public partial class GamesPageViewModel : ObservableObject
         _gameManager.StrengthMode = value.Key;
     }
 
-    partial void OnGtaVcEnableChanged(bool value)
+    partial void OnGtaVcEnabledChanged(bool value)
     {
         if (value)
-            EnableGameCount++;
+            EnabledGameCount++;
         else
-            EnableGameCount--;
-        _gameManager.GtaVcGameRule.IsEnable = value;
+            EnabledGameCount--;
+        _gameManager.GtaVcGameRule.IsEnabled = value;
     }
 
     partial void OnGtaVcStrengthModeChanged(KeyValuePair<Mode, string> value)
@@ -143,9 +143,9 @@ public partial class GamesPageViewModel : ObservableObject
         _gameManager.GtaVcGameRule.StrengthMode = value.Key;
     }
 
-    partial void OnGtaVcDamageRuleEnableChanged(bool value)
+    partial void OnGtaVcDamageRuleEnabledChanged(bool value)
     {
-        _gameManager.GtaVcGameRule.DamageRuleEnable = value;
+        _gameManager.GtaVcGameRule.DamageRuleEnabled = value;
     }
 
     partial void OnGtaVcDamageRuleThresholdChanged(double value)
@@ -163,9 +163,9 @@ public partial class GamesPageViewModel : ObservableObject
         _gameManager.GtaVcGameRule.DamageRuleDuration = (int)value;
     }
 
-    partial void OnGtaVcBustedRuleEnableChanged(bool value)
+    partial void OnGtaVcBustedRuleEnabledChanged(bool value)
     {
-        _gameManager.GtaVcGameRule.BustedRuleEnable = value;
+        _gameManager.GtaVcGameRule.BustedRuleEnabled = value;
     }
 
     partial void OnGtaVcBustedRuleStrengthChanged(double value)
@@ -178,9 +178,9 @@ public partial class GamesPageViewModel : ObservableObject
         _gameManager.GtaVcGameRule.BustedRuleDuration = (int)value;
     }
 
-    partial void OnGtaVcWastedRuleEnableChanged(bool value)
+    partial void OnGtaVcWastedRuleEnabledChanged(bool value)
     {
-        _gameManager.GtaVcGameRule.WastedRuleEnable = value;
+        _gameManager.GtaVcGameRule.WastedRuleEnabled = value;
     }
 
     partial void OnGtaVcWastedRuleStrengthChanged(double value)
@@ -193,9 +193,9 @@ public partial class GamesPageViewModel : ObservableObject
         _gameManager.GtaVcGameRule.WastedRuleDuration = (int)value;
     }
 
-    partial void OnGtaVcMiTangRuleEnableChanged(bool value)
+    partial void OnGtaVcMiTangRuleEnabledChanged(bool value)
     {
-        _gameManager.GtaVcGameRule.MiTangRuleEnable = value;
+        _gameManager.GtaVcGameRule.MiTangRuleEnabled = value;
     }
 
     partial void OnGtaVcMiTangRuleStrengthChanged(double value)
@@ -208,9 +208,9 @@ public partial class GamesPageViewModel : ObservableObject
         _gameManager.GtaVcGameRule.MiTangRuleDuration = (int)value;
     }
 
-    partial void OnGtaVcWantedLevelRuleEnableChanged(bool value)
+    partial void OnGtaVcWantedLevelRuleEnabledChanged(bool value)
     {
-        _gameManager.GtaVcGameRule.WantedLevelRuleEnable = value;
+        _gameManager.GtaVcGameRule.WantedLevelRuleEnabled = value;
     }
 
     partial void OnGtaVcWantedLevelRuleStrengthChanged(double value)
@@ -223,9 +223,9 @@ public partial class GamesPageViewModel : ObservableObject
         _gameManager.GtaVcGameRule.WantedLevelRuleDuration = (int)value;
     }
 
-    partial void OnGtaVcFellOffBikeRuleEnableChanged(bool value)
+    partial void OnGtaVcFellOffBikeRuleEnabledChanged(bool value)
     {
-        _gameManager.GtaVcGameRule.FellOffBikeRuleEnable = value;
+        _gameManager.GtaVcGameRule.FellOffBikeRuleEnabled = value;
     }
 
     partial void OnGtaVcFellOffBikeRuleStrengthChanged(double value)

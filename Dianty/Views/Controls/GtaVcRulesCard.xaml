@@ -12,7 +12,7 @@
         <toolkit:SettingsExpander.HeaderIcon>
             <FontIcon Glyph="&#xE804;"/>
         </toolkit:SettingsExpander.HeaderIcon>
-        <ToggleSwitch IsOn="{x:Bind ViewModel.GtaVcEnable, Mode=TwoWay}"/>
+        <ToggleSwitch IsOn="{x:Bind ViewModel.GtaVcEnabled, Mode=TwoWay}"/>
         <toolkit:SettingsExpander.Items>
             <toolkit:SettingsCard Header="此玩法的规则强度模式" Description="多条规则同时生效时">
                 <toolkit:SettingsCard.HeaderIcon>
@@ -50,7 +50,7 @@
                         </StackPanel>
                     </StackPanel>
                 </toolkit:SettingsCard.Header>
-                <ToggleSwitch IsOn="{x:Bind ViewModel.GtaVcDamageRuleEnable, Mode=TwoWay}"/>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.GtaVcDamageRuleEnabled, Mode=TwoWay}"/>
             </toolkit:SettingsCard>
             <toolkit:SettingsCard>
                 <toolkit:SettingsCard.Header>
@@ -72,7 +72,7 @@
                         </StackPanel>
                     </StackPanel>
                 </toolkit:SettingsCard.Header>
-                <ToggleSwitch IsOn="{x:Bind ViewModel.GtaVcBustedRuleEnable, Mode=TwoWay}"/>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.GtaVcBustedRuleEnabled, Mode=TwoWay}"/>
             </toolkit:SettingsCard>
             <toolkit:SettingsCard>
                 <toolkit:SettingsCard.Header>
@@ -94,7 +94,7 @@
                         </StackPanel>
                     </StackPanel>
                 </toolkit:SettingsCard.Header>
-                <ToggleSwitch IsOn="{x:Bind ViewModel.GtaVcWastedRuleEnable, Mode=TwoWay}"/>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.GtaVcWastedRuleEnabled, Mode=TwoWay}"/>
             </toolkit:SettingsCard>
             <toolkit:SettingsCard>
                 <toolkit:SettingsCard.Header>
@@ -116,7 +116,7 @@
                         </StackPanel>
                     </StackPanel>
                 </toolkit:SettingsCard.Header>
-                <ToggleSwitch IsOn="{x:Bind ViewModel.GtaVcMiTangRuleEnable, Mode=TwoWay}"/>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.GtaVcMiTangRuleEnabled, Mode=TwoWay}"/>
             </toolkit:SettingsCard>
             <toolkit:SettingsCard>
                 <toolkit:SettingsCard.Header>
@@ -138,7 +138,7 @@
                         </StackPanel>
                     </StackPanel>
                 </toolkit:SettingsCard.Header>
-                <ToggleSwitch IsOn="{x:Bind ViewModel.GtaVcWantedLevelRuleEnable, Mode=TwoWay}"/>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.GtaVcWantedLevelRuleEnabled, Mode=TwoWay}"/>
             </toolkit:SettingsCard>
             <toolkit:SettingsCard>
                 <toolkit:SettingsCard.Header>
@@ -160,7 +160,7 @@
                         </StackPanel>
                     </StackPanel>
                 </toolkit:SettingsCard.Header>
-                <ToggleSwitch IsOn="{x:Bind ViewModel.GtaVcFellOffBikeRuleEnable, Mode=TwoWay}"/>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.GtaVcFellOffBikeRuleEnabled, Mode=TwoWay}"/>
             </toolkit:SettingsCard>
         </toolkit:SettingsExpander.Items>
     </toolkit:SettingsExpander>

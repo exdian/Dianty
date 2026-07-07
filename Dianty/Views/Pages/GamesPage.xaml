@@ -45,7 +45,7 @@
                         Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                     <TextBlock
                         Grid.Row="1" Grid.Column="0"
-                        Text="{x:Bind ViewModel.EnableGameCount, Mode=OneWay}"
+                        Text="{x:Bind ViewModel.EnabledGameCount, Mode=OneWay}"
                         FontSize="20" FontWeight="Bold" />
                     <TextBlock
                         Grid.Row="0" Grid.Column="1"
