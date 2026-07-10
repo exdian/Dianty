@@ -13,9 +13,9 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <TextBlock x:Name="_gamesPageHeader" Text="玩法" Style="{StaticResource TitleTextBlockStyle}" Margin="12,6,12,12"/>
+        <TextBlock x:Name="PageHeader" Text="玩法" Style="{StaticResource TitleTextBlockStyle}" Margin="12,6,12,12"/>
         <ScrollViewer
-            x:Name="_gamesPageContent" Grid.Row="1" Padding="12,0"
+            x:Name="PageContent" Grid.Row="1" Padding="12,0"
             VerticalScrollBarVisibility="Auto" VerticalScrollMode="Auto">
             <StackPanel x:Name="_gamesPageStackPanel" Spacing="{StaticResource CommonCardSpacing}" Margin="0,0,0,24" Loaded="StackPanel_Loaded">
                 <StackPanel.ChildrenTransitions>
@@ -95,8 +95,8 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <!-- NavigationView.DisplayMode != Minimal -->
-                        <Setter Target="_gamesPageHeader.Margin" Value="24,12"/>
-                        <Setter Target="_gamesPageContent.Padding" Value="24,0"/>
+                        <Setter Target="PageHeader.Margin" Value="24,12"/>
+                        <Setter Target="PageContent.Padding" Value="24,0"/>
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>

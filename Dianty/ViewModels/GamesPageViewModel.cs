@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.Messaging;
 using Dianty.Models;
 using Dianty.Services;
 using Dianty.Utils.Messages;
-using GameMonitor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,9 +12,9 @@ namespace Dianty.ViewModels;
 
 public partial class GamesPageViewModel : ObservableObject
 {
-    public GamesPageViewModel(IMemoryService memoryService, IQueueService queueService)
+    public GamesPageViewModel(GameManager gameManager, IQueueService queueService)
     {
-        _gameManager = new GameManager(memoryService);
+        _gameManager = gameManager;
         _gameManager.OutputStrengthChanged += GameManager_OutputStrengthChanged;
         _queueService = queueService;
 

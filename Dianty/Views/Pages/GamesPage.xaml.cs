@@ -44,5 +44,5 @@ public sealed partial class GamesPage : Page
         });
     }
 
-    public readonly record struct RequiredParameter(GamesPageViewModel ViewModel, IQueueService QueueService);
+    public record class RequiredParameter(GamesPageViewModel ViewModel, IQueueService QueueService);
 }

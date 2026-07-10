@@ -3,6 +3,7 @@ using Dianty.Resources;
 using Dianty.Services;
 using Dianty.ViewModels;
 using Dianty.Views.Pages;
+using DungeonToolkit.Coyote;
 using GameMonitor;
 using Microsoft.UI.Xaml;
 using System;
@@ -55,10 +56,15 @@ public partial class App : Application
         ServiceLocator.Register(templateContent);
         ServiceLocator.Register<IMemoryService>(static () => new MemoryService());
 
+        var coyoteManager = new CoyoteManager();
+        var gameManager = new GameManager(coyoteManager)
+        {
+            GtaVcGameRule = new GtaVcGameRule(ServiceLocator.GetService<IMemoryService>())
+        };
+
         ServiceLocator.RegisterViewModel(typeof(DebugPage), new DebugPageViewModel(queueService));
         ServiceLocator.RegisterViewModel(typeof(GamesPage), new GamesPage.RequiredParameter(
-            new GamesPageViewModel(ServiceLocator.GetService<IMemoryService>(), queueService),
-            queueService));
+            new GamesPageViewModel(gameManager, queueService), queueService));
     }
 
     private void MergedDictionaries()
