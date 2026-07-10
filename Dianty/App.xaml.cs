@@ -2,6 +2,7 @@
 using Dianty.Resources;
 using Dianty.Services;
 using Dianty.ViewModels;
+using Dianty.Views;
 using Dianty.Views.Pages;
 using DungeonToolkit.Coyote;
 using GameMonitor;
@@ -35,6 +36,7 @@ public partial class App : Application
         var window = new MainWindow();
         ServiceLocator.Init(RegisterService);
         ResourceLoader.Init(MergedDictionaries);
+        TopPageLocator.Init(GetTopPage);
         window.ViewModel = new MainViewModel(window);
         _mainWindow = window;
         _window = window;
@@ -76,5 +78,21 @@ public partial class App : Application
         var newDictionary = new ResourceDictionary();
         LoadComponent(newDictionary, new Uri("ms-appx:///Resources/AppResourceDictionary.xaml", UriKind.Absolute));
         Resources.MergedDictionaries.Add(newDictionary);
+    }
+
+    private static Type? GetTopPage(string pageName)
+    {
+        return pageName switch
+        {
+            nameof(DebugPage) => typeof(DebugPage),
+            nameof(HomePage) => typeof(HomePage),
+            nameof(DevicesPage) => typeof(DevicesPage),
+            nameof(WavesPage) => typeof(WavesPage),
+            nameof(GamesPage) => typeof(GamesPage),
+            nameof(SafetyPage) => typeof(SafetyPage),
+            nameof(SettingsPage) => typeof(SettingsPage),
+            nameof(CoyoteBleDetailPage) => typeof(DevicesPage),
+            _ => null
+        };
     }
 }

@@ -25,7 +25,7 @@
         </Grid>
         <NavigationView
             x:Name="_navView"
-            Loaded="NavView_Loaded" SelectionChanged="NavView_SelectionChanged" BackRequested="NavView_BackRequested"
+            Loaded="NavView_Loaded" ItemInvoked="NavView_ItemInvoked" BackRequested="NavView_BackRequested"
             LayoutUpdated="NavView_LayoutUpdated" PaneClosed="NavView_PaneChanged" PaneOpened="NavView_PaneChanged"
             OpenPaneLength="120" CompactModeThresholdWidth="{StaticResource MinimalModeThresholdWidth}" ExpandedModeThresholdWidth="750"
             IsBackEnabled="{x:Bind _contentFrame.CanGoBack, Mode=OneWay}">
@@ -33,7 +33,7 @@
                 <Thickness x:Key="NavigationViewContentMargin">0,48,0,0</Thickness>
                 <Thickness x:Key="NavigationViewMinimalContentMargin">0,48,0,0</Thickness>
             </NavigationView.Resources>
-            <Frame x:Name="_contentFrame" IsTabStop="True" Navigated="ContentFrame_Navigated"/>
+            <Frame x:Name="_contentFrame" IsTabStop="True" Navigated="OnFrameNavigated"/>
             <NavigationView.MenuItems>
                 <NavigationViewItem Icon="Home" Content="主页" Tag="{x:Bind HomePage}"/>
                 <NavigationViewItem Content="设备" Tag="{x:Bind DevicesPage}">

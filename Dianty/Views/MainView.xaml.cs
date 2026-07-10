@@ -9,6 +9,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Shapes;
 using System;
@@ -106,7 +107,7 @@ public sealed partial class MainView : UserControl
 
     private void NavView_Loaded(object sender, RoutedEventArgs e)
     {
-        _navView.SelectedItem = _navView.MenuItems[0];
+        _contentFrame.Navigate(HomePage, ServiceLocator.GetViewModel(HomePage));
 
         var splitView = VisualTreeHelperExtension.FindChildByName(_navView, "RootSplitView") as SplitView;
         if (splitView is not null)
@@ -256,18 +257,26 @@ public sealed partial class MainView : UserControl
         }
     }
 
-    private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
+    private void Navigate(Type pageType, NavigationTransitionInfo transitionInfo)
     {
-        if (args.IsSettingsSelected)
+        Type targetPageType = _contentFrame.CurrentSourcePageType;
+        if (pageType is not null && !pageType.Equals(targetPageType))
         {
-            var viewModel = ServiceLocator.GetViewModel(SettingsPage);
-            _contentFrame.Navigate(SettingsPage, viewModel, args.RecommendedNavigationTransitionInfo);
+            var viewModel = ServiceLocator.GetViewModel(pageType);
+            _contentFrame.Navigate(pageType, viewModel, transitionInfo);
         }
-        else if (args.SelectedItemContainer is not null)
+    }
+
+    private void NavView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
+    {
+        if (args.IsSettingsInvoked)
         {
-            Type navPageType = args.SelectedItemContainer.Tag as Type ?? HomePage;
-            var viewModel = ServiceLocator.GetViewModel(navPageType);
-            _contentFrame.Navigate(navPageType, viewModel, args.RecommendedNavigationTransitionInfo);
+            Navigate(SettingsPage, args.RecommendedNavigationTransitionInfo);
+        }
+        else if (args.InvokedItemContainer is not null)
+        {
+            Type navPageType = args.InvokedItemContainer.Tag as Type ?? HomePage;
+            Navigate(navPageType, args.RecommendedNavigationTransitionInfo);
         }
     }
 
@@ -275,34 +284,39 @@ public sealed partial class MainView : UserControl
     {
         if (!_contentFrame.CanGoBack)
             return;
+
         if (_navView.IsPaneOpen && (_navView.DisplayMode is NavigationViewDisplayMode.Compact or NavigationViewDisplayMode.Minimal))
-        {
             _navView.IsPaneOpen = false;
+        else
+            _contentFrame.GoBack();
+    }
+
+    private void OnFrameNavigated(object sender, NavigationEventArgs e)
+    {
+        var topPageType = TopPageLocator.GetTopPage(_contentFrame.SourcePageType.Name);
+        if (topPageType is null)
+        {
+            _navView.SelectedItem = null;
             return;
         }
 
-        _contentFrame.GoBack();
-    }
-
-    private void ContentFrame_Navigated(object sender, NavigationEventArgs e)
-    {
-        if (_contentFrame.SourcePageType is null)
-            return;
-
-        if (_contentFrame.SourcePageType == SettingsPage)
+        if (topPageType == SettingsPage)
         {
-            var selectedItem = (NavigationViewItem)_navView.SettingsItem;
-            if (!ReferenceEquals(selectedItem, _navView.SelectedItem))
-                _navView.SelectedItem = selectedItem;
+            if (!ReferenceEquals(_navView.SelectedItem, _navView.SettingsItem))
+                _navView.SelectedItem = _navView.SettingsItem;
         }
         else
         {
-            var selectedItem = _navView.MenuItems
-                .OfType<NavigationViewItem>()
-                .FirstOrDefault(i => i.Tag.Equals(_contentFrame.SourcePageType));
-            if (selectedItem is not null && !ReferenceEquals(selectedItem, _navView.SelectedItem))
-                _navView.SelectedItem = selectedItem;
+            SelectNavigationItem(topPageType);
         }
+    }
+
+    private void SelectNavigationItem(Type pageType)
+    {
+        var selectedItem = _navView.MenuItems.OfType<NavigationViewItem>()
+            .FirstOrDefault(i => i.Tag.Equals(pageType));
+        if (selectedItem is not null && !ReferenceEquals(selectedItem, _navView.SelectedItem))
+            _navView.SelectedItem = selectedItem;
     }
 
     private void NavView_LayoutUpdated(object sender, object e)
