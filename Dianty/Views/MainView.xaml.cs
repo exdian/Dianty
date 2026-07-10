@@ -59,11 +59,13 @@ public sealed partial class MainView : UserControl
     private void MainView_Loaded(object sender, RoutedEventArgs e)
     {
         WeakReferenceMessenger.Default.Register<KeyDownMessage>(this, ProcessKey);
+        WeakReferenceMessenger.Default.Register<NavigationRequest>(this, ProcessNavigationRequest);
     }
 
     private void MainView_Unloaded(object sender, RoutedEventArgs e)
     {
         WeakReferenceMessenger.Default.Unregister<KeyDownMessage>(this);
+        WeakReferenceMessenger.Default.Unregister<NavigationRequest>(this);
     }
 
     private void ProcessKey(object recipient, KeyDownMessage message)
@@ -83,6 +85,21 @@ public sealed partial class MainView : UserControl
             else
             {
                 _navView.MenuItems.Add(_debugMenuItem);
+            }
+        });
+    }
+
+    private void ProcessNavigationRequest(object recipient, NavigationRequest message)
+    {
+        _queueService.TryEnqueue(() =>
+        {
+            if (message.IsBackward)
+            {
+                NavView_BackRequested(_navView, null!);
+            }
+            else if (message.PageType is not null && message.NavigationOptions is not null)
+            {
+                _contentFrame.NavigateToType(message.PageType, message.Parameter, message.NavigationOptions);
             }
         });
     }
@@ -282,8 +299,8 @@ public sealed partial class MainView : UserControl
         {
             var selectedItem = _navView.MenuItems
                 .OfType<NavigationViewItem>()
-                .First(i => i.Tag.Equals(_contentFrame.SourcePageType));
-            if (!ReferenceEquals(selectedItem, _navView.SelectedItem))
+                .FirstOrDefault(i => i.Tag.Equals(_contentFrame.SourcePageType));
+            if (selectedItem is not null && !ReferenceEquals(selectedItem, _navView.SelectedItem))
                 _navView.SelectedItem = selectedItem;
         }
     }

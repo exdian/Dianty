@@ -54,6 +54,8 @@ public partial class App : Application
         ServiceLocator.Register(windowService);
         ServiceLocator.Register(queueService);
         ServiceLocator.Register(templateContent);
+        ICoyoteBLEDetector coyoteBleDetector = new CoyoteBleDetector();
+        ServiceLocator.Register(coyoteBleDetector);
         ServiceLocator.Register<IMemoryService>(static () => new MemoryService());
 
         var coyoteManager = new CoyoteManager();
@@ -63,6 +65,8 @@ public partial class App : Application
         };
 
         ServiceLocator.RegisterViewModel(typeof(DebugPage), new DebugPageViewModel(queueService));
+        ServiceLocator.RegisterViewModel(typeof(DevicesPage), new DevicesPage.RequiredParameter(
+            new DevicesPageViewModel(queueService, coyoteBleDetector), queueService));
         ServiceLocator.RegisterViewModel(typeof(GamesPage), new GamesPage.RequiredParameter(
             new GamesPageViewModel(gameManager, queueService), queueService));
     }
