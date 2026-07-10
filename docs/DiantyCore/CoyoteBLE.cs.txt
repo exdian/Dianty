@@ -18,8 +18,9 @@ public class CoyoteBLE
     public byte CurrentStrengthB { get; }
     public int TargetStrengthA { get; set; }
     public int TargetStrengthB { get; set; }
-    public event EventHandler? Disconnected;
+    public event EventHandler<ConnectionStatusChangedEventArgs>? ConnectionStatusChanged;
     public event EventHandler<StrengthChangedEventArgs>? StrengthChanged;
+    public event EventHandler<BatteryLevelChangedEventArgs>? BatteryLevelChanged;
     public async Task<bool> ConnectNewAsync(ICoyoteBLEDetector coyoteDetector, CancellationToken token);
     public async Task<bool> ReconnectingAsync(ICoyoteBLEDetector coyoteDetector, CancellationToken token);
     public async Task<bool> SendB0CommandAsync();
@@ -30,6 +31,10 @@ public class CoyoteBLE
     {
         public byte CurrentStrengthA { get; }
         public byte CurrentStrengthB { get; }
+    }
+    public class BatteryLevelChangedEventArgs(byte batteryLevel) : EventArgs 
+    {
+        public byte BatteryLevel { get; }
     }
 }
 

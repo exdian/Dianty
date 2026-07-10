@@ -8,14 +8,14 @@ public class CoyoteWS
     public bool IsConnected { get; }
     public byte CurrentStrengthA { get; }
     public byte CurrentStrengthB { get; }
-    public byte StrengthCapA { get; set; }
-    public byte StrengthCapB { get; set; }
-    public event EventHandler? Disconnected;
+    public byte StrengthCapA { get; }
+    public byte StrengthCapB { get; }
+    public event EventHandler<ConnectionStatusChangedEventArgs>? ConnectionStatusChanged;
     public event EventHandler<ClientIdChangedEventArgs>? ClientIdChanged;
     public event EventHandler? BindingSucceed;
     public event EventHandler<StrengthChangedEventArgs>? StrengthChanged;
     public event EventHandler<FeedbackReceivedEventArgs>? FeedbackReceived;
-    public async Task<bool> TryConnectAsync(CancellationToken token);
+    public async Task<bool> ConnectAsync(CancellationToken token);
     public async Task DisconnectAsync();
     public async Task<bool> SetStrengthAsync(int strength, Channel channel);
     public bool AddPulseList(PulseData pulseA, PulseData pulseB);
@@ -25,12 +25,12 @@ public class CoyoteWS
     {
         public string ClientId { get; }
     }
-    public class StrengthChangedEventArgs(byte currentStrengthA, byte currentStrengthB, byte maxStrengthA, byte maxStrengthB) : EventArgs 
+    public class StrengthChangedEventArgs(byte currentStrengthA, byte currentStrengthB, byte strengthCapA, byte strengthCapB) : EventArgs 
     {
         public byte CurrentStrengthA { get; }
         public byte CurrentStrengthB { get; }
-        public byte MaxStrengthA { get; }
-        public byte MaxStrengthB { get; }
+        public byte StrengthCapA { get; }
+        public byte StrengthCapB { get; }
     }
     public class FeedbackReceivedEventArgs(int feedback) : EventArgs 
     {

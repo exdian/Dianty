@@ -23,4 +23,8 @@ public class WaveException : Exception
     public WaveException(string message): base(message);
     public WaveException(string? message, Exception? innerException): base(message, innerException);
 }
+public class ConnectionStatusChangedEventArgs(bool isConnected) : EventArgs 
+{
+    public bool IsConnected { get; }
+}
 
