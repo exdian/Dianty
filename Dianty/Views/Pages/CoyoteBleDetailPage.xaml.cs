@@ -7,6 +7,7 @@ using Dianty.ViewModels;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System.Collections.ObjectModel;
 
@@ -25,7 +26,7 @@ public sealed partial class CoyoteBleDetailPage : Page
 
     private CoyoteBleItem? ViewModel { get; set; }
 
-    private ObservableCollection<string>? Traces { get; set; }
+    private ObservableCollection<string>? Paths { get; set; }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
@@ -33,33 +34,39 @@ public sealed partial class CoyoteBleDetailPage : Page
         if (e.Parameter is RequiredParameter parameter)
         {
             ViewModel = parameter.ViewModel;
-            Traces = new ObservableCollection<string>(parameter.Traces)
-            {
-                "详细信息"
-            };
+            Paths = [.. parameter.Paths, "详细信息"];
             _queueService = parameter.QueueService;
         }
     }
 
     private void OnBreadcrumbBarItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args)
     {
-        if (Traces is not null)
+        if (Paths is null)
+            return;
+
+        var options = new FrameNavigationOptions
         {
-            for (int i = Traces.Count - 1; i > args.Index; i--)
+            IsNavigationStackEnabled = true,
+            TransitionInfoOverride = new SlideNavigationTransitionInfo
             {
-                Traces.RemoveAt(i);
+                Effect = SlideNavigationTransitionEffect.FromLeft
             }
+        };
+        var navigationRequest = new NavigationRequest(Paths.Count - 1 - args.Index, options);
+        for (int i = Paths.Count - 1; i > args.Index; i--)
+        {
+            Paths.RemoveAt(i);
         }
 
         // 当文本框修改时点击导航，文本框绑定的属性不能及时更新，因此需要将导航放到低优先级队列
         if (_queueService is null)
         {
-            WeakReferenceMessenger.Default.Send(new NavigationRequest(isBackward: true));
+            WeakReferenceMessenger.Default.Send(navigationRequest);
         }
         else
         {
             _queueService.TryEnqueue(DispatcherQueuePriority.Low,
-                () => WeakReferenceMessenger.Default.Send(new NavigationRequest(isBackward: true)));
+                () => WeakReferenceMessenger.Default.Send(navigationRequest));
         }
     }
 
@@ -102,5 +109,5 @@ public sealed partial class CoyoteBleDetailPage : Page
         }
     }
 
-    public record class RequiredParameter(CoyoteBleItem ViewModel, string[] Traces, IQueueService? QueueService);
+    public record class RequiredParameter(CoyoteBleItem ViewModel, string[] Paths, IQueueService? QueueService);
 }

@@ -19,7 +19,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <BreadcrumbBar x:Name="PageHeader" Margin="12,6,12,12" ItemsSource="{x:Bind Traces}" ItemClicked="OnBreadcrumbBarItemClicked">
+        <BreadcrumbBar x:Name="PageHeader" Margin="12,6,12,12" ItemsSource="{x:Bind Paths}" ItemClicked="OnBreadcrumbBarItemClicked">
             <BreadcrumbBar.ItemTemplate>
                 <DataTemplate x:DataType="x:String">
                     <TextBlock Text="{x:Bind}" Style="{StaticResource TitleTextBlockStyle}"/>

@@ -5,9 +5,10 @@ namespace Dianty.Utils.Messages;
 
 public class NavigationRequest
 {
-    public NavigationRequest(bool isBackward)
+    public NavigationRequest(int goBackLevel, FrameNavigationOptions navigationOptions)
     {
-        IsBackward = isBackward;
+        GoBackLevel = goBackLevel;
+        NavigationOptions = navigationOptions;
     }
 
     public NavigationRequest(Type pageType, object? parameter, FrameNavigationOptions navigationOptions)
@@ -17,8 +18,8 @@ public class NavigationRequest
         NavigationOptions = navigationOptions;
     }
 
-    public bool IsBackward { get; }
+    public int GoBackLevel { get; }
     public Type? PageType { get; }
     public object? Parameter { get; }
-    public FrameNavigationOptions? NavigationOptions { get; }
+    public FrameNavigationOptions NavigationOptions { get; }
 }

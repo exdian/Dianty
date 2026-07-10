@@ -94,11 +94,15 @@ public sealed partial class MainView : UserControl
     {
         _queueService.TryEnqueue(() =>
         {
-            if (message.IsBackward)
+            if (message.GoBackLevel > 0)
             {
-                NavView_BackRequested(_navView, null!);
+                if (message.GoBackLevel <= _contentFrame.BackStack.Count)
+                {
+                    var pageStackEntry = _contentFrame.BackStack[^message.GoBackLevel];
+                    _contentFrame.NavigateToType(pageStackEntry.SourcePageType, pageStackEntry.Parameter, message.NavigationOptions);
+                }
             }
-            else if (message.PageType is not null && message.NavigationOptions is not null)
+            else if (message.PageType is not null)
             {
                 _contentFrame.NavigateToType(message.PageType, message.Parameter, message.NavigationOptions);
             }
