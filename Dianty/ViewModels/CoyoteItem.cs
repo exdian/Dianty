@@ -303,7 +303,7 @@ public partial class CoyoteWsItem : CoyoteItem
         _cts = new CancellationTokenSource();
         try
         {
-#if !Debug_QrCode
+#if !DEBUG || !Debug_QrCode
             _getClientIdTcs = new TaskCompletionSource();
             if (!await _coyoteWS.ConnectAsync(_cts.Token))
                 return;
@@ -364,7 +364,7 @@ public partial class CoyoteWsItem : CoyoteItem
     }
 
     [RelayCommand]
-    private void ShowQrcode()
+    private void ShowQrCode()
     {
         IsVisibleQrCode = !IsVisibleQrCode;
     }
