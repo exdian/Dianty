@@ -22,6 +22,8 @@ public class SvgPathConverter
     private Point _lastEndPoint;
     private int _index;
 
+    // 测试用例 M5 .0 -.0e-1 5 .1e02 5C8.3333 3.3333 6.6667 1.6667 .5e1 -0
+    // 一个三角形 5,0  0,5  10,5
     public static PathGeometry? Parse(ReadOnlyMemory<char> svgPath)
     {
         if (svgPath.Length == 0)
@@ -182,14 +184,10 @@ public class SvgPathConverter
                 Throw();
                 break;
             case Command.M:
-                Process_M();
-                break;
-            case Command.m:
-                Process_m();
-                break;
             case Command.L:
                 Process_L();
                 break;
+            case Command.m:
             case Command.l:
                 Process_l();
                 break;
@@ -636,12 +634,13 @@ public class SvgPathConverter
                             continue;
                         if (c == '.')
                         {
-                            for (i++; i < svgPath.Length; i++)
-                            {
-                                c = svgPath[i];
-                                if (c < '0' || c > '9')
-                                    break;
-                            }
+                            i++;
+                            i = GetDecimalEndIndex(svgPath, i);
+                        }
+                        else if (c == 'E' || c == 'e')
+                        {
+                            i++;
+                            i = GetExponentEndIndex(svgPath, i);
                         }
                         break;
                     }
@@ -649,12 +648,8 @@ public class SvgPathConverter
                     return float.Parse(svgPath[start..i]);
                 case '.':
                     start = i;
-                    for (i++; i < svgPath.Length; i++)
-                    {
-                        c = svgPath[i];
-                        if (c < '0' || c > '9')
-                            break;
-                    }
+                    i++;
+                    i = GetDecimalEndIndex(svgPath, i);
                     _index = i;
                     return float.Parse(svgPath[start..i]);
             }
@@ -695,6 +690,40 @@ public class SvgPathConverter
     private void Throw()
     {
         throw new ArgumentException($"在[{_index}]出现了意外的字符");
+    }
+
+    private static int GetDecimalEndIndex(ReadOnlySpan<char> svgPath, int index)
+    {
+        int i;
+        for (i = index; i < svgPath.Length; i++)
+        {
+            char c = svgPath[i];
+            if (c >= '0' && c <= '9')
+                continue;
+            if (c == 'E' || c == 'e')
+            {
+                i++;
+                i = GetExponentEndIndex(svgPath, i);
+            }
+            break;
+        }
+        return i;
+    }
+
+    private static int GetExponentEndIndex(ReadOnlySpan<char> svgPath, int index)
+    {
+        int i = index;
+        char c = svgPath[i];
+        if (c == '-' || (c >= '0' && c <= '9'))
+        {
+            for (i++; i < svgPath.Length; i++)
+            {
+                c = svgPath[i];
+                if (c < '0' || c > '9')
+                    break;
+            }
+        }
+        return i;
     }
 
     private enum Command
