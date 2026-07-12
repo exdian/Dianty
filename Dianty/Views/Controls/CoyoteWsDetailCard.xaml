@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="Dianty.Views.Controls.CoyoteWsDetailCard"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <StackPanel Spacing="{StaticResource CommonCardSpacing}" Margin="0,0,0,24">
+        <StackPanel.ChildrenTransitions>
+            <RepositionThemeTransition />
+        </StackPanel.ChildrenTransitions>
+        <toolkit:SettingsCard Header="设备名称" HeaderIcon="Tag">
+            <TextBox Text="{x:Bind ViewModel.Name, Mode=TwoWay}"/>
+        </toolkit:SettingsCard>
+        <toolkit:SettingsCard
+            Header="连接状态" HeaderIcon="Link"
+            Description="{x:Bind ViewModel.IsBleConnection, Converter={StaticResource CoyoteConnectionTypeConverter}}">
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource CommonControlSpacing}">
+                <ProgressRing IsActive="{x:Bind ViewModel.IsConnecting, Mode=OneWay}"/>
+                <Grid>
+                    <ContentControl Content="{x:Bind ViewModel.ConnectionMessage, Mode=OneWay}" VerticalAlignment="Center">
+                        <ContentControl.ContentTransitions>
+                            <PaneThemeTransition Edge="Bottom"/>
+                        </ContentControl.ContentTransitions>
+                    </ContentControl>
+                    <TeachingTip
+                        IsOpen="{x:Bind ViewModel.IsVisibleQrCode, Mode=OneWay}" PreferredPlacement="Center"
+                        CloseButtonContent="关闭" CloseButtonCommand="{x:Bind ViewModel.ShowQrcodeCommand}">
+                        <TeachingTip.Content>
+                            <Border Background="Black">
+                                <Viewbox>
+                                    <Path
+                                        Data="{x:Bind ViewModel.QrCodeSvgPath, Mode=OneWay, Converter={StaticResource QrCodeSvgPathConverter}}"
+                                        Fill="White"/>
+                                </Viewbox>
+                            </Border>
+                        </TeachingTip.Content>
+                    </TeachingTip>
+                </Grid>
+                <Button
+                    Content="&#xED14;" FontFamily="{ThemeResource SymbolThemeFontFamily}" FontSize="20" Padding="4.67"
+                    ToolTipService.ToolTip="查看二维码" Command="{x:Bind ViewModel.ShowQrcodeCommand}"
+                    Visibility="{x:Bind ViewModel.CanShowQrCode, Mode=OneWay, Converter={StaticResource VisibleIfTrueConverter}}"/>
+                <Button
+                    Content="{x:Bind ViewModel.IsConnecting, Mode=OneWay, Converter={StaticResource ReconnectingButtonContentConverter}}"
+                    Command="{x:Bind ViewModel.ReconnectingCommand}">
+                    <Button.ContentTransitions>
+                        <PaneThemeTransition Edge="Right"/>
+                    </Button.ContentTransitions>
+                </Button>
+            </StackPanel>
+        </toolkit:SettingsCard>
+        <!-- 在 ScrollViewer 的空白区域（或其内部非交互元素上）点击鼠标时，ScrollViewer 在 PointerReleased 事件的处理逻辑中，
+        会尝试将焦点自动设置到其内部第一个可获取焦点的子元素上。
+        这里获得焦点的是设备名称的 TextBox，并且会强制滚动到 TextBox，此处设置 TabIndex 可解决此问题 -->
+        <toolkit:SettingsCard Header="是否允许输出" TabIndex="1">
+            <toolkit:SettingsCard.HeaderIcon>
+                <FontIcon Glyph="&#xE7E8;"/>
+            </toolkit:SettingsCard.HeaderIcon>
+            <ToggleSwitch IsOn="{x:Bind ViewModel.IsEnabled, Mode=TwoWay}"/>
+        </toolkit:SettingsCard>
+        <toolkit:SettingsExpander Header="更多" IsExpanded="True">
+            <toolkit:SettingsExpander.HeaderIcon>
+                <FontIcon Glyph="&#xF0E3;"/>
+            </toolkit:SettingsExpander.HeaderIcon>
+            <toolkit:SettingsExpander.Items>
+                <toolkit:SettingsCard Header="当前A通道强度">
+                    <toolkit:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xF093;"/>
+                    </toolkit:SettingsCard.HeaderIcon>
+                    <TextBlock Text="{x:Bind ViewModel.CurrentStrengthA, Mode=OneWay}"/>
+                </toolkit:SettingsCard>
+                <toolkit:SettingsCard Header="当前B通道强度">
+                    <toolkit:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xF094;"/>
+                    </toolkit:SettingsCard.HeaderIcon>
+                    <TextBlock Text="{x:Bind ViewModel.CurrentStrengthB, Mode=OneWay}"/>
+                </toolkit:SettingsCard>
+                <toolkit:SettingsCard Header="A通道强度上限">
+                    <toolkit:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xF093;"/>
+                    </toolkit:SettingsCard.HeaderIcon>
+                    <TextBlock Text="{x:Bind ViewModel.StrengthCapA, Mode=OneWay}"/>
+                </toolkit:SettingsCard>
+                <toolkit:SettingsCard Header="B通道强度上限">
+                    <toolkit:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xF094;"/>
+                    </toolkit:SettingsCard.HeaderIcon>
+                    <TextBlock Text="{x:Bind ViewModel.StrengthCapB, Mode=OneWay}"/>
+                </toolkit:SettingsCard>
+            </toolkit:SettingsExpander.Items>
+        </toolkit:SettingsExpander>
+    </StackPanel>
+</UserControl>

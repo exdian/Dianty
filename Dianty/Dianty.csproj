@@ -16,8 +16,10 @@
     <None Remove="LoadView.xaml" />
     <None Remove="MainView.xaml" />
     <None Remove="Resources\AppResourceDictionary.xaml" />
-    <None Remove="Views\Controls\GtaVcRulesCard.xaml" />
-    <None Remove="Views\Pages\CoyoteBleDetailPage.xaml" />
+    <None Remove="Views\Controls\CoyoteBleDetailCard.xaml" />
+    <None Remove="Views\Controls\CoyoteWsDetailCard.xaml" />
+    <None Remove="Views\Controls\GtaVcRuleCard.xaml" />
+    <None Remove="Views\Pages\CoyoteDetailPage.xaml" />
     <None Remove="Views\Pages\DebugPage.xaml" />
     <None Remove="Views\Pages\DevicesPage.xaml" />
     <None Remove="Views\Pages\GamesPage.xaml" />
@@ -73,7 +75,17 @@
     <ProjectReference Include="..\..\DiantyCore\GameMonitor\GameMonitor.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Pages\CoyoteBleDetailPage.xaml">
+    <Page Update="Views\Pages\CoyoteDetailPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Controls\CoyoteWsDetailCard.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Controls\CoyoteBleDetailCard.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
@@ -88,7 +100,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Controls\GtaVcRulesCard.xaml">
+    <Page Update="Views\Controls\GtaVcRuleCard.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

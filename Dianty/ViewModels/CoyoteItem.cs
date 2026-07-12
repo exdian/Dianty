@@ -1,10 +1,9 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿#define Debug_QrCode
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Dianty.Services;
 using Dianty.Utils;
 using DungeonToolkit.Coyote;
-using Microsoft.UI.Xaml.Markup;
-using Microsoft.UI.Xaml.Media;
 using QRCoder;
 using System;
 using System.Diagnostics;
@@ -32,7 +31,7 @@ public partial class CoyoteItem : ObservableObject
         _queueService = queueService;
         Name = coyote.DeviceName;
         IsEnabled = coyote.IsEnabled;
-        UpdateConnectionMessage(coyote.IsConnected);
+        UpdateConnectionMessage(coyote.IsBound);
         coyote.ConnectionStatusChanged += OnConnectionStatusChanged;
     }
 
@@ -76,7 +75,7 @@ public partial class CoyoteItem : ObservableObject
 
 public partial class CoyoteBleItem : CoyoteItem
 {
-    public CoyoteBleItem(CoyoteBLE coyote, IQueueService queueService, ICoyoteBLEDetector coyoteBleDetector)
+    public CoyoteBleItem(CoyoteBLE coyote, IQueueService queueService, ICoyoteBleDetector coyoteBleDetector)
         : base(coyote, queueService)
     {
         _coyoteBleDetector = coyoteBleDetector;
@@ -95,7 +94,7 @@ public partial class CoyoteBleItem : CoyoteItem
         coyote.BatteryLevelChanged += OnBatteryLevelChanged;
     }
 
-    private readonly ICoyoteBLEDetector _coyoteBleDetector;
+    private readonly ICoyoteBleDetector _coyoteBleDetector;
     private CancellationTokenSource? _cts;
     private int _reconnectingCount;
 
@@ -247,7 +246,6 @@ public partial class CoyoteWsItem : CoyoteItem
 {
     public CoyoteWsItem(CoyoteWS coyote, IQueueService queueService) : base(coyote, queueService)
     {
-        ClientId = coyote.ClientId;
         CurrentStrengthA = coyote.CurrentStrengthA;
         CurrentStrengthB = coyote.CurrentStrengthB;
         StrengthCapA = coyote.StrengthCapA;
@@ -262,9 +260,6 @@ public partial class CoyoteWsItem : CoyoteItem
     private TaskCompletionSource? _bindingTcs;
     private CancellationTokenSource? _cts;
     private int _reconnectingCount;
-
-    [ObservableProperty]
-    public partial string ClientId { get; private set; }
 
     [ObservableProperty]
     public partial int CurrentStrengthA { get; private set; }
@@ -282,7 +277,13 @@ public partial class CoyoteWsItem : CoyoteItem
     public partial bool IsConnecting { get; private set; }
 
     [ObservableProperty]
-    public partial Geometry? QrCode { get; private set; }
+    public partial string QrCodeSvgPath { get; private set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial bool CanShowQrCode { get; private set; }
+
+    [ObservableProperty]
+    public partial bool IsVisibleQrCode { get; set; }
 
     [RelayCommand(CanExecute = nameof(CanReconnecting), AllowConcurrentExecutions = true)]
     private async Task Reconnecting()
@@ -302,15 +303,19 @@ public partial class CoyoteWsItem : CoyoteItem
         _cts = new CancellationTokenSource();
         try
         {
+#if !Debug_QrCode
             _getClientIdTcs = new TaskCompletionSource();
             if (!await _coyoteWS.ConnectAsync(_cts.Token))
                 return;
             await _getClientIdTcs.Task.WaitAsync(_cts.Token);
+#endif
             _bindingTcs = new TaskCompletionSource();
-            var qrCode = await Task.Run(CreateSvgQrCode);
+            var qrCodeSvgPath = await Task.Run(CreateQrCodeSvgPathString);
             _queueService.TryEnqueue(() =>
             {
-                QrCode = qrCode;
+                QrCodeSvgPath = qrCodeSvgPath;
+                CanShowQrCode = true;
+                IsVisibleQrCode = true;
                 ConnectionMessage = "已获取二维码";
             });
             await _bindingTcs.Task.WaitAsync(_cts.Token);
@@ -319,6 +324,8 @@ public partial class CoyoteWsItem : CoyoteItem
         catch (OperationCanceledException)
         {
             connectionMessage = "已取消连接";
+            if (_coyoteWS.IsConnected)
+                await _coyoteWS.DisconnectAsync();
         }
         catch { }
         finally
@@ -332,21 +339,34 @@ public partial class CoyoteWsItem : CoyoteItem
             _bindingTcs = null;
             _queueService.TryEnqueue(() =>
             {
-                QrCode = null;
+                CanShowQrCode = false;
+                IsVisibleQrCode = false;
                 ConnectionMessage = connectionMessage;
                 IsConnecting = false;
             });
 
             await Task.Delay(3000);
             if (count == _reconnectingCount)
-                _queueService.TryEnqueue(() => UpdateConnectionMessage(_coyoteWS.IsConnected));
+            {
+                _queueService.TryEnqueue(() =>
+                {
+                    QrCodeSvgPath = string.Empty;
+                    UpdateConnectionMessage(_coyoteWS.IsBound);
+                });
+            }
         }
     }
 
     private bool CanReconnecting()
     {
         Debug.Assert(_coyoteWS is not null);
-        return !_coyoteWS.IsConnected;
+        return !_coyoteWS.IsBound;
+    }
+
+    [RelayCommand]
+    private void ShowQrcode()
+    {
+        IsVisibleQrCode = !IsVisibleQrCode;
     }
 
     private void OnConnectionStatusChanged(object? sender, ConnectionStatusChangedEventArgs e)
@@ -361,7 +381,6 @@ public partial class CoyoteWsItem : CoyoteItem
 
     private void OnClientIdChanged(object? sender, CoyoteWS.ClientIdChangedEventArgs e)
     {
-        _queueService.TryEnqueue(() => ClientId = e.ClientId);
         if (e.ClientId.Length != 0)
             _getClientIdTcs?.TrySetResult();
     }
@@ -382,20 +401,15 @@ public partial class CoyoteWsItem : CoyoteItem
         });
     }
 
-    private Geometry? CreateSvgQrCode()
+    private string CreateQrCodeSvgPathString()
     {
         Debug.Assert(_coyoteWS is not null);
         var clientId = _coyoteWS.ClientId;
-        if (clientId.Length == 0)
-            return null;
         using QRCodeGenerator qrGenerator = new();
         using QRCodeData qrCodeData = qrGenerator.CreateQrCode(
             "https://www.dungeon-lab.com/app-download.php#DGLAB-SOCKET#" +
             $"wss://ws.dungeon-lab.cn/{clientId}", QRCodeGenerator.ECCLevel.L);
         using SvgQRCode svgQrCode = new(qrCodeData);
-        string qrCodeSvgPath = svgQrCode.GetSvgPath();
-        string xamlString = $"<PathGeometry xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation' Figures='{qrCodeSvgPath}' />";
-        var result = XamlReader.Load(xamlString) as PathGeometry;
-        return result;
+        return svgQrCode.GetSvgPath(needMargin: true);
     }
 }

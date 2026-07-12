@@ -7,19 +7,20 @@ namespace Dianty.ViewModels;
 
 public partial class DevicesPageViewModel : ObservableObject
 {
-    public DevicesPageViewModel(IQueueService queueService, ICoyoteBLEDetector coyoteBleDetector)
+    public DevicesPageViewModel(IQueueService queueService, ICoyoteBleDetector coyoteBleDetector)
     {
         _queueService = queueService;
         _coyoteBleDetector = coyoteBleDetector;
 
 #if DEBUG
-        CoyoteItems.Add(new CoyoteBleItem(new CoyoteBLE(), _queueService, _coyoteBleDetector));
-        CoyoteItems.Add(new CoyoteWsItem(new CoyoteWS(), _queueService));
+        CoyoteItems.Add(new CoyoteBleItem(new CoyoteBLE { DeviceName = "调试" }, _queueService, _coyoteBleDetector));
+        CoyoteItems.Add(new CoyoteWsItem(new CoyoteWS { DeviceName = "调试0" }, _queueService));
+        CoyoteItems.Add(new CoyoteWsItem(new CoyoteWS { DeviceName = "调试1" }, _queueService));
 #endif
     }
 
     private readonly IQueueService _queueService;
-    private readonly ICoyoteBLEDetector _coyoteBleDetector;
+    private readonly ICoyoteBleDetector _coyoteBleDetector;
 
     public ObservableCollection<CoyoteItem> CoyoteItems { get; } = [];
 }

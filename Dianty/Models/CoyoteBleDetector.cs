@@ -6,7 +6,7 @@ using Windows.Devices.Bluetooth.Advertisement;
 
 namespace Dianty.Models;
 
-internal class CoyoteBleDetector : ICoyoteBLEDetector
+internal class CoyoteBleDetector : ICoyoteBleDetector
 {
     public async Task<ulong?> ScanAsync(Guid uuid, string name, CancellationToken token)
     {
@@ -88,7 +88,7 @@ internal class CoyoteBleDetector : ICoyoteBLEDetector
         return completedTask == tcs.Task;
     }
 
-    public async Task<ICoyoteBLEService?> ConnectAsync(ulong address, GattServiceInfo gattServiceInfo, CancellationToken token)
+    public async Task<ICoyoteBleService?> ConnectAsync(ulong address, GattServiceInfo gattServiceInfo, CancellationToken token)
     {
         try
         {

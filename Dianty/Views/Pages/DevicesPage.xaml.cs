@@ -46,14 +46,10 @@ public sealed partial class DevicesPage : Page
                 Effect = SlideNavigationTransitionEffect.FromRight
             }
         };
-        if (element.DataContext is CoyoteBleItem bleItem)
+        if (element.DataContext is CoyoteItem coyoteItem)
         {
-            var requiredParameter = new CoyoteBleDetailPage.RequiredParameter(bleItem, traces, _queueService);
-            WeakReferenceMessenger.Default.Send(new NavigationRequest(typeof(CoyoteBleDetailPage), requiredParameter, options));
-        }
-        else if (element.DataContext is CoyoteWsItem wsItem)
-        {
-
+            var requiredParameter = new CoyoteDetailPage.RequiredParameter(coyoteItem, traces, _queueService);
+            WeakReferenceMessenger.Default.Send(new NavigationRequest(typeof(CoyoteDetailPage), requiredParameter, options));
         }
     }
 

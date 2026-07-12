@@ -8,9 +8,9 @@ public static class SvgQRCodeExtension
 {
     extension(SvgQRCode svgQRCode)
     {
-        public string GetSvgPath(bool hasBorder = false)
+        public string GetSvgPath(bool needMargin = false)
         {
-            var svgString = svgQRCode.GetGraphic(1, darkColorHex: "#000", lightColorHex: "#FFF", drawQuietZones: hasBorder);
+            var svgString = svgQRCode.GetGraphic(1, darkColorHex: "#000", lightColorHex: "#FFF", drawQuietZones: needMargin);
             using StringReader stringReader = new(svgString);
             using XmlReader reader = XmlReader.Create(stringReader);
             string? path = string.Empty;
@@ -25,7 +25,7 @@ public static class SvgQRCodeExtension
                 {
                     path = reader.GetAttribute("d");
                 }
-                else if (hasBorder && reader.Name == "rect")
+                else if (needMargin && reader.Name == "rect")
                 {
                     var x = reader.GetAttribute("x");
                     var y = reader.GetAttribute("y");

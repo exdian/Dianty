@@ -9,7 +9,7 @@ using Windows.Devices.Bluetooth.GenericAttributeProfile;
 
 namespace Dianty.Models;
 
-internal partial class CoyoteBleService : ICoyoteBLEService
+internal partial class CoyoteBleService : ICoyoteBleService
 {
     private CoyoteBleService(
         BluetoothLEDevice bleDevice,
@@ -31,7 +31,7 @@ internal partial class CoyoteBleService : ICoyoteBLEService
     private readonly GattCharacteristic _messageCharacteristic;
     private readonly GattCharacteristic? _batteryCharacteristic;
 
-    public event EventHandler<ICoyoteBLEService.MessageReceivedEventArgs>? MessageReceived;
+    public event EventHandler<ICoyoteBleService.MessageReceivedEventArgs>? MessageReceived;
     public event EventHandler? Disconnected;
 
     public static async Task<CoyoteBleService> CreateCoyoteBleServiceAsync(
@@ -141,7 +141,7 @@ internal partial class CoyoteBleService : ICoyoteBLEService
 
     private void OnMessageReceived(byte[] message)
     {
-        var args = new ICoyoteBLEService.MessageReceivedEventArgs(message);
+        var args = new ICoyoteBleService.MessageReceivedEventArgs(message);
         MessageReceived?.Invoke(this, args);
     }
 

@@ -21,8 +21,8 @@ public class CoyoteBLE
     public event EventHandler<ConnectionStatusChangedEventArgs>? ConnectionStatusChanged;
     public event EventHandler<StrengthChangedEventArgs>? StrengthChanged;
     public event EventHandler<BatteryLevelChangedEventArgs>? BatteryLevelChanged;
-    public async Task<bool> ConnectNewAsync(ICoyoteBLEDetector coyoteDetector, CancellationToken token);
-    public async Task<bool> ReconnectingAsync(ICoyoteBLEDetector coyoteDetector, CancellationToken token);
+    public async Task<bool> ConnectNewAsync(ICoyoteBleDetector coyoteDetector, CancellationToken token);
+    public async Task<bool> ReconnectingAsync(ICoyoteBleDetector coyoteDetector, CancellationToken token);
     public async Task<bool> SendB0CommandAsync();
     public async Task<bool> SendBfCommandAsync();
     public async Task<bool> UpdateBatteryLevelAsync();

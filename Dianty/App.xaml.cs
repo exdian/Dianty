@@ -56,7 +56,7 @@ public partial class App : Application
         ServiceLocator.Register(windowService);
         ServiceLocator.Register(queueService);
         ServiceLocator.Register(templateContent);
-        ICoyoteBLEDetector coyoteBleDetector = new CoyoteBleDetector();
+        ICoyoteBleDetector coyoteBleDetector = new CoyoteBleDetector();
         ServiceLocator.Register(coyoteBleDetector);
         ServiceLocator.Register<IMemoryService>(static () => new MemoryService());
 
@@ -91,7 +91,7 @@ public partial class App : Application
             nameof(GamesPage) => typeof(GamesPage),
             nameof(SafetyPage) => typeof(SafetyPage),
             nameof(SettingsPage) => typeof(SettingsPage),
-            nameof(CoyoteBleDetailPage) => typeof(DevicesPage),
+            nameof(CoyoteDetailPage) => typeof(DevicesPage),
             _ => null
         };
     }

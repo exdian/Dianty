@@ -38,7 +38,7 @@ public sealed partial class GamesPage : Page
 
         _queueService.TryEnqueue(DispatcherQueuePriority.Low, () =>
         {
-            var rulesCard = new GtaVcRulesCard(ViewModel);
+            var rulesCard = new GtaVcRuleCard(ViewModel);
             var collection = _gamesPageStackPanel.Children;
             collection.Insert(collection.Count - 1, rulesCard);
         });

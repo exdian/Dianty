@@ -24,14 +24,10 @@ public partial class MainViewModel : ObservableObject
     private async void LoadDataAsync()
     {
         var stopwatch = Stopwatch.StartNew();
-        var task = Task.CompletedTask;
+        var task = Task.Delay(300);
 
         // 后台耗时操作
-        await Task.Run(() =>
-        {
-            task = Task.Delay(300);
-            ServiceLocator.RegisterDefault();
-        });
+        await Task.Run(ServiceLocator.RegisterDefault);
         Debug.WriteLine($"后台加载耗时: {stopwatch.ElapsedMilliseconds} ms");
 
         // 必须在 UI 线程的操作

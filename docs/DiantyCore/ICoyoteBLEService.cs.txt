@@ -1,6 +1,6 @@
 ﻿namespace DungeonToolkit.Coyote;
 
-public interface ICoyoteBLEService : IDisposable 
+public interface ICoyoteBleService : IDisposable 
 {
     event EventHandler<MessageReceivedEventArgs>? MessageReceived;
     event EventHandler? Disconnected;

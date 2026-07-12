@@ -4,8 +4,9 @@ public class CoyoteWS
 {
     public string DeviceName { get; set; }
     public bool IsEnabled { get; set; }
-    public string ClientId { get; }
     public bool IsConnected { get; }
+    public bool IsBound { get; }
+    public string ClientId { get; }
     public byte CurrentStrengthA { get; }
     public byte CurrentStrengthB { get; }
     public byte StrengthCapA { get; }

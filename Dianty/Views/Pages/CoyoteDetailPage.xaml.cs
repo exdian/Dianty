@@ -1,11 +1,9 @@
 using CommunityToolkit.Mvvm.Messaging;
-using CommunityToolkit.WinUI.Controls;
 using Dianty.Services;
-using Dianty.Utils;
 using Dianty.Utils.Messages;
 using Dianty.ViewModels;
+using Dianty.Views.Controls;
 using Microsoft.UI.Dispatching;
-using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
@@ -15,16 +13,16 @@ namespace Dianty.Views.Pages;
 /// <summary>
 /// An empty page that can be used on its own or navigated to within a Frame.
 /// </summary>
-public sealed partial class CoyoteBleDetailPage : Page
+public sealed partial class CoyoteDetailPage : Page
 {
-    public CoyoteBleDetailPage()
+    public CoyoteDetailPage()
     {
         InitializeComponent();
     }
 
     private IQueueService? _queueService;
 
-    private CoyoteBleItem? ViewModel { get; set; }
+    private CoyoteItem? ViewModel { get; set; }
 
     private ObservableCollection<string>? Paths { get; set; }
 
@@ -70,44 +68,19 @@ public sealed partial class CoyoteBleDetailPage : Page
         }
     }
 
-    private void OnSettingsCardLoaded(object sender, RoutedEventArgs e)
+    private void OnScrollViewerLoaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
-        if (sender is SettingsCard settingsCard)
-            AdjustSettingsCardLayout(settingsCard);
-    }
+        if (_queueService is null)
+            return;
 
-    private static void AdjustSettingsCardLayout(SettingsCard settingsCard)
-    {
-        // 使内容拉伸铺满
-        if (VisualTreeHelperExtension.FindChildByName(settingsCard, "PART_RootGrid") is not Grid grid)
-            return;
-        if (VisualTreeHelperExtension.FindChildByName(grid, "PART_ContentPresenter") is not ContentPresenter contentPresenter)
-            return;
-        settingsCard.HorizontalContentAlignment = HorizontalAlignment.Stretch;
-        grid.ColumnDefinitions[1].Width = new GridLength(1, GridUnitType.Auto);
-        grid.ColumnDefinitions[2].Width = new GridLength(1, GridUnitType.Star);
-        contentPresenter.HorizontalAlignment = HorizontalAlignment.Stretch;
-        Grid.SetColumnSpan(contentPresenter, 2);
-        var visualStateGroups = VisualStateManager.GetVisualStateGroups(grid);
-        foreach (var visualStateGroup in visualStateGroups)
+        _queueService.TryEnqueue(DispatcherQueuePriority.Low, () =>
         {
-            if (visualStateGroup.Name == "ContentAlignmentStates")
-            {
-                foreach (var state in visualStateGroup.States)
-                {
-                    if (state.Name == "RightWrapped")
-                    {
-                        state.Setters.RemoveAt(3);
-                    }
-                    else if (state.Name == "RightWrappedNoIcon")
-                    {
-                        state.Setters.RemoveAt(4);
-                    }
-                }
-                break;
-            }
-        }
+            if (ViewModel is CoyoteBleItem coyoteBleItem)
+                _pageContent.Content = new CoyoteBleDetailCard(coyoteBleItem);
+            else if (ViewModel is CoyoteWsItem coyoteWsItem)
+                _pageContent.Content = new CoyoteWsDetailCard(coyoteWsItem);
+        });
     }
 
-    public record class RequiredParameter(CoyoteBleItem ViewModel, string[] Paths, IQueueService? QueueService);
+    public record class RequiredParameter(CoyoteItem ViewModel, string[] Paths, IQueueService? QueueService);
 }
