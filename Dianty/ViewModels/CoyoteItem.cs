@@ -4,7 +4,6 @@ using CommunityToolkit.Mvvm.Input;
 using Dianty.Services;
 using Dianty.Utils;
 using DungeonToolkit.Coyote;
-using QRCoder;
 using System;
 using System.Diagnostics;
 using System.Threading;
@@ -132,7 +131,7 @@ public partial class CoyoteBleItem : CoyoteItem
     public partial bool IsConnecting { get; private set; }
 
     [RelayCommand(CanExecute = nameof(CanReconnecting), AllowConcurrentExecutions = true)]
-    private async Task Reconnecting()
+    private async Task ReconnectingAsync()
     {
         Debug.Assert(_coyoteBLE is not null);
         if (IsConnecting)
@@ -286,7 +285,7 @@ public partial class CoyoteWsItem : CoyoteItem
     public partial bool IsVisibleQrCode { get; set; }
 
     [RelayCommand(CanExecute = nameof(CanReconnecting), AllowConcurrentExecutions = true)]
-    private async Task Reconnecting()
+    private async Task ReconnectingAsync()
     {
         Debug.Assert(_coyoteWS is not null);
         if (IsConnecting)
@@ -310,7 +309,7 @@ public partial class CoyoteWsItem : CoyoteItem
             await _getClientIdTcs.Task.WaitAsync(_cts.Token);
 #endif
             _bindingTcs = new TaskCompletionSource();
-            var qrCodeSvgPath = await Task.Run(CreateQrCodeSvgPathString);
+            var qrCodeSvgPath = await Task.Run(() => CoyoteHelper.CreateQrCodeSvgPathString(_coyoteWS));
             _queueService.TryEnqueue(() =>
             {
                 QrCodeSvgPath = qrCodeSvgPath;
@@ -399,17 +398,5 @@ public partial class CoyoteWsItem : CoyoteItem
             StrengthCapA = e.StrengthCapA;
             StrengthCapB = e.StrengthCapB;
         });
-    }
-
-    private string CreateQrCodeSvgPathString()
-    {
-        Debug.Assert(_coyoteWS is not null);
-        var clientId = _coyoteWS.ClientId;
-        using QRCodeGenerator qrGenerator = new();
-        using QRCodeData qrCodeData = qrGenerator.CreateQrCode(
-            "https://www.dungeon-lab.com/app-download.php#DGLAB-SOCKET#" +
-            $"wss://ws.dungeon-lab.cn/{clientId}", QRCodeGenerator.ECCLevel.L);
-        using SvgQRCode svgQrCode = new(qrCodeData);
-        return svgQrCode.GetSvgPath(needMargin: true);
     }
 }

@@ -28,7 +28,7 @@
                     </ContentControl>
                     <TeachingTip
                         IsOpen="{x:Bind ViewModel.IsVisibleQrCode, Mode=OneWay}"
-                        CloseButtonContent="关闭" CloseButtonCommand="{x:Bind ViewModel.ShowQrCodeCommand}">
+                        CloseButtonContent="隐藏" CloseButtonCommand="{x:Bind ViewModel.ShowQrCodeCommand}">
                         <TeachingTip.Content>
                             <Border Background="Black">
                                 <Viewbox>
