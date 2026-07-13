@@ -1,9 +1,12 @@
 ﻿#define Debug_QrCode
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Dianty.Services;
 using Dianty.Utils;
+using Dianty.Utils.Messages;
 using DungeonToolkit.Coyote;
+using Microsoft.UI.Dispatching;
 using System;
 using System.Diagnostics;
 using System.Threading;
@@ -281,9 +284,6 @@ public partial class CoyoteWsItem : CoyoteItem
     [ObservableProperty]
     public partial bool CanShowQrCode { get; private set; }
 
-    [ObservableProperty]
-    public partial bool IsVisibleQrCode { get; set; }
-
     [RelayCommand(CanExecute = nameof(CanReconnecting), AllowConcurrentExecutions = true)]
     private async Task ReconnectingAsync()
     {
@@ -309,13 +309,13 @@ public partial class CoyoteWsItem : CoyoteItem
             await _getClientIdTcs.Task.WaitAsync(_cts.Token);
 #endif
             _bindingTcs = new TaskCompletionSource();
-            var qrCodeSvgPath = await Task.Run(() => CoyoteHelper.CreateQrCodeSvgPathString(_coyoteWS));
+            var qrCodeSvgPath = await Task.Run(() => CoyoteHelper.CreateQrCodeSvgPathString(_coyoteWS), _cts.Token);
             _queueService.TryEnqueue(() =>
             {
                 QrCodeSvgPath = qrCodeSvgPath;
                 CanShowQrCode = true;
-                IsVisibleQrCode = true;
                 ConnectionMessage = "已获取二维码";
+                WeakReferenceMessenger.Default.Send(new WebSocketQrCodeVisibility(isVisible: true));
             });
             await _bindingTcs.Task.WaitAsync(_cts.Token);
             connectionMessage = "连接成功";
@@ -336,10 +336,10 @@ public partial class CoyoteWsItem : CoyoteItem
             _getClientIdTcs = null;
             _bindingTcs?.TrySetResult();
             _bindingTcs = null;
-            _queueService.TryEnqueue(() =>
+            _queueService.TryEnqueue(DispatcherQueuePriority.Low, () =>
             {
+                WeakReferenceMessenger.Default.Send(new WebSocketQrCodeVisibility(isVisible: false));
                 CanShowQrCode = false;
-                IsVisibleQrCode = false;
                 ConnectionMessage = connectionMessage;
                 IsConnecting = false;
             });
@@ -360,12 +360,6 @@ public partial class CoyoteWsItem : CoyoteItem
     {
         Debug.Assert(_coyoteWS is not null);
         return !_coyoteWS.IsBound;
-    }
-
-    [RelayCommand]
-    private void ShowQrCode()
-    {
-        IsVisibleQrCode = !IsVisibleQrCode;
     }
 
     private void OnConnectionStatusChanged(object? sender, ConnectionStatusChangedEventArgs e)

@@ -15,9 +15,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <TextBlock x:Name="_pageHeader" Text="设备" Style="{StaticResource TitleTextBlockStyle}" Margin="12,6,12,12"/>
-        <TeachingTip
-            IsOpen="{x:Bind ViewModel.IsVisibleQrCode, Mode=OneWay}" Target="{x:Bind QrCodeButton}" PreferredPlacement="Bottom"
-            CloseButtonContent="隐藏" CloseButtonCommand="{x:Bind ViewModel.ShowQrCodeCommand}">
+        <TeachingTip x:Name="_qrCodeTip" Target="{x:Bind QrCodeButton}" PreferredPlacement="Bottom" CloseButtonContent="隐藏">
             <TeachingTip.Content>
                 <Border Background="Black">
                     <Viewbox>
@@ -58,15 +56,17 @@
                         Content="取消" Command="{x:Bind ViewModel.CancelConnectCommand}"
                         Visibility="{x:Bind ViewModel.IsConnecting, Mode=OneWay, Converter={StaticResource VisibleIfTrueConverter}}"/>
                     <Button
-                        x:Name="QrCodeButton" ToolTipService.ToolTip="查看二维码" Command="{x:Bind ViewModel.ShowQrCodeCommand}"
+                        x:Name="QrCodeButton" ToolTipService.ToolTip="查看二维码" Click="OnQrCodeButtonClick"
                         Content="&#xED14;" FontFamily="{ThemeResource SymbolThemeFontFamily}" FontSize="20" Padding="4.67"
                         Visibility="{x:Bind ViewModel.CanShowQrCode, Mode=OneWay, Converter={StaticResource VisibleIfTrueConverter}}"/>
+                    <ProgressRing
+                        IsActive="{x:Bind ViewModel.IsConnecting, Mode=OneWay}"
+                        Visibility="{x:Bind ViewModel.IsConnecting, Mode=OneWay, Converter={StaticResource VisibleIfTrueConverter}}"/>
                     <ContentControl Content="{x:Bind ViewModel.ConnectionMessage, Mode=OneWay}" VerticalAlignment="Center">
                         <ContentControl.ContentTransitions>
                             <PaneThemeTransition Edge="Bottom"/>
                         </ContentControl.ContentTransitions>
                     </ContentControl>
-                    <ProgressRing IsActive="{x:Bind ViewModel.IsConnecting, Mode=OneWay}"/>
                 </StackPanel>
             </ListView.Header>
             <ListView.ItemTemplate>
