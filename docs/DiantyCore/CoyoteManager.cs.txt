@@ -1,6 +1,6 @@
 ﻿namespace DungeonToolkit.Coyote;
 
-public class CoyoteManager  
+public class CoyoteManager : IDisposable 
 {
     public CoyoteManager();
     public WaveQueue ChannelA { get; }
@@ -15,5 +15,6 @@ public class CoyoteManager
     public void ClearCoyotes();
     public void StartOutput();
     public void StopOutput();
+    public void Dispose();
 }
 

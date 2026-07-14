@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Dianty.ViewModels;
 
-public partial class CoyoteItem : ObservableObject
+public partial class CoyoteItem : ObservableObject, IDisposable
 {
     public CoyoteItem(CoyoteBLE coyote, IQueueService queueService, ICoyoteListService coyoteListService)
     {
@@ -43,6 +43,7 @@ public partial class CoyoteItem : ObservableObject
     protected readonly CoyoteWS? _coyoteWS;
     protected readonly IQueueService _queueService;
     protected readonly ICoyoteListService _coyoteListService;
+    private bool _isDisposed;
 
     [ObservableProperty]
     public partial string Name { get; set; }
@@ -59,8 +60,26 @@ public partial class CoyoteItem : ObservableObject
     private void DeleteThis()
     {
         _coyoteListService.Remove(this);
-        _coyoteBLE?.Dispose();
-        _coyoteWS?.Dispose();
+        Dispose();
+    }
+
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_isDisposed)
+            return;
+        _isDisposed = true;
+
+        if (disposing)
+        {
+            _coyoteBLE?.Dispose();
+            _coyoteWS?.Dispose();
+        }
     }
 
     protected void UpdateConnectionMessage(bool isConnected)

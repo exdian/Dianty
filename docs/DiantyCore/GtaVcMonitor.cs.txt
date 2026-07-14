@@ -1,6 +1,6 @@
 ﻿namespace GameMonitor;
 
-public class GtaVcMonitor  
+public class GtaVcMonitor : IDisposable 
 {
     public GtaVcMonitor(IMemoryService memoryService);
     public int? CurrentPid { get; }
@@ -17,6 +17,7 @@ public class GtaVcMonitor
     public event EventHandler<PlayerFellOffBikeEventArgs>? PlayerFellOffBike;
     public void Start();
     public void Stop();
+    public void Dispose();
     public class PlayerTookDamageEventArgs(float damage) : EventArgs 
     {
         public float Damage { get; }

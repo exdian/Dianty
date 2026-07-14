@@ -11,7 +11,7 @@ using static GameMonitor.GtaVcMonitor;
 
 namespace Dianty.Models;
 
-public class GtaVcGameRule : GameRule
+public partial class GtaVcGameRule : GameRule, IDisposable
 {
     public GtaVcGameRule(IMemoryService memoryService)
     {
@@ -36,19 +36,6 @@ public class GtaVcGameRule : GameRule
         };
     }
 
-    ~GtaVcGameRule()
-    {
-        _monitor.Stop();
-        _stopwatch.Stop();
-        _timer.Dispose();
-
-        _monitor.PlayerTookDamage -= Monitor_PlayerTookDamage;
-        _monitor.PlayerBusted -= Monitor_PlayerBusted;
-        _monitor.PlayerWasted -= Monitor_PlayerWasted;
-        _monitor.PlayerWantedLevelChanged -= Monitor_PlayerWantedLevelChanged;
-        _monitor.PlayerFellOffBike -= Monitor_PlayerFellOffBike;
-    }
-
     private readonly GtaVcMonitor _monitor;
     private readonly Stopwatch _stopwatch;
     private readonly Timer _timer;
@@ -60,6 +47,7 @@ public class GtaVcGameRule : GameRule
     private long _miTangRuleStartTick;
     private long _wantedLevelRuleStartTick;
     private long _fellOffBikeRuleStartTick;
+    private bool _isDisposed;
 
     public override bool IsEnabled
     {
@@ -352,6 +340,33 @@ public class GtaVcGameRule : GameRule
                 }
                 ComputeOutputStrength();
             }
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_isDisposed)
+            return;
+        _isDisposed = true;
+
+        if (disposing)
+        {
+            _monitor.Stop();
+            _monitor.Dispose();
+            _stopwatch.Stop();
+            _timer.Dispose();
+
+            _monitor.PlayerTookDamage -= Monitor_PlayerTookDamage;
+            _monitor.PlayerBusted -= Monitor_PlayerBusted;
+            _monitor.PlayerWasted -= Monitor_PlayerWasted;
+            _monitor.PlayerWantedLevelChanged -= Monitor_PlayerWantedLevelChanged;
+            _monitor.PlayerFellOffBike -= Monitor_PlayerFellOffBike;
         }
     }
 

@@ -126,22 +126,30 @@ internal partial class CoyoteBleService : ICoyoteBleService
 
     public void Dispose()
     {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
         if (_isDisposed)
             return;
         _isDisposed = true;
 
-        _bleDevice.ConnectionStatusChanged -= BleDevice_ConnectionStatusChanged;
-        _messageCharacteristic.ValueChanged -= MessageCharacteristic_ValueChanged;
-        try
+        if (disposing)
         {
-            foreach (var service in _bleDevice.GattServices.Reverse())
+            _bleDevice.ConnectionStatusChanged -= BleDevice_ConnectionStatusChanged;
+            _messageCharacteristic.ValueChanged -= MessageCharacteristic_ValueChanged;
+            try
             {
-                service.Dispose();
+                foreach (var service in _bleDevice.GattServices.Reverse())
+                {
+                    service.Dispose();
+                }
             }
+            catch { }
+            _bleDevice.Dispose();
         }
-        catch { }
-        _bleDevice.Dispose();
-        GC.SuppressFinalize(this);
     }
 
     public async Task<bool> SendCommandAsync(byte[] command)

@@ -10,7 +10,7 @@ using static Dianty.Models.AutomaticStrength;
 
 namespace Dianty.ViewModels;
 
-public partial class GamesPageViewModel : ObservableObject
+public partial class GamesPageViewModel : ObservableObject, IDisposable
 {
     public GamesPageViewModel(GameManager gameManager, IQueueService queueService)
     {
@@ -28,13 +28,9 @@ public partial class GamesPageViewModel : ObservableObject
         GtaVcStrengthMode = StrengthModes.First();
     }
 
-    ~GamesPageViewModel()
-    {
-        _gameManager.OutputStrengthChanged -= GameManager_OutputStrengthChanged;
-    }
-
     private readonly GameManager _gameManager;
     private readonly IQueueService _queueService;
+    private bool _isDisposed;
 
     public KeyValuePair<Mode, string>[] StrengthModes { get; }
 
@@ -112,6 +108,25 @@ public partial class GamesPageViewModel : ObservableObject
 
     [ObservableProperty]
     public partial double GtaVcFellOffBikeRuleDuration { get; set; }
+
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_isDisposed)
+            return;
+        _isDisposed = true;
+
+        if (disposing)
+        {
+            _gameManager.OutputStrengthChanged -= GameManager_OutputStrengthChanged;
+            _gameManager.Dispose();
+        }
+    }
 
     private void GameManager_OutputStrengthChanged(object? sender, EventArgs e)
     {

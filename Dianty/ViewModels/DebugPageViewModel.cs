@@ -21,12 +21,8 @@ public partial class DebugPageViewModel : ObservableObject, IDisposable
         });
     }
 
-    ~DebugPageViewModel()
-    {
-        Dispose();
-    }
-
     private readonly IQueueService _queueService;
+    private bool _isDisposed;
 
     public ObservableCollection<Log> Logs { get; } = [];
 
@@ -61,7 +57,19 @@ public partial class DebugPageViewModel : ObservableObject, IDisposable
 
     public void Dispose()
     {
-        WeakReferenceMessenger.Default.Unregister<Log>(this);
+        Dispose(disposing: true);
         GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_isDisposed)
+            return;
+        _isDisposed = true;
+
+        if (disposing)
+        {
+            WeakReferenceMessenger.Default.Unregister<Log>(this);
+        }
     }
 }
