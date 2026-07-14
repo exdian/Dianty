@@ -8,14 +8,14 @@ namespace Dianty.Views.Controls;
 
 public sealed partial class CoyoteBleDetailCard : UserControl
 {
-    public CoyoteBleDetailCard(CoyoteBleItem? coyoteBleItem)
+    public CoyoteBleDetailCard(CoyoteBleItem coyoteBleItem)
     {
         InitializeComponent();
 
         ViewModel = coyoteBleItem;
     }
 
-    private CoyoteBleItem? ViewModel { get; set; }
+    private CoyoteBleItem ViewModel { get; set; }
 
     private void OnSettingsCardLoaded(object sender, RoutedEventArgs e)
     {

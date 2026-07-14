@@ -16,10 +16,11 @@ namespace Dianty.ViewModels;
 
 public partial class CoyoteItem : ObservableObject
 {
-    public CoyoteItem(CoyoteBLE coyote, IQueueService queueService)
+    public CoyoteItem(CoyoteBLE coyote, IQueueService queueService, ICoyoteListService coyoteListService)
     {
         _coyoteBLE = coyote;
         _queueService = queueService;
+        _coyoteListService = coyoteListService;
         Name = coyote.DeviceName;
         IsEnabled = coyote.IsEnabled;
         UpdateConnectionMessage(coyote.IsConnected);
@@ -27,10 +28,11 @@ public partial class CoyoteItem : ObservableObject
         coyote.ConnectionStatusChanged += OnConnectionStatusChanged;
     }
 
-    public CoyoteItem(CoyoteWS coyote, IQueueService queueService)
+    public CoyoteItem(CoyoteWS coyote, IQueueService queueService, ICoyoteListService coyoteListService)
     {
         _coyoteWS = coyote;
         _queueService = queueService;
+        _coyoteListService = coyoteListService;
         Name = coyote.DeviceName;
         IsEnabled = coyote.IsEnabled;
         UpdateConnectionMessage(coyote.IsBound);
@@ -40,6 +42,7 @@ public partial class CoyoteItem : ObservableObject
     protected readonly CoyoteBLE? _coyoteBLE;
     protected readonly CoyoteWS? _coyoteWS;
     protected readonly IQueueService _queueService;
+    protected readonly ICoyoteListService _coyoteListService;
 
     [ObservableProperty]
     public partial string Name { get; set; }
@@ -51,6 +54,14 @@ public partial class CoyoteItem : ObservableObject
 
     [ObservableProperty]
     public partial bool IsEnabled { get; set; }
+
+    [RelayCommand]
+    private void DeleteThis()
+    {
+        _coyoteListService.Remove(this);
+        _coyoteBLE?.Dispose();
+        _coyoteWS?.Dispose();
+    }
 
     protected void UpdateConnectionMessage(bool isConnected)
     {
@@ -77,8 +88,9 @@ public partial class CoyoteItem : ObservableObject
 
 public partial class CoyoteBleItem : CoyoteItem
 {
-    public CoyoteBleItem(CoyoteBLE coyote, IQueueService queueService, ICoyoteBleDetector coyoteBleDetector)
-        : base(coyote, queueService)
+    public CoyoteBleItem(CoyoteBLE coyote, IQueueService queueService,
+        ICoyoteBleDetector coyoteBleDetector, ICoyoteListService coyoteListService)
+        : base(coyote, queueService, coyoteListService)
     {
         _coyoteBleDetector = coyoteBleDetector;
         MaxStrengthA = coyote.MaxStrengthA;
@@ -99,6 +111,8 @@ public partial class CoyoteBleItem : CoyoteItem
     private readonly ICoyoteBleDetector _coyoteBleDetector;
     private CancellationTokenSource? _cts;
     private int _reconnectingCount;
+
+    public CoyoteBLE Coyote => _coyoteBLE!;
 
     [ObservableProperty]
     public partial double MaxStrengthA { get; set; }
@@ -246,7 +260,8 @@ public partial class CoyoteBleItem : CoyoteItem
 
 public partial class CoyoteWsItem : CoyoteItem
 {
-    public CoyoteWsItem(CoyoteWS coyote, IQueueService queueService) : base(coyote, queueService)
+    public CoyoteWsItem(CoyoteWS coyote, IQueueService queueService, ICoyoteListService coyoteListService)
+        : base(coyote, queueService, coyoteListService)
     {
         CurrentStrengthA = coyote.CurrentStrengthA;
         CurrentStrengthB = coyote.CurrentStrengthB;
@@ -262,6 +277,8 @@ public partial class CoyoteWsItem : CoyoteItem
     private TaskCompletionSource? _bindingTcs;
     private CancellationTokenSource? _cts;
     private int _reconnectingCount;
+
+    public CoyoteWS Coyote => _coyoteWS!;
 
     [ObservableProperty]
     public partial int CurrentStrengthA { get; private set; }
@@ -323,10 +340,12 @@ public partial class CoyoteWsItem : CoyoteItem
         catch (OperationCanceledException)
         {
             connectionMessage = "已取消连接";
-            if (_coyoteWS.IsConnected)
-                await _coyoteWS.DisconnectAsync();
+            await _coyoteWS.DisconnectAsync();
         }
-        catch { }
+        catch
+        {
+            await _coyoteWS.DisconnectAsync();
+        }
         finally
         {
             _cts.Cancel();

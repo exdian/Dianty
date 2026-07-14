@@ -61,16 +61,18 @@ public partial class App : Application
         ServiceLocator.Register<IMemoryService>(static () => new MemoryService());
 
         var coyoteManager = new CoyoteManager();
+        var coyoteItems = new CoyoteCollection(coyoteManager);
+        ServiceLocator.Register<ICoyoteListService>(coyoteItems);
         var gameManager = new GameManager(coyoteManager)
         {
             GtaVcGameRule = new GtaVcGameRule(ServiceLocator.GetService<IMemoryService>())
         };
 
-        ServiceLocator.RegisterViewModel(typeof(DebugPage), new DebugPageViewModel(queueService));
         ServiceLocator.RegisterViewModel(typeof(DevicesPage), new DevicesPage.RequiredParameter(
-            new DevicesPageViewModel(queueService, coyoteBleDetector), queueService));
+            new DevicesPageViewModel(coyoteItems, queueService, coyoteBleDetector), queueService));
         ServiceLocator.RegisterViewModel(typeof(GamesPage), new GamesPage.RequiredParameter(
             new GamesPageViewModel(gameManager, queueService), queueService));
+        ServiceLocator.RegisterViewModel(typeof(DebugPage), new DebugPageViewModel(queueService));
     }
 
     private void MergedDictionaries()

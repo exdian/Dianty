@@ -12,6 +12,7 @@ public class CoyoteManager
     public void AddCoyote(CoyoteWS coyote);
     public bool RemoveCoyote(CoyoteBLE coyote);
     public bool RemoveCoyote(CoyoteWS coyote);
+    public void ClearCoyotes();
     public void StartOutput();
     public void StopOutput();
 }

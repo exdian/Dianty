@@ -1,6 +1,6 @@
 ﻿namespace DungeonToolkit.Coyote;
 
-public class CoyoteBLE  
+public class CoyoteBLE : IDisposable 
 {
     public CoyoteBLE();
     public string DeviceName { get; set; }
@@ -23,6 +23,8 @@ public class CoyoteBLE
     public event EventHandler<BatteryLevelChangedEventArgs>? BatteryLevelChanged;
     public async Task<bool> ConnectNewAsync(ICoyoteBleDetector coyoteDetector, CancellationToken token);
     public async Task<bool> ReconnectingAsync(ICoyoteBleDetector coyoteDetector, CancellationToken token);
+    public void Disconnect();
+    public void Dispose();
     public async Task<bool> SendB0CommandAsync();
     public async Task<bool> SendBfCommandAsync();
     public async Task<bool> UpdateBatteryLevelAsync();

@@ -17,6 +17,7 @@
     <None Remove="MainView.xaml" />
     <None Remove="Resources\AppResourceDictionary.xaml" />
     <None Remove="Views\Controls\CoyoteBleDetailCard.xaml" />
+    <None Remove="Views\Controls\CoyoteDeletionCard.xaml" />
     <None Remove="Views\Controls\CoyoteWsDetailCard.xaml" />
     <None Remove="Views\Controls\GtaVcRuleCard.xaml" />
     <None Remove="Views\Pages\CoyoteDetailPage.xaml" />
@@ -73,6 +74,11 @@
   <ItemGroup>
     <ProjectReference Include="..\..\DiantyCore\DungeonToolkit\DungeonToolkit.csproj" />
     <ProjectReference Include="..\..\DiantyCore\GameMonitor\GameMonitor.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Controls\CoyoteDeletionCard.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\Pages\CoyoteDetailPage.xaml">

@@ -9,9 +9,7 @@ using Microsoft.UI.Xaml.Navigation;
 using System.Threading.Tasks;
 
 namespace Dianty.Views.Pages;
-/// <summary>
-/// An empty page that can be used on its own or navigated to within a Frame.
-/// </summary>
+
 public sealed partial class DevicesPage : Page
 {
     public DevicesPage()
@@ -38,7 +36,7 @@ public sealed partial class DevicesPage : Page
 
     private void OnSettingsCardClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not FrameworkElement element)
+        if (sender is not FrameworkElement element || _queueService is null)
             return;
 
         string[] traces = [_pageHeader.Text];

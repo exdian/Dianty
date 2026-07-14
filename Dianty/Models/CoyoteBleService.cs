@@ -37,66 +37,91 @@ internal partial class CoyoteBleService : ICoyoteBleService
     public static async Task<CoyoteBleService> CreateCoyoteBleServiceAsync(
         ulong address, GattServiceInfo gattServiceInfo, CancellationToken token)
     {
-        token.ThrowIfCancellationRequested();
-        var bleDevice = await BluetoothLEDevice.FromBluetoothAddressAsync(address);
-        token.ThrowIfCancellationRequested();
-        bleDevice ??= await BluetoothLEDevice.FromBluetoothAddressAsync(address) ?? throw new Exception("设备连接失败");
-
-        // 获取 GATT 服务
-        token.ThrowIfCancellationRequested();
-        var servicesResult = await bleDevice.GetGattServicesAsync();
-        token.ThrowIfCancellationRequested();
-        if (servicesResult.Status != GattCommunicationStatus.Success)
-            servicesResult = await bleDevice.GetGattServicesAsync();
-        if (servicesResult.Status != GattCommunicationStatus.Success)
-            throw new Exception($"服务获取失败: {servicesResult.Status}");
-        var commandService = servicesResult.Services.FirstOrDefault(s => s.Uuid == gattServiceInfo.CommandServiceUuid)
-            ?? throw new Exception("未找到命令服务");
-        var batteryService = servicesResult.Services.FirstOrDefault(s => s.Uuid == gattServiceInfo.BatteryServiceUuid);
-
-        // 获取命令特征和消息特征
-        token.ThrowIfCancellationRequested();
-        var characteristicsResult = await commandService.GetCharacteristicsAsync();
-        token.ThrowIfCancellationRequested();
-        if (characteristicsResult.Status != GattCommunicationStatus.Success)
-            characteristicsResult = await commandService.GetCharacteristicsAsync();
-        if (characteristicsResult.Status != GattCommunicationStatus.Success)
-            throw new Exception($"特征获取失败: {characteristicsResult.Status}");
-        var commandCharacteristic = characteristicsResult.Characteristics.FirstOrDefault(c => c.Uuid == gattServiceInfo.CommandCharacteristicUuid)
-            ?? throw new Exception("未找到命令特征");
-        var messageCharacteristic = characteristicsResult.Characteristics.FirstOrDefault(c => c.Uuid == gattServiceInfo.MessageCharacteristicUuid)
-            ?? throw new Exception("未找到消息特征");
-        if (!commandCharacteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.WriteWithoutResponse))
-            throw new Exception("命令特征权限错误");
-
-        // 获取电池特征
-        GattCharacteristic? batteryCharacteristic = null;
-        if (batteryService is not null)
+        BluetoothLEDevice? bleDevice = null;
+        CoyoteBleService? result = null;
+        try
         {
             token.ThrowIfCancellationRequested();
-            var batteryCharacteristicsResult = await batteryService.GetCharacteristicsAsync();
+            bleDevice = await BluetoothLEDevice.FromBluetoothAddressAsync(address);
             token.ThrowIfCancellationRequested();
-            batteryCharacteristic = batteryCharacteristicsResult.Characteristics.FirstOrDefault(c => c.Uuid == gattServiceInfo.BatteryCharacteristicUuid);
-        }
+            bleDevice ??= await BluetoothLEDevice.FromBluetoothAddressAsync(address) ?? throw new Exception("设备连接失败");
 
-        // 订阅消息通知
-        var result = new CoyoteBleService(bleDevice, commandCharacteristic, messageCharacteristic, batteryCharacteristic);
-        var operationResult = await messageCharacteristic.WriteClientCharacteristicConfigurationDescriptorAsync(
-            GattClientCharacteristicConfigurationDescriptorValue.Notify);
-        token.ThrowIfCancellationRequested();
-        if (operationResult != GattCommunicationStatus.Success)
-        {
-            operationResult = await messageCharacteristic.WriteClientCharacteristicConfigurationDescriptorAsync(
+            // 获取 GATT 服务
+            token.ThrowIfCancellationRequested();
+            var servicesResult = await bleDevice.GetGattServicesAsync();
+            token.ThrowIfCancellationRequested();
+            if (servicesResult.Status != GattCommunicationStatus.Success)
+                servicesResult = await bleDevice.GetGattServicesAsync();
+            if (servicesResult.Status != GattCommunicationStatus.Success)
+                throw new Exception($"服务获取失败: {servicesResult.Status}");
+            var commandService = servicesResult.Services.FirstOrDefault(s => s.Uuid == gattServiceInfo.CommandServiceUuid)
+                ?? throw new Exception("未找到命令服务");
+            var batteryService = servicesResult.Services.FirstOrDefault(s => s.Uuid == gattServiceInfo.BatteryServiceUuid);
+
+            // 获取命令特征和消息特征
+            token.ThrowIfCancellationRequested();
+            var characteristicsResult = await commandService.GetCharacteristicsAsync();
+            token.ThrowIfCancellationRequested();
+            if (characteristicsResult.Status != GattCommunicationStatus.Success)
+                characteristicsResult = await commandService.GetCharacteristicsAsync();
+            if (characteristicsResult.Status != GattCommunicationStatus.Success)
+                throw new Exception($"特征获取失败: {characteristicsResult.Status}");
+            var commandCharacteristic = characteristicsResult.Characteristics.FirstOrDefault(c => c.Uuid == gattServiceInfo.CommandCharacteristicUuid)
+                ?? throw new Exception("未找到命令特征");
+            var messageCharacteristic = characteristicsResult.Characteristics.FirstOrDefault(c => c.Uuid == gattServiceInfo.MessageCharacteristicUuid)
+                ?? throw new Exception("未找到消息特征");
+            if (!commandCharacteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.WriteWithoutResponse))
+                throw new Exception("命令特征权限错误");
+
+            // 获取电池特征
+            GattCharacteristic? batteryCharacteristic = null;
+            if (batteryService is not null)
+            {
+                token.ThrowIfCancellationRequested();
+                var batteryCharacteristicsResult = await batteryService.GetCharacteristicsAsync();
+                token.ThrowIfCancellationRequested();
+                batteryCharacteristic = batteryCharacteristicsResult.Characteristics.FirstOrDefault(c => c.Uuid == gattServiceInfo.BatteryCharacteristicUuid);
+            }
+
+            // 订阅消息通知
+            result = new CoyoteBleService(bleDevice, commandCharacteristic, messageCharacteristic, batteryCharacteristic);
+            var operationResult = await messageCharacteristic.WriteClientCharacteristicConfigurationDescriptorAsync(
                 GattClientCharacteristicConfigurationDescriptorValue.Notify);
             token.ThrowIfCancellationRequested();
-        }
-        if (operationResult != GattCommunicationStatus.Success)
-        {
-            result.Dispose();
-            throw new Exception($"消息特征描述符写入失败: {operationResult}");
-        }
+            if (operationResult != GattCommunicationStatus.Success)
+            {
+                operationResult = await messageCharacteristic.WriteClientCharacteristicConfigurationDescriptorAsync(
+                    GattClientCharacteristicConfigurationDescriptorValue.Notify);
+                token.ThrowIfCancellationRequested();
+            }
+            if (operationResult != GattCommunicationStatus.Success)
+            {
+                result.Dispose();
+                throw new Exception($"消息特征描述符写入失败: {operationResult}");
+            }
 
-        return result;
+            return result;
+        }
+        catch
+        {
+            if (result is not null)
+            {
+                result.Dispose();
+            }
+            else if (bleDevice is not null)
+            {
+                try
+                {
+                    foreach (var service in bleDevice.GattServices.Reverse())
+                    {
+                        service.Dispose();
+                    }
+                }
+                catch { }
+                bleDevice.Dispose();
+            }
+            throw;
+        }
     }
 
     public void Dispose()
@@ -107,6 +132,14 @@ internal partial class CoyoteBleService : ICoyoteBleService
 
         _bleDevice.ConnectionStatusChanged -= BleDevice_ConnectionStatusChanged;
         _messageCharacteristic.ValueChanged -= MessageCharacteristic_ValueChanged;
+        try
+        {
+            foreach (var service in _bleDevice.GattServices.Reverse())
+            {
+                service.Dispose();
+            }
+        }
+        catch { }
         _bleDevice.Dispose();
         GC.SuppressFinalize(this);
     }
@@ -149,6 +182,7 @@ internal partial class CoyoteBleService : ICoyoteBleService
     {
         if (sender.ConnectionStatus == BluetoothConnectionStatus.Disconnected)
         {
+            Dispose();
             OnDisconnected();
         }
     }

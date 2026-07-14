@@ -10,19 +10,20 @@ namespace Dianty.Views.Controls;
 
 public sealed partial class CoyoteWsDetailCard : UserControl
 {
-    public CoyoteWsDetailCard(CoyoteWsItem? coyoteWsItem, IQueueService queueService)
+    public CoyoteWsDetailCard(CoyoteWsItem coyoteWsItem, IQueueService queueService)
     {
         InitializeComponent();
 
         ViewModel = coyoteWsItem;
         _queueService = queueService;
+
         Loaded += OnDevicesPageLoaded;
         Unloaded += OnDevicesPageUnloaded;
     }
 
     private readonly IQueueService _queueService;
 
-    private CoyoteWsItem? ViewModel { get; set; }
+    private CoyoteWsItem ViewModel { get; set; }
 
     private void OnQrCodeButtonClick(object sender, RoutedEventArgs e)
     {

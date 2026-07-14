@@ -10,9 +10,7 @@ using Microsoft.UI.Xaml.Navigation;
 using System.Collections.ObjectModel;
 
 namespace Dianty.Views.Pages;
-/// <summary>
-/// An empty page that can be used on its own or navigated to within a Frame.
-/// </summary>
+
 public sealed partial class CoyoteDetailPage : Page
 {
     public CoyoteDetailPage()
@@ -82,5 +80,5 @@ public sealed partial class CoyoteDetailPage : Page
         });
     }
 
-    public record class RequiredParameter(CoyoteItem ViewModel, string[] Paths, IQueueService? QueueService);
+    public record class RequiredParameter(CoyoteItem ViewModel, string[] Paths, IQueueService QueueService);
 }

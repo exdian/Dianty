@@ -15,18 +15,20 @@ namespace Dianty.ViewModels;
 
 public partial class DevicesPageViewModel : ObservableObject
 {
-    public DevicesPageViewModel(IQueueService queueService, ICoyoteBleDetector coyoteBleDetector)
+    public DevicesPageViewModel(CoyoteCollection coyoteCollection, IQueueService queueService, ICoyoteBleDetector coyoteBleDetector)
     {
+        _coyoteCollection = coyoteCollection;
         _queueService = queueService;
         _coyoteBleDetector = coyoteBleDetector;
 
 #if DEBUG
-        CoyoteItems.Add(new CoyoteBleItem(new CoyoteBLE { DeviceName = "调试" }, _queueService, _coyoteBleDetector));
-        CoyoteItems.Add(new CoyoteWsItem(new CoyoteWS { DeviceName = "调试0" }, _queueService));
-        CoyoteItems.Add(new CoyoteWsItem(new CoyoteWS { DeviceName = "调试1" }, _queueService));
+        CoyoteItems.Add(new CoyoteBleItem(new CoyoteBLE { DeviceName = "调试" }, _queueService, _coyoteBleDetector, _coyoteCollection));
+        CoyoteItems.Add(new CoyoteWsItem(new CoyoteWS { DeviceName = "调试0" }, _queueService, _coyoteCollection));
+        CoyoteItems.Add(new CoyoteWsItem(new CoyoteWS { DeviceName = "调试1" }, _queueService, _coyoteCollection));
 #endif
     }
 
+    private readonly CoyoteCollection _coyoteCollection;
     private readonly IQueueService _queueService;
     private readonly ICoyoteBleDetector _coyoteBleDetector;
     private TaskCompletionSource? _getClientIdTcs;
@@ -34,7 +36,7 @@ public partial class DevicesPageViewModel : ObservableObject
     private CancellationTokenSource? _cts;
     private int _reconnectingCount;
 
-    public ObservableCollection<CoyoteItem> CoyoteItems { get; } = [];
+    public ObservableCollection<CoyoteItem> CoyoteItems => _coyoteCollection;
 
     [ObservableProperty]
     public partial string ConnectionMessage { get; protected set; } = string.Empty;
@@ -66,15 +68,19 @@ public partial class DevicesPageViewModel : ObservableObject
             if (await coyote.ConnectNewAsync(_coyoteBleDetector, _cts.Token))
             {
                 connectionMessage = "连接成功";
-                var coyoteBleItem = new CoyoteBleItem(coyote, _queueService, _coyoteBleDetector);
+                var coyoteBleItem = new CoyoteBleItem(coyote, _queueService, _coyoteBleDetector, _coyoteCollection);
                 _queueService.TryEnqueue(() => CoyoteItems.Add(coyoteBleItem));
             }
         }
         catch (OperationCanceledException)
         {
             connectionMessage = "已取消连接";
+            coyote.Dispose();
         }
-        catch { }
+        catch
+        {
+            coyote.Dispose();
+        }
         finally
         {
             _cts.Cancel();
@@ -125,16 +131,18 @@ public partial class DevicesPageViewModel : ObservableObject
             });
             await _bindingTcs.Task.WaitAsync(_cts.Token);
             connectionMessage = "连接成功";
-            var coyoteWsItem = new CoyoteWsItem(coyote, _queueService);
+            var coyoteWsItem = new CoyoteWsItem(coyote, _queueService, _coyoteCollection);
             _queueService.TryEnqueue(() => CoyoteItems.Add(coyoteWsItem));
         }
         catch (OperationCanceledException)
         {
             connectionMessage = "已取消连接";
-            if (coyote.IsConnected)
-                await coyote.DisconnectAsync();
+            coyote.Dispose();
         }
-        catch { }
+        catch
+        {
+            coyote.Dispose();
+        }
         finally
         {
             _cts.Cancel();
