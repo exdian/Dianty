@@ -84,12 +84,12 @@ public partial class App : Application
     {
         return pageName switch
         {
-            nameof(DebugPage) => typeof(DebugPage),
             nameof(HomePage) => typeof(HomePage),
             nameof(DevicesPage) => typeof(DevicesPage),
             nameof(WavesPage) => typeof(WavesPage),
             nameof(GamesPage) => typeof(GamesPage),
             nameof(SafetyPage) => typeof(SafetyPage),
+            nameof(DebugPage) => typeof(DebugPage),
             nameof(SettingsPage) => typeof(SettingsPage),
             nameof(CoyoteDetailPage) => typeof(DevicesPage),
             _ => null

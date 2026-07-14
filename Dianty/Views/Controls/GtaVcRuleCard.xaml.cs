@@ -5,12 +5,12 @@ namespace Dianty.Views.Controls;
 
 public sealed partial class GtaVcRuleCard : UserControl
 {
-    public GtaVcRuleCard(GamesPageViewModel? viewModel)
+    public GtaVcRuleCard(GamesPageViewModel viewModel)
     {
         InitializeComponent();
 
         ViewModel = viewModel;
     }
 
-    private GamesPageViewModel? ViewModel { get; }
+    private GamesPageViewModel ViewModel { get; }
 }
