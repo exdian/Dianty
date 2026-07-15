@@ -345,7 +345,7 @@ public partial class CoyoteWsItem : CoyoteItem
             await _getClientIdTcs.Task.WaitAsync(_cts.Token);
 #endif
             _bindingTcs = new TaskCompletionSource();
-            var qrCodeSvgPath = await Task.Run(() => CoyoteHelper.CreateQrCodeSvgPathString(_coyoteWS), _cts.Token);
+            var qrCodeSvgPath = await Task.Run(() => CoyoteHelper.CreateQrCodeSvgPathString(_coyoteWS)).WithCancellation(_cts.Token);
             _queueService.TryEnqueue(() =>
             {
                 QrCodeSvgPath = qrCodeSvgPath;

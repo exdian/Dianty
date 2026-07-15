@@ -121,7 +121,7 @@ public partial class DevicesPageViewModel : ObservableObject
                 return;
             await _getClientIdTcs.Task.WaitAsync(_cts.Token);
             _bindingTcs = new TaskCompletionSource();
-            var qrCodeSvgPath = await Task.Run(() => CoyoteHelper.CreateQrCodeSvgPathString(coyote), _cts.Token);
+            var qrCodeSvgPath = await Task.Run(() => CoyoteHelper.CreateQrCodeSvgPathString(coyote)).WithCancellation(_cts.Token);
             _queueService.TryEnqueue(() =>
             {
                 QrCodeSvgPath = qrCodeSvgPath;

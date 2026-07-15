@@ -39,13 +39,13 @@ internal class CoyoteBleDetector : ICoyoteBleDetector
             return null;
         }
 
-        var completedTask = await Task.WhenAny(tcs.Task, Task.Delay(TimeSpan.FromSeconds(30), token));
+        var completedTask = await Task.WhenAny(tcs.Task, Task.Delay(TimeSpan.FromSeconds(30), token)).ConfigureAwait(false);
         watcher.Stop();
         watcher.Received -= Watcher_Received;
         if (token.IsCancellationRequested)
         {
-            tcs.TrySetCanceled(token);
-            await completedTask;
+            tcs.TrySetResult();
+            await completedTask.ConfigureAwait(false);
         }
         return result;
     }
@@ -77,13 +77,13 @@ internal class CoyoteBleDetector : ICoyoteBleDetector
             return false;
         }
 
-        var completedTask = await Task.WhenAny(tcs.Task, Task.Delay(TimeSpan.FromSeconds(30), token));
+        var completedTask = await Task.WhenAny(tcs.Task, Task.Delay(TimeSpan.FromSeconds(30), token)).ConfigureAwait(false);
         watcher.Stop();
         watcher.Received -= Watcher_Received;
         if (token.IsCancellationRequested)
         {
-            tcs.TrySetCanceled(token);
-            await completedTask;
+            tcs.TrySetResult();
+            await completedTask.ConfigureAwait(false);
         }
         return completedTask == tcs.Task;
     }
@@ -92,7 +92,7 @@ internal class CoyoteBleDetector : ICoyoteBleDetector
     {
         try
         {
-            return await CoyoteBleService.CreateCoyoteBleServiceAsync(address, gattServiceInfo, token);
+            return await CoyoteBleService.CreateCoyoteBleServiceAsync(address, gattServiceInfo, token).ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {
