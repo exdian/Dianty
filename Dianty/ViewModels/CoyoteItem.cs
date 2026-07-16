@@ -106,10 +106,11 @@ public partial class CoyoteItem : ObservableObject, IDisposable
 public partial class CoyoteBleItem : CoyoteItem
 {
     public CoyoteBleItem(CoyoteBLE coyote, IQueueService queueService,
-        ICoyoteBleDetector coyoteBleDetector, ICoyoteListService coyoteListService)
+        ICoyoteListService coyoteListService, ICoyoteBleDetector coyoteBleDetector)
         : base(coyote, queueService, coyoteListService)
     {
         _coyoteBleDetector = coyoteBleDetector;
+        _bfCommandTimer = new Timer(SendBfCommand, null, Timeout.Infinite, Timeout.Infinite);
         MaxStrengthA = coyote.MaxStrengthA;
         MaxStrengthB = coyote.MaxStrengthB;
         IsGentle = coyote.IsGentle;
@@ -127,6 +128,8 @@ public partial class CoyoteBleItem : CoyoteItem
     }
 
     private readonly ICoyoteBleDetector _coyoteBleDetector;
+    private readonly Timer _bfCommandTimer;
+    private const int BfCommandCooldownTime = 1500;
     private CancellationTokenSource? _cts;
     private int _reconnectingCount;
 
@@ -209,6 +212,13 @@ public partial class CoyoteBleItem : CoyoteItem
         }
     }
 
+    private void SendBfCommand(object? state)
+    {
+        Debug.Assert(_coyoteBLE is not null);
+        if (_coyoteBLE.IsConnected)
+            _ = _coyoteBLE.SendBfCommandAsync();
+    }
+
     private void OnConnectionStatusChanged(object? sender, ConnectionStatusChangedEventArgs e)
     {
         _queueService.TryEnqueue(() => IsConnectingOrConnected = e.IsConnected);
@@ -247,12 +257,14 @@ public partial class CoyoteBleItem : CoyoteItem
     {
         Debug.Assert(_coyoteBLE is not null);
         _coyoteBLE.MaxStrengthA = (byte)value;
+        _bfCommandTimer.Change(BfCommandCooldownTime, Timeout.Infinite);
     }
 
     partial void OnMaxStrengthBChanged(double value)
     {
         Debug.Assert(_coyoteBLE is not null);
         _coyoteBLE.MaxStrengthB = (byte)value;
+        _bfCommandTimer.Change(BfCommandCooldownTime, Timeout.Infinite);
     }
 
     partial void OnIsGentleChanged(bool value)
@@ -265,24 +277,37 @@ public partial class CoyoteBleItem : CoyoteItem
     {
         Debug.Assert(_coyoteBLE is not null);
         _coyoteBLE.BfFrequencyParamA = (byte)value;
+        _bfCommandTimer.Change(BfCommandCooldownTime, Timeout.Infinite);
     }
 
     partial void OnBfFrequencyParamBChanged(double value)
     {
         Debug.Assert(_coyoteBLE is not null);
         _coyoteBLE.BfFrequencyParamB = (byte)value;
+        _bfCommandTimer.Change(BfCommandCooldownTime, Timeout.Infinite);
     }
 
     partial void OnBfStrengthParamAChanged(double value)
     {
         Debug.Assert(_coyoteBLE is not null);
         _coyoteBLE.BfStrengthParamA = (byte)value;
+        _bfCommandTimer.Change(BfCommandCooldownTime, Timeout.Infinite);
     }
 
     partial void OnBfStrengthParamBChanged(double value)
     {
         Debug.Assert(_coyoteBLE is not null);
         _coyoteBLE.BfStrengthParamB = (byte)value;
+        _bfCommandTimer.Change(BfCommandCooldownTime, Timeout.Infinite);
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+        if (disposing)
+        {
+            _bfCommandTimer.Dispose();
+        }
     }
 }
 

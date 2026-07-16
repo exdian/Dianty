@@ -20,7 +20,7 @@ public partial class DevicesPageViewModel : ObservableObject
         _coyoteBleDetector = coyoteBleDetector;
 
 #if DEBUG
-        CoyoteItems.Add(new CoyoteBleItem(new CoyoteBLE { DeviceName = "调试" }, _queueService, _coyoteBleDetector, _coyoteCollection));
+        CoyoteItems.Add(new CoyoteBleItem(new CoyoteBLE { DeviceName = "调试" }, _queueService, _coyoteCollection, _coyoteBleDetector));
         CoyoteItems.Add(new CoyoteWsItem(new CoyoteWS { DeviceName = "调试0" }, _queueService, _coyoteCollection));
         CoyoteItems.Add(new CoyoteWsItem(new CoyoteWS { DeviceName = "调试1" }, _queueService, _coyoteCollection));
 #endif
@@ -69,7 +69,7 @@ public partial class DevicesPageViewModel : ObservableObject
             if (await coyote.ConnectNewAsync(_coyoteBleDetector, _cts.Token))
             {
                 connectionMessage = "连接成功";
-                var coyoteBleItem = new CoyoteBleItem(coyote, _queueService, _coyoteBleDetector, _coyoteCollection);
+                var coyoteBleItem = new CoyoteBleItem(coyote, _queueService, _coyoteCollection, _coyoteBleDetector);
                 _queueService.TryEnqueue(() => CoyoteItems.Add(coyoteBleItem));
             }
         }
