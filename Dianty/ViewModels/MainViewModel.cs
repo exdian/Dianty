@@ -35,7 +35,7 @@ public partial class MainViewModel : ObservableObject
 
         // 至少加载 300 毫秒
         await task;
-        _queueService.TryEnqueue(() =>
+        _queueService.TryEnqueue(DispatcherQueuePriority.Low, () =>
         {
             IsLoaded = true;
             Debug.WriteLine($"总加载耗时: {stopwatch.ElapsedMilliseconds} ms");

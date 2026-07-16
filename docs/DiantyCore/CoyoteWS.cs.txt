@@ -1,4 +1,9 @@
-﻿namespace DungeonToolkit.Coyote;
+﻿using System.Diagnostics;
+using System.Net.WebSockets;
+using System.Text;
+using System.Text.Json;
+
+namespace DungeonToolkit.Coyote;
 
 public class CoyoteWS : IDisposable 
 {

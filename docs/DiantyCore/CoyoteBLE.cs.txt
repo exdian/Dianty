@@ -1,4 +1,6 @@
-﻿namespace DungeonToolkit.Coyote;
+﻿using static DungeonToolkit.Coyote.ICoyoteBleService;
+
+namespace DungeonToolkit.Coyote;
 
 public class CoyoteBLE : IDisposable 
 {

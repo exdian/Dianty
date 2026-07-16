@@ -1,4 +1,8 @@
-﻿namespace DungeonToolkit.Coyote;
+﻿using System.Data;
+using System.Diagnostics.CodeAnalysis;
+using System.Text;
+
+namespace DungeonToolkit.Coyote;
 
 public class Wave  
 {

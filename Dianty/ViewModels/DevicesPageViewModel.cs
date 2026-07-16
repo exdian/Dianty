@@ -5,7 +5,6 @@ using Dianty.Services;
 using Dianty.Utils;
 using Dianty.Utils.Messages;
 using DungeonToolkit.Coyote;
-using DungeonToolkit.Helper;
 using Microsoft.UI.Dispatching;
 using System;
 using System.Collections.ObjectModel;
@@ -122,7 +121,7 @@ public partial class DevicesPageViewModel : ObservableObject
                 return;
             await _getClientIdTcs.Task.WaitAsync(_cts.Token);
             _bindingTcs = new TaskCompletionSource();
-            var qrCodeSvgPath = await Task.Run(() => CoyoteHelper.CreateQrCodeSvgPathString(coyote)).WithCancellation(_cts.Token);
+            var qrCodeSvgPath = await Task.Run(() => CoyoteHelper.CreateQrCodeSvgPathString(coyote)).WaitAsync(_cts.Token);
             _queueService.TryEnqueue(() =>
             {
                 QrCodeSvgPath = qrCodeSvgPath;
