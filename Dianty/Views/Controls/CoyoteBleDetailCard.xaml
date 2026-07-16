@@ -26,13 +26,9 @@
                         <PaneThemeTransition Edge="Bottom"/>
                     </ContentControl.ContentTransitions>
                 </ContentControl>
-                <Button
-                    Content="{x:Bind ViewModel.IsConnecting, Mode=OneWay, Converter={StaticResource ReconnectingButtonContentConverter}}"
-                    Command="{x:Bind ViewModel.ReconnectingCommand}">
-                    <Button.ContentTransitions>
-                        <PaneThemeTransition Edge="Right"/>
-                    </Button.ContentTransitions>
-                </Button>
+                <ToggleSwitch
+                    IsOn="{x:Bind ViewModel.IsConnectingOrConnected, Mode=TwoWay}"
+                    OnContent="{x:Null}" OffContent="{x:Null}" Margin="-8,0,0,0"/>
             </StackPanel>
         </toolkit:SettingsCard>
         <!-- 在 ScrollViewer 的空白区域（或其内部非交互元素上）点击鼠标时，ScrollViewer 在 PointerReleased 事件的处理逻辑中，

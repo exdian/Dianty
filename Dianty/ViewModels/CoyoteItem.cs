@@ -120,6 +120,7 @@ public partial class CoyoteBleItem : CoyoteItem
         BatteryLevel = coyote.BatteryLevel;
         CurrentStrengthA = coyote.CurrentStrengthA;
         CurrentStrengthB = coyote.CurrentStrengthB;
+        IsConnectingOrConnected = coyote.IsConnected;
         coyote.ConnectionStatusChanged += OnConnectionStatusChanged;
         coyote.StrengthChanged += OnStrengthChanged;
         coyote.BatteryLevelChanged += OnBatteryLevelChanged;
@@ -164,15 +165,14 @@ public partial class CoyoteBleItem : CoyoteItem
     [ObservableProperty]
     public partial bool IsConnecting { get; private set; }
 
-    [RelayCommand(CanExecute = nameof(CanReconnecting), AllowConcurrentExecutions = true)]
-    private async Task ReconnectingAsync()
+    [ObservableProperty]
+    public partial bool IsConnectingOrConnected { get; set; }
+
+    private async void Reconnecting()
     {
         Debug.Assert(_coyoteBLE is not null);
         if (IsConnecting)
-        {
-            _cts?.Cancel();
             return;
-        }
         IsConnecting = true;
 
         _reconnectingCount++;
@@ -192,6 +192,8 @@ public partial class CoyoteBleItem : CoyoteItem
         catch { }
         finally
         {
+            if (!_coyoteBLE.IsConnected)
+                _queueService.TryEnqueue(() => IsConnectingOrConnected = false);
             _cts.Cancel();
             _cts.Dispose();
             _cts = null;
@@ -207,15 +209,9 @@ public partial class CoyoteBleItem : CoyoteItem
         }
     }
 
-    private bool CanReconnecting()
-    {
-        Debug.Assert(_coyoteBLE is not null);
-        return !_coyoteBLE.IsConnected;
-    }
-
     private void OnConnectionStatusChanged(object? sender, ConnectionStatusChangedEventArgs e)
     {
-        _queueService.TryEnqueue(ReconnectingCommand.NotifyCanExecuteChanged);
+        _queueService.TryEnqueue(() => IsConnectingOrConnected = e.IsConnected);
     }
 
     private void OnStrengthChanged(object? sender, CoyoteBLE.StrengthChangedEventArgs e)
@@ -230,6 +226,21 @@ public partial class CoyoteBleItem : CoyoteItem
     private void OnBatteryLevelChanged(object? sender, CoyoteBLE.BatteryLevelChangedEventArgs e)
     {
         _queueService.TryEnqueue(() => BatteryLevel = e.BatteryLevel);
+    }
+
+    partial void OnIsConnectingOrConnectedChanged(bool value)
+    {
+        Debug.Assert(_coyoteBLE is not null);
+        if (value)
+        {
+            Reconnecting();
+        }
+        else
+        {
+            _cts?.Cancel();
+            if (_coyoteBLE.IsConnected)
+                _coyoteBLE.Disconnect();
+        }
     }
 
     partial void OnMaxStrengthAChanged(double value)
@@ -284,6 +295,7 @@ public partial class CoyoteWsItem : CoyoteItem
         CurrentStrengthB = coyote.CurrentStrengthB;
         StrengthCapA = coyote.StrengthCapA;
         StrengthCapB = coyote.StrengthCapB;
+        IsConnectingOrConnected = coyote.IsBound;
         coyote.ConnectionStatusChanged += OnConnectionStatusChanged;
         coyote.ClientIdChanged += OnClientIdChanged;
         coyote.BindingSucceed += OnBindingSucceed;
@@ -321,15 +333,14 @@ public partial class CoyoteWsItem : CoyoteItem
     [ObservableProperty]
     public partial bool IsQrCodeDisplayed { get; private set; }
 
-    [RelayCommand(CanExecute = nameof(CanReconnecting), AllowConcurrentExecutions = true)]
-    private async Task ReconnectingAsync()
+    [ObservableProperty]
+    public partial bool IsConnectingOrConnected { get; set; }
+
+    private async void Reconnecting()
     {
         Debug.Assert(_coyoteWS is not null);
         if (IsConnecting)
-        {
-            _cts?.Cancel();
             return;
-        }
         IsConnecting = true;
 
         _reconnectingCount++;
@@ -360,14 +371,15 @@ public partial class CoyoteWsItem : CoyoteItem
         catch (OperationCanceledException)
         {
             connectionMessage = "已取消连接";
-            await _coyoteWS.DisconnectAsync();
         }
-        catch
-        {
-            await _coyoteWS.DisconnectAsync();
-        }
+        catch { }
         finally
         {
+            if (!_coyoteWS.IsBound)
+            {
+                await _coyoteWS.DisconnectAsync();
+                _queueService.TryEnqueue(() => IsConnectingOrConnected = false);
+            }
             _cts.Cancel();
             _cts.Dispose();
             _cts = null;
@@ -395,10 +407,19 @@ public partial class CoyoteWsItem : CoyoteItem
         }
     }
 
-    private bool CanReconnecting()
+    partial void OnIsConnectingOrConnectedChanged(bool value)
     {
         Debug.Assert(_coyoteWS is not null);
-        return !_coyoteWS.IsBound;
+        if (value)
+        {
+            Reconnecting();
+        }
+        else
+        {
+            _cts?.Cancel();
+            if (_coyoteWS.IsConnected)
+                _ = _coyoteWS.DisconnectAsync();
+        }
     }
 
     private void OnConnectionStatusChanged(object? sender, ConnectionStatusChangedEventArgs e)
@@ -408,7 +429,7 @@ public partial class CoyoteWsItem : CoyoteItem
             _getClientIdTcs?.TrySetException(new Exception());
             _bindingTcs?.TrySetException(new Exception());
         }
-        _queueService.TryEnqueue(ReconnectingCommand.NotifyCanExecuteChanged);
+        _queueService.TryEnqueue(() => IsConnectingOrConnected = e.IsConnected);
     }
 
     private void OnClientIdChanged(object? sender, CoyoteWS.ClientIdChangedEventArgs e)
