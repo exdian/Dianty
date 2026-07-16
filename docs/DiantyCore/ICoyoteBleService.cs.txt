@@ -1,0 +1,14 @@
+﻿namespace DungeonToolkit.Coyote;
+
+public interface ICoyoteBleService : IDisposable 
+{
+    event EventHandler<MessageReceivedEventArgs>? MessageReceived;
+    event EventHandler? Disconnected;
+    Task<bool> SendCommandAsync(byte[] command);
+    Task<byte?> ReadBatteryLevelAsync();
+    class MessageReceivedEventArgs(byte[] message) : EventArgs 
+    {
+        public byte[] Message { get; }
+    }
+}
+

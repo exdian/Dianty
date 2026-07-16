@@ -1,38 +1,50 @@
+using CommunityToolkit.Mvvm.Messaging;
 using Dianty.Services;
 using Dianty.Utils;
+using Dianty.Utils.Messages;
 using Dianty.Views.Pages;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
+using Microsoft.UI.Xaml.Shapes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Windows.Foundation;
 using Windows.Graphics;
 
 namespace Dianty.Views;
 
 public sealed partial class MainView : UserControl
 {
-    public MainView(ITitleBarService titleBarService, IWindowService windowService)
+    public MainView(ITitleBarService titleBarService, IWindowService windowService, IQueueService queueService)
     {
         InitializeComponent();
         _titleBarService = titleBarService;
         _windowService = windowService;
+        _queueService = queueService;
 
         // 导航按钮不居中，需要手动刷新一下
         _navView.IsPaneOpen = false;
         _navView.IsPaneOpen = true;
 
-#if DEBUG
-        _navView.MenuItems.Add(DebugPage.GetNavigationViewItem());
-#endif
+        _debugMenuItem = DebugPage.GetNavigationViewItem();
+        _keySequenceTrigger.AddKeySequence("debug", ToggleDebugMenuItem);
+        Loaded += MainView_Loaded;
+        Unloaded += MainView_Unloaded;
     }
 
     private readonly ITitleBarService _titleBarService;
     private readonly IWindowService _windowService;
+    private readonly IQueueService _queueService;
     private readonly List<FrameworkElement> _interactableElements = [];
+    private readonly KeySequenceTrigger _keySequenceTrigger = new();
+    private readonly NavigationViewItem _debugMenuItem;
     private RectInt32[] _previousPassthroughRects = [];
     private Button? _backButton;
     private Button? _closePaneButton;
@@ -45,9 +57,67 @@ public sealed partial class MainView : UserControl
     private Type SafetyPage => typeof(SafetyPage);
     private static Type SettingsPage => typeof(SettingsPage);
 
+    private void MainView_Loaded(object sender, RoutedEventArgs e)
+    {
+        WeakReferenceMessenger.Default.Register<KeyDownMessage>(this, ProcessKey);
+        WeakReferenceMessenger.Default.Register<NavigationRequest>(this, ProcessNavigationRequest);
+    }
+
+    private void MainView_Unloaded(object sender, RoutedEventArgs e)
+    {
+        WeakReferenceMessenger.Default.Unregister<KeyDownMessage>(this);
+        WeakReferenceMessenger.Default.Unregister<NavigationRequest>(this);
+    }
+
+    private void ProcessKey(object recipient, KeyDownMessage message)
+    {
+        _keySequenceTrigger.ProcessKey(message.Key);
+    }
+
+    private void ToggleDebugMenuItem()
+    {
+        _queueService.TryEnqueue(DispatcherQueuePriority.Low, () =>
+        {
+            if (_navView.MenuItems.Contains(_debugMenuItem))
+            {
+                _navView.MenuItems.Remove(_debugMenuItem);
+                NavView_BackRequested(null!, null!);
+            }
+            else
+            {
+                _navView.MenuItems.Add(_debugMenuItem);
+            }
+        });
+    }
+
+    private void ProcessNavigationRequest(object recipient, NavigationRequest message)
+    {
+        _queueService.TryEnqueue(() =>
+        {
+            var isNavigationStackEnabled = message.NavigationOptions.IsNavigationStackEnabled;
+            message.NavigationOptions.IsNavigationStackEnabled = true;
+            if (message.GoBackLevel > 0)
+            {
+                if (message.GoBackLevel <= _contentFrame.BackStack.Count)
+                {
+                    var pageStackEntry = _contentFrame.BackStack[^message.GoBackLevel];
+                    _contentFrame.NavigateToType(pageStackEntry.SourcePageType, pageStackEntry.Parameter, message.NavigationOptions);
+                    if (!isNavigationStackEnabled)
+                        _contentFrame.BackStack.RemoveAt(_contentFrame.BackStack.Count - 1);
+                }
+            }
+            else if (message.PageType is not null)
+            {
+                _contentFrame.NavigateToType(message.PageType, message.Parameter, message.NavigationOptions);
+                if (!isNavigationStackEnabled && _contentFrame.BackStack.Count > 0)
+                    _contentFrame.BackStack.RemoveAt(_contentFrame.BackStack.Count - 1);
+            }
+        });
+    }
+
     private void NavView_Loaded(object sender, RoutedEventArgs e)
     {
-        _navView.SelectedItem = _navView.MenuItems[0];
+        _contentFrame.Navigate(HomePage, ServiceLocator.GetViewModel(HomePage));
 
         var splitView = VisualTreeHelperExtension.FindChildByName(_navView, "RootSplitView") as SplitView;
         if (splitView is not null)
@@ -92,6 +162,17 @@ public sealed partial class MainView : UserControl
             _backButton = VisualTreeHelperExtension.FindChildByName(_navView, "NavigationViewBackButton") as Button;
             _closePaneButton = VisualTreeHelperExtension.FindChildByName(_navView, "NavigationViewCloseButton") as Button;
             _togglePaneButton = VisualTreeHelperExtension.FindChildByName(_navView, "TogglePaneButton") as Button;
+
+            // 面板浮动打开时的透明矩形
+            var rectangle = VisualTreeHelperExtension.FindChildByName(splitView, "LightDismissLayer") as Rectangle;
+            if (rectangle is not null)
+            {
+                var clip = new RectangleGeometry
+                {
+                    Rect = new Rect(0, 48, float.MaxValue, float.MaxValue)
+                };
+                rectangle.Clip = clip;
+            }
         }
     }
 
@@ -182,21 +263,30 @@ public sealed partial class MainView : UserControl
         {
             _backButton?.Opacity = isDeactivated ? 0.5 : 1;
             _closePaneButton?.Opacity = isDeactivated ? 0.5 : 1;
+            _togglePaneButton?.Opacity = 1;
         }
     }
 
-    private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
+    private void Navigate(Type pageType, NavigationTransitionInfo transitionInfo)
     {
-        if (args.IsSettingsSelected)
+        Type targetPageType = _contentFrame.CurrentSourcePageType;
+        if (pageType is not null && !pageType.Equals(targetPageType))
         {
-            var viewModel = ServiceLocator.GetViewModel(SettingsPage);
-            _contentFrame.Navigate(SettingsPage, viewModel, args.RecommendedNavigationTransitionInfo);
+            var viewModel = ServiceLocator.GetViewModel(pageType);
+            _contentFrame.Navigate(pageType, viewModel, transitionInfo);
         }
-        else if (args.SelectedItemContainer is not null)
+    }
+
+    private void NavView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
+    {
+        if (args.IsSettingsInvoked)
         {
-            Type navPageType = args.SelectedItemContainer.Tag as Type ?? HomePage;
-            var viewModel = ServiceLocator.GetViewModel(navPageType);
-            _contentFrame.Navigate(navPageType, viewModel, args.RecommendedNavigationTransitionInfo);
+            Navigate(SettingsPage, args.RecommendedNavigationTransitionInfo);
+        }
+        else if (args.InvokedItemContainer is not null)
+        {
+            Type navPageType = args.InvokedItemContainer.Tag as Type ?? HomePage;
+            Navigate(navPageType, args.RecommendedNavigationTransitionInfo);
         }
     }
 
@@ -204,35 +294,39 @@ public sealed partial class MainView : UserControl
     {
         if (!_contentFrame.CanGoBack)
             return;
-        if (_navView.IsPaneOpen
-            && (_navView.DisplayMode == NavigationViewDisplayMode.Compact
-            || _navView.DisplayMode == NavigationViewDisplayMode.Minimal))
+
+        if (_navView.IsPaneOpen && (_navView.DisplayMode is NavigationViewDisplayMode.Compact or NavigationViewDisplayMode.Minimal))
+            _navView.IsPaneOpen = false;
+        else
+            _contentFrame.GoBack();
+    }
+
+    private void OnFrameNavigated(object sender, NavigationEventArgs e)
+    {
+        var topPageType = TopPageLocator.GetTopPage(_contentFrame.SourcePageType.Name);
+        if (topPageType is null)
         {
+            _navView.SelectedItem = null;
             return;
         }
 
-        _contentFrame.GoBack();
-    }
-
-    private void ContentFrame_Navigated(object sender, NavigationEventArgs e)
-    {
-        if (_contentFrame.SourcePageType is null)
-            return;
-
-        if (_contentFrame.SourcePageType == SettingsPage)
+        if (topPageType == SettingsPage)
         {
-            var selectedItem = (NavigationViewItem)_navView.SettingsItem;
-            if (!ReferenceEquals(selectedItem, _navView.SelectedItem))
-                _navView.SelectedItem = selectedItem;
+            if (!ReferenceEquals(_navView.SelectedItem, _navView.SettingsItem))
+                _navView.SelectedItem = _navView.SettingsItem;
         }
         else
         {
-            var selectedItem = _navView.MenuItems
-                .OfType<NavigationViewItem>()
-                .First(i => i.Tag.Equals(_contentFrame.SourcePageType));
-            if (!ReferenceEquals(selectedItem, _navView.SelectedItem))
-                _navView.SelectedItem = selectedItem;
+            SelectNavigationItem(topPageType);
         }
+    }
+
+    private void SelectNavigationItem(Type pageType)
+    {
+        var selectedItem = _navView.MenuItems.OfType<NavigationViewItem>()
+            .FirstOrDefault(i => i.Tag.Equals(pageType));
+        if (selectedItem is not null && !ReferenceEquals(selectedItem, _navView.SelectedItem))
+            _navView.SelectedItem = selectedItem;
     }
 
     private void NavView_LayoutUpdated(object sender, object e)
@@ -250,5 +344,13 @@ public sealed partial class MainView : UserControl
     private void RootElement_PointerPressed(object sender, PointerRoutedEventArgs e)
     {
         UpdateIconRegion();
+    }
+
+    private void TitleBar_PointerPressed(object sender, PointerRoutedEventArgs e)
+    {
+        if (_navView.IsPaneOpen && (_navView.DisplayMode is NavigationViewDisplayMode.Compact or NavigationViewDisplayMode.Minimal))
+        {
+            _navView.IsPaneOpen = false;
+        }
     }
 }

@@ -1,28 +1,57 @@
-﻿using GameMonitor;
+﻿using DungeonToolkit.Coyote;
 using System;
+using System.Collections.Generic;
 
 namespace Dianty.Models;
 
-public class GameManager : AutomaticStrength
+public partial class GameManager : AutomaticStrength, IDisposable
 {
-    public GameManager(IMemoryService memoryService)
+    public GameManager(CoyoteManager coyoteManager)
     {
-        GtaVcGameRule = new GtaVcGameRule(memoryService);
-        GtaVcGameRule.OutputStrengthChanged += GtaVcGameRule_OutputStrengthChanged;
-
-        _gameRules = [GtaVcGameRule];
+        _coyoteManager = coyoteManager;
     }
 
-    ~GameManager()
+    private readonly List<GameRule> _gameRules = [];
+    private readonly CoyoteManager _coyoteManager;
+    private bool _isDisposed;
+
+    public required GtaVcGameRule GtaVcGameRule
     {
-        GtaVcGameRule.OutputStrengthChanged -= GtaVcGameRule_OutputStrengthChanged;
+        get;
+        init
+        {
+            field = value;
+            field.OutputStrengthChanged += GameRule_OutputStrengthChanged;
+            _gameRules.Add(field);
+        }
     }
 
-    private readonly GameRule[] _gameRules;
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
 
-    public GtaVcGameRule GtaVcGameRule { get; }
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_isDisposed)
+            return;
+        _isDisposed = true;
 
-    private void GtaVcGameRule_OutputStrengthChanged(object? sender, EventArgs e)
+        if (disposing)
+        {
+            for (int i = 0; i < _gameRules.Count; i++)
+            {
+                var rule = _gameRules[i];
+                rule.OutputStrengthChanged -= GameRule_OutputStrengthChanged;
+                if (rule is IDisposable gameRule)
+                    gameRule.Dispose();
+            }
+            _coyoteManager.Dispose();
+        }
+    }
+
+    private void GameRule_OutputStrengthChanged(object? sender, EventArgs e)
     {
         ComputeOutputStrength();
     }
@@ -30,10 +59,10 @@ public class GameManager : AutomaticStrength
     protected override int GetMaxStrength()
     {
         int result = 0;
-        for (int i = 0; i < _gameRules.Length; i++)
+        for (int i = 0; i < _gameRules.Count; i++)
         {
             var gameRule = _gameRules[i];
-            if (gameRule.IsEnable)
+            if (gameRule.IsEnabled)
             {
                 var outputStrength = gameRule.OutputStrength;
                 if (outputStrength > result)
@@ -48,10 +77,10 @@ public class GameManager : AutomaticStrength
     protected override int SumStrength()
     {
         int result = 0;
-        for (int i = 0; i < _gameRules.Length; i++)
+        for (int i = 0; i < _gameRules.Count; i++)
         {
             var gameRule = _gameRules[i];
-            if (gameRule.IsEnable)
+            if (gameRule.IsEnabled)
             {
                 var outputStrength = gameRule.OutputStrength;
                 if (outputStrength > result)
@@ -63,12 +92,19 @@ public class GameManager : AutomaticStrength
         return result;
     }
 
+    protected override void OnOutputStrengthChanged(int strength)
+    {
+        _coyoteManager.StrengthA = strength;
+        _coyoteManager.StrengthB = strength;
+        base.OnOutputStrengthChanged(strength);
+    }
+
     public abstract class GameRule : AutomaticStrength
     {
         public string Name { get; set; } = string.Empty;
 
         public string Description { get; set; } = string.Empty;
 
-        public virtual bool IsEnable { get; set; }
+        public virtual bool IsEnabled { get; set; }
     }
 }

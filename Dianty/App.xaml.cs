@@ -1,7 +1,10 @@
 ﻿using Dianty.Models;
+using Dianty.Resources;
 using Dianty.Services;
 using Dianty.ViewModels;
+using Dianty.Views;
 using Dianty.Views.Pages;
+using DungeonToolkit.Coyote;
 using GameMonitor;
 using Microsoft.UI.Xaml;
 using System;
@@ -33,6 +36,7 @@ public partial class App : Application
         var window = new MainWindow();
         ServiceLocator.Init(RegisterService);
         ResourceLoader.Init(MergedDictionaries);
+        TopPageLocator.Init(GetTopPage);
         window.ViewModel = new MainViewModel(window);
         _mainWindow = window;
         _window = window;
@@ -52,18 +56,45 @@ public partial class App : Application
         ServiceLocator.Register(windowService);
         ServiceLocator.Register(queueService);
         ServiceLocator.Register(templateContent);
+        ICoyoteBleDetector coyoteBleDetector = new CoyoteBleDetector();
+        ServiceLocator.Register(coyoteBleDetector);
         ServiceLocator.Register<IMemoryService>(static () => new MemoryService());
 
-        ServiceLocator.RegisterViewModel(typeof(DebugPage), new DebugPageViewModel(queueService));
+        var coyoteManager = new CoyoteManager();
+        var coyoteItems = new CoyoteCollection(coyoteManager);
+        ServiceLocator.Register<ICoyoteListService>(coyoteItems);
+        var gameManager = new GameManager(coyoteManager)
+        {
+            GtaVcGameRule = new GtaVcGameRule(ServiceLocator.GetService<IMemoryService>())
+        };
+
+        ServiceLocator.RegisterViewModel(typeof(DevicesPage), new DevicesPage.RequiredParameter(
+            new DevicesPageViewModel(coyoteItems, queueService, coyoteBleDetector), queueService));
         ServiceLocator.RegisterViewModel(typeof(GamesPage), new GamesPage.RequiredParameter(
-            new GamesPageViewModel(ServiceLocator.GetService<IMemoryService>(), queueService),
-            queueService));
+            new GamesPageViewModel(gameManager, queueService), queueService));
+        ServiceLocator.RegisterViewModel(typeof(DebugPage), new DebugPageViewModel(queueService));
     }
 
     private void MergedDictionaries()
     {
         var newDictionary = new ResourceDictionary();
-        LoadComponent(newDictionary, new Uri("ms-appx:///AppResourceDictionary.xaml", UriKind.Absolute));
+        LoadComponent(newDictionary, new Uri("ms-appx:///Resources/AppResourceDictionary.xaml", UriKind.Absolute));
         Resources.MergedDictionaries.Add(newDictionary);
+    }
+
+    private static Type? GetTopPage(string pageName)
+    {
+        return pageName switch
+        {
+            nameof(HomePage) => typeof(HomePage),
+            nameof(DevicesPage) => typeof(DevicesPage),
+            nameof(WavesPage) => typeof(WavesPage),
+            nameof(GamesPage) => typeof(GamesPage),
+            nameof(SafetyPage) => typeof(SafetyPage),
+            nameof(DebugPage) => typeof(DebugPage),
+            nameof(SettingsPage) => typeof(SettingsPage),
+            nameof(CoyoteDetailPage) => typeof(DevicesPage),
+            _ => null
+        };
     }
 }

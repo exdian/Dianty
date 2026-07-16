@@ -1,0 +1,12 @@
+﻿namespace DungeonToolkit.Coyote;
+
+public class WavePlayer  
+{
+    public WavePlayer(Wave wave);
+    public static WavePlayer Empty { get; }
+    public byte Speed { get; set; }
+    public Wave Wave { get; }
+    public PulseData CurrentPulseData { get; }
+    public PulseData NextPulseData();
+}
+

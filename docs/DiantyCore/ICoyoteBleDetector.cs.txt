@@ -1,0 +1,14 @@
+﻿namespace DungeonToolkit.Coyote;
+
+public interface ICoyoteBleDetector  
+{
+    Task<ulong?> ScanAsync(Guid uuid, string name, CancellationToken token);
+    Task<bool> ScanAsync(ulong address, CancellationToken token);
+    Task<ICoyoteBleService?> ConnectAsync(ulong address, GattServiceInfo gattServiceInfo, CancellationToken token);
+}
+public record class GattServiceInfo(
+    Guid CommandServiceUuid, Guid CommandCharacteristicUuid, Guid MessageCharacteristicUuid,
+    Guid BatteryServiceUuid, Guid BatteryCharacteristicUuid)  
+{
+}
+

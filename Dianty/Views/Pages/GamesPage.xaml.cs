@@ -6,9 +6,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 
 namespace Dianty.Views.Pages;
-/// <summary>
-/// An empty page that can be used on its own or navigated to within a Frame.
-/// </summary>
+
 public sealed partial class GamesPage : Page
 {
     public GamesPage()
@@ -33,16 +31,16 @@ public sealed partial class GamesPage : Page
     private void StackPanel_Loaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
         // 实测该元素更晚触发 Loaded 事件
-        if (_queueService is null)
+        if (_queueService is null || ViewModel is null)
             return;
 
         _queueService.TryEnqueue(DispatcherQueuePriority.Low, () =>
         {
-            var rulesCard = new GtaVcRulesCard(ViewModel);
+            var rulesCard = new GtaVcRuleCard(ViewModel);
             var collection = _gamesPageStackPanel.Children;
             collection.Insert(collection.Count - 1, rulesCard);
         });
     }
 
-    public readonly record struct RequiredParameter(GamesPageViewModel ViewModel, IQueueService QueueService);
+    public record class RequiredParameter(GamesPageViewModel ViewModel, IQueueService QueueService);
 }

@@ -8,7 +8,9 @@
     mc:Ignorable="d">
 
     <Grid PointerPressed="RootElement_PointerPressed">
-        <Grid MinHeight="48" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="56,0,0,0">
+        <Grid
+            MinHeight="48" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="56,0,144,0"
+            Background="Transparent" PointerPressed="TitleBar_PointerPressed">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
@@ -18,12 +20,12 @@
             </Viewbox>
             <TextBlock
                 x:Name="_titleText" Grid.Column="1"
-                Text="Dianty" Style="{StaticResource CaptionTextBlockStyle}" Margin="16,0,142,0"
+                Text="Dianty" Style="{StaticResource CaptionTextBlockStyle}" Margin="16,0,0,0"
                 TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" VerticalAlignment="Center"/>
         </Grid>
         <NavigationView
             x:Name="_navView"
-            Loaded="NavView_Loaded" SelectionChanged="NavView_SelectionChanged" BackRequested="NavView_BackRequested"
+            Loaded="NavView_Loaded" ItemInvoked="NavView_ItemInvoked" BackRequested="NavView_BackRequested"
             LayoutUpdated="NavView_LayoutUpdated" PaneClosed="NavView_PaneChanged" PaneOpened="NavView_PaneChanged"
             OpenPaneLength="120" CompactModeThresholdWidth="{StaticResource MinimalModeThresholdWidth}" ExpandedModeThresholdWidth="750"
             IsBackEnabled="{x:Bind _contentFrame.CanGoBack, Mode=OneWay}">
@@ -31,7 +33,7 @@
                 <Thickness x:Key="NavigationViewContentMargin">0,48,0,0</Thickness>
                 <Thickness x:Key="NavigationViewMinimalContentMargin">0,48,0,0</Thickness>
             </NavigationView.Resources>
-            <Frame x:Name="_contentFrame" IsTabStop="True" Navigated="ContentFrame_Navigated"/>
+            <Frame x:Name="_contentFrame" IsTabStop="True" Navigated="OnFrameNavigated"/>
             <NavigationView.MenuItems>
                 <NavigationViewItem Icon="Home" Content="主页" Tag="{x:Bind HomePage}"/>
                 <NavigationViewItem Content="设备" Tag="{x:Bind DevicesPage}">
@@ -56,6 +58,14 @@
         </NavigationView>
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
+                <!-- 在小窗口尺寸下加载页面仍会触发 MinWindowWidth="{StaticResource MinimalModeThresholdWidth}" 的
+                AdaptiveTrigger，即使不使用资源，直接写 MinWindowWidth="500"，问题也依旧存在，原因不明。
+                但是加上另一个 MinWindowWidth="1" 的 AdaptiveTrigger 后问题解决了 -->
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1" />
+                    </VisualState.StateTriggers>
+                </VisualState>
                 <VisualState>
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="{StaticResource MinimalModeThresholdWidth}" />

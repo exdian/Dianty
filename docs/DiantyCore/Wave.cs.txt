@@ -1,0 +1,35 @@
+﻿using System.Data;
+using System.Diagnostics.CodeAnalysis;
+using System.Text;
+
+namespace DungeonToolkit.Coyote;
+
+public class Wave  
+{
+    public string Name { get; set; }
+    public byte Speed { get; set; }
+    public byte[]? Data { get; }
+    public static bool TryParse(string waveString, [MaybeNullWhen(false)] out Wave? wave);
+    public static Wave FromUtf8Data(byte[] data);
+    public static async Task<Wave> FromFileNameAsync(string fileName, CancellationToken token);
+    public static Wave GetEmpty();
+    public List<Section> GetAvailableSection();
+    public class Section  
+    {
+        public byte PulseFrequency1 { get; set; }
+        public byte PulseFrequency2 { get; set; }
+        public byte Duration { get; set; }
+        public GradientFrequencyMode FrequencyMode { get; set; }
+        public bool IsEnabled { get; set; }
+        public List<byte> PulseStrengths { get; }
+    }
+    public enum GradientFrequencyMode 
+    {
+        Unknown,
+        Fixed,
+        Section,
+        PulseUnit,
+        BetweenPulseUnit,
+    }
+}
+

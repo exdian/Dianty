@@ -1,5 +1,7 @@
+using CommunityToolkit.Mvvm.Messaging;
 using Dianty.Services;
 using Dianty.Utils;
+using Dianty.Utils.Messages;
 using Dianty.ViewModels;
 using Dianty.Views;
 using Microsoft.UI.Dispatching;
@@ -9,6 +11,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Windows.Graphics;
 using WinRT.Interop;
@@ -26,6 +29,8 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
         AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
         SetWindowSize();
     }
+
+    private readonly Dictionary<Windows.System.VirtualKey, bool> _keyStatus = [];
 
     private ITemplateContent TemplateContent => this;
 
@@ -59,7 +64,7 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
     {
         if (item is bool value && value)
         {
-            return new MainView(this, this);
+            return new MainView(this, this, this);
         }
         else
         {
@@ -100,6 +105,7 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
         // 当鼠标指针从标题栏按钮移到非客户区的穿透区域时，标题栏按钮仍会处于指针悬停状态
         // 因此需要发送消息提醒窗口鼠标指针已离开标题栏按钮
         // 实测 WM_NCMOUSELEAVE 消息不能解决此问题，可能是因为整个窗口都是非客户区
+        // 并且 InputNonClientPointerSource 的 PointerEntered 和 PointerExited 事件参数不会出现 Passthrough 的区域类型，只能以这种方法实现了
         var hWnd = WindowNative.GetWindowHandle(this);
         PostMessage(hWnd, WM_NCMOUSEMOVE, HTCAPTION, nint.Zero);
     }
@@ -109,6 +115,32 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
         if (FocusManager.GetFocusedElement(Content.XamlRoot) is TextBox)
         {
             _rootElement.Focus(FocusState.Programmatic);
+        }
+    }
+
+    private void RootElement_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        var key = e.Key;
+        if ((int)key < 65 || (int)key > 90 || FocusManager.GetFocusedElement(Content.XamlRoot) is TextBox)
+            return;
+
+        if (_keyStatus.TryGetValue(key, out var wasKeyDown))
+        {
+            if (wasKeyDown)
+            {
+                return;
+            }
+        }
+        _keyStatus[key] = true;
+        WeakReferenceMessenger.Default.Send(new KeyDownMessage(key));
+    }
+
+    private void RootElement_KeyUp(object sender, KeyRoutedEventArgs e)
+    {
+        var key = e.Key;
+        if (_keyStatus.ContainsKey(key))
+        {
+            _keyStatus[key] = false;
         }
     }
 

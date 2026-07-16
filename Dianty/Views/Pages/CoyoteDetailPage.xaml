@@ -1,33 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Page
-    x:Class="Dianty.Views.Pages.DebugPage"
+    x:Class="Dianty.Views.Pages.CoyoteDetailPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:msg="using:Dianty.Utils.Messages"
+    xmlns:converters="using:CommunityToolkit.WinUI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid RowSpacing="12">
+    <Page.Resources>
+        <x:Double x:Key="BreadcrumbBarChevronFontSize">16</x:Double>
+    </Page.Resources>
+
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-
-        <Button x:Name="ClearButton" Grid.Row="0" Margin="12,12,12,0"
-                Command="{x:Bind ViewModel.ClearLogCommand}" Content="清空日志" />
-
-        <ListView
-            x:Name="_logListView" Grid.Row="1" Padding="9,0"
-            SelectionMode="Extended" ItemsSource="{x:Bind ViewModel.Logs}">
-            <ListView.ItemTemplate>
-                <DataTemplate x:DataType="msg:Log">
-                    <TextBlock 
-                        Text="{x:Bind ToString()}" FontFamily="Consolas, Courier New, monospace"
-                        TextWrapping="Wrap" Margin="0,10"/>
+        <BreadcrumbBar x:Name="PageHeader" Margin="12,6,12,12" ItemsSource="{x:Bind Paths}" ItemClicked="OnBreadcrumbBarItemClicked">
+            <BreadcrumbBar.ItemTemplate>
+                <DataTemplate x:DataType="x:String">
+                    <TextBlock Text="{x:Bind}" Style="{StaticResource TitleTextBlockStyle}"/>
                 </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+            </BreadcrumbBar.ItemTemplate>
+        </BreadcrumbBar>
+        <ScrollViewer
+            x:Name="_pageContent" Grid.Row="1" Padding="12,0" Loaded="OnScrollViewerLoaded"
+            VerticalScrollBarVisibility="Auto" VerticalScrollMode="Auto"/>
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
                 <VisualState>
@@ -41,8 +40,8 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <!-- NavigationView.DisplayMode != Minimal -->
-                        <Setter Target="ClearButton.Margin" Value="24,24,24,0"/>
-                        <Setter Target="_logListView.Padding" Value="21,0"/>
+                        <Setter Target="PageHeader.Margin" Value="24,12"/>
+                        <Setter Target="_pageContent.Padding" Value="24,0"/>
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>

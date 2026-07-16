@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:format="using:Windows.Globalization.NumberFormatting"
+    xmlns:converters="using:CommunityToolkit.WinUI.Converters"
+    xmlns:utils="using:Dianty.Utils">
+
+    <x:Double x:Key="MinimalModeThresholdWidth">500</x:Double>
+    <x:Double x:Key="CommonCardSpacing">4</x:Double>
+    <x:Double x:Key="CommonControlSpacing">8</x:Double>
+
+    <format:DecimalFormatter x:Key="DecimalIntegerFormatter" IntegerDigits="1" FractionDigits="0">
+        <format:DecimalFormatter.NumberRounder>
+            <format:IncrementNumberRounder Increment="1" RoundingAlgorithm="RoundHalfUp" />
+        </format:DecimalFormatter.NumberRounder>
+    </format:DecimalFormatter>
+
+    <converters:BoolToObjectConverter x:Key="CoyoteTypeIconConverter" TrueValue="&#xE702;" FalseValue="&#xE753;"/>
+    <converters:BoolToObjectConverter x:Key="CoyoteConnectionTypeConverter" TrueValue="此设备通过蓝牙连接" FalseValue="此设备通过WebSocket连接"/>
+    <converters:BoolToVisibilityConverter x:Key="VisibleIfTrueConverter" TrueValue="Visible" FalseValue="Collapsed"/>
+    <converters:BoolToVisibilityConverter x:Key="VisibleIfFalseConverter" TrueValue="Collapsed" FalseValue="Visible"/>
+    <utils:IntToBatteryIconConverter x:Key="IntToBatteryIconConverter"/>
+    <utils:IntToBatteryPercentageConverter x:Key="IntToBatteryPercentageConverter"/>
+    <utils:QrCodeSvgPathConverter x:Key="QrCodeSvgPathConverter"/>
+
+    <Style x:Key="StretchListViewItemStyle" TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
+        <Setter Property="Padding" Value="0"/>
+    </Style>
+
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Name="Default">
+            <SolidColorBrush x:Key="NavigationViewDefaultPaneBackground" Color="#F02C2C2C"/>
+        </ResourceDictionary>
+        <ResourceDictionary x:Name="Light">
+            <SolidColorBrush x:Key="NavigationViewDefaultPaneBackground" Color="#F0F9F9F9"/>
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+
+</ResourceDictionary>

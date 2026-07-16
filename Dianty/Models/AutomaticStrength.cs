@@ -37,7 +37,7 @@ public abstract class AutomaticStrength
 
     protected abstract int SumStrength();
 
-    protected void OnOutputStrengthChanged(int strength)
+    protected virtual void OnOutputStrengthChanged(int strength)
     {
         var args = new OutputStrengthChangedEventArgs(strength);
         OutputStrengthChanged?.Invoke(this, args);

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Dianty.Utils;
+namespace Dianty.Utils.Messages;
 
 public class Log
 {

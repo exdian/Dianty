@@ -1,0 +1,30 @@
+﻿namespace DungeonToolkit.Coyote;
+
+public readonly record struct PulseData(
+    byte Frequency1, byte Frequency2, byte Frequency3, byte Frequency4,
+    byte Strength1, byte Strength2, byte Strength3, byte Strength4)  
+{
+}
+public enum Channel 
+{
+    None,
+    A,
+    B,
+}
+public enum WavePlayMode 
+{
+    RepeatAll,
+    Shuffle,
+    RepeatOne,
+}
+public class WaveException : Exception 
+{
+    public WaveException(): base();
+    public WaveException(string message): base(message);
+    public WaveException(string? message, Exception? innerException): base(message, innerException);
+}
+public class ConnectionStatusChangedEventArgs(bool isConnected) : EventArgs 
+{
+    public bool IsConnected { get; }
+}
+

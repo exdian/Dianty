@@ -3,14 +3,14 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace Dianty.Views.Controls;
 
-public sealed partial class GtaVcRulesCard : UserControl
+public sealed partial class GtaVcRuleCard : UserControl
 {
-    public GtaVcRulesCard(GamesPageViewModel? viewModel)
+    public GtaVcRuleCard(GamesPageViewModel viewModel)
     {
         InitializeComponent();
 
         ViewModel = viewModel;
     }
 
-    private GamesPageViewModel? ViewModel { get; }
+    private GamesPageViewModel ViewModel { get; }
 }

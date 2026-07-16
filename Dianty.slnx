@@ -4,6 +4,7 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
+  <Project Path="../DiantyCore/DungeonToolkit/DungeonToolkit.csproj" />
   <Project Path="../DiantyCore/GameMonitor/GameMonitor.csproj" />
   <Project Path="Dianty/Dianty.csproj">
     <Platform Solution="*|ARM64" Project="ARM64" />
