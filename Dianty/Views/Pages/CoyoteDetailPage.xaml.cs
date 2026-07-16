@@ -76,7 +76,7 @@ public sealed partial class CoyoteDetailPage : Page
             if (ViewModel is CoyoteBleItem coyoteBleItem)
                 _pageContent.Content = new CoyoteBleDetailCard(coyoteBleItem);
             else if (ViewModel is CoyoteWsItem coyoteWsItem)
-                _pageContent.Content = new CoyoteWsDetailCard(coyoteWsItem, _queueService);
+                _pageContent.Content = new CoyoteWsDetailCard(coyoteWsItem);
         });
     }
 

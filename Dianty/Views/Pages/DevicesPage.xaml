@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="using:Dianty.ViewModels"
     xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
+    xmlns:controls="using:Dianty.Views.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -15,17 +16,6 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <TextBlock x:Name="_pageHeader" Text="设备" Style="{StaticResource TitleTextBlockStyle}" Margin="12,6,12,12"/>
-        <TeachingTip x:Name="_qrCodeTip" Target="{x:Bind QrCodeButton}" PreferredPlacement="Bottom" CloseButtonContent="隐藏">
-            <TeachingTip.Content>
-                <Border Background="Black">
-                    <Viewbox>
-                        <Path
-                            Data="{x:Bind ViewModel.QrCodeSvgPath, Mode=OneWay, Converter={StaticResource QrCodeSvgPathConverter}}"
-                            Fill="White"/>
-                    </Viewbox>
-                </Border>
-            </TeachingTip.Content>
-        </TeachingTip>
         <ListView
             x:Name="PageContent" Grid.Row="1" Padding="12,0,12,20" SelectionMode="None"
             ItemsSource="{x:Bind ViewModel.CoyoteItems}" ItemContainerStyle="{StaticResource StretchListViewItemStyle}">
@@ -55,9 +45,9 @@
                     <Button
                         Content="取消" Command="{x:Bind ViewModel.CancelConnectCommand}"
                         Visibility="{x:Bind ViewModel.IsConnecting, Mode=OneWay, Converter={StaticResource VisibleIfTrueConverter}}"/>
-                    <Button
-                        x:Name="QrCodeButton" ToolTipService.ToolTip="查看二维码" Click="OnQrCodeButtonClick"
-                        Content="&#xED14;" FontFamily="{ThemeResource SymbolThemeFontFamily}" FontSize="20" Padding="4.67"
+                    <controls:QrCodeButton
+                        IsDisplayed="{x:Bind ViewModel.IsQrCodeDisplayed, Mode=OneWay}"
+                        QrCodeGeometry="{x:Bind ViewModel.QrCodeSvgPath, Mode=OneWay, Converter={StaticResource QrCodeSvgPathConverter}}"
                         Visibility="{x:Bind ViewModel.CanShowQrCode, Mode=OneWay, Converter={StaticResource VisibleIfTrueConverter}}"/>
                     <ProgressRing
                         IsActive="{x:Bind ViewModel.IsConnecting, Mode=OneWay}"

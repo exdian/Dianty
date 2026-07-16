@@ -21,27 +21,14 @@
             Description="{x:Bind ViewModel.IsBleConnection, Converter={StaticResource CoyoteConnectionTypeConverter}}">
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource CommonControlSpacing}">
                 <ProgressRing IsActive="{x:Bind ViewModel.IsConnecting, Mode=OneWay}"/>
-                <Grid>
-                    <ContentControl Content="{x:Bind ViewModel.ConnectionMessage, Mode=OneWay}" VerticalAlignment="Center">
-                        <ContentControl.ContentTransitions>
-                            <PaneThemeTransition Edge="Bottom"/>
-                        </ContentControl.ContentTransitions>
-                    </ContentControl>
-                    <TeachingTip x:Name="_qrCodeTip" Target="{x:Bind QrCodeButton}" PreferredPlacement="Bottom" CloseButtonContent="隐藏">
-                        <TeachingTip.Content>
-                            <Border Background="Black">
-                                <Viewbox>
-                                    <Path
-                                        Data="{x:Bind ViewModel.QrCodeSvgPath, Mode=OneWay, Converter={StaticResource QrCodeSvgPathConverter}}"
-                                        Fill="White"/>
-                                </Viewbox>
-                            </Border>
-                        </TeachingTip.Content>
-                    </TeachingTip>
-                </Grid>
-                <Button
-                    x:Name="QrCodeButton" ToolTipService.ToolTip="查看二维码" Click="OnQrCodeButtonClick"
-                    Content="&#xED14;" FontFamily="{ThemeResource SymbolThemeFontFamily}" FontSize="20" Padding="4.67"
+                <ContentControl Content="{x:Bind ViewModel.ConnectionMessage, Mode=OneWay}" VerticalAlignment="Center">
+                    <ContentControl.ContentTransitions>
+                        <PaneThemeTransition Edge="Bottom"/>
+                    </ContentControl.ContentTransitions>
+                </ContentControl>
+                <local:QrCodeButton
+                    IsDisplayed="{x:Bind ViewModel.IsQrCodeDisplayed, Mode=OneWay}"
+                    QrCodeGeometry="{x:Bind ViewModel.QrCodeSvgPath, Mode=OneWay, Converter={StaticResource QrCodeSvgPathConverter}}"
                     Visibility="{x:Bind ViewModel.CanShowQrCode, Mode=OneWay, Converter={StaticResource VisibleIfTrueConverter}}"/>
                 <Button
                     Content="{x:Bind ViewModel.IsConnecting, Mode=OneWay, Converter={StaticResource ReconnectingButtonContentConverter}}"

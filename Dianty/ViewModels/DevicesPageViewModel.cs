@@ -1,9 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
 using Dianty.Services;
 using Dianty.Utils;
-using Dianty.Utils.Messages;
 using DungeonToolkit.Coyote;
 using Microsoft.UI.Dispatching;
 using System;
@@ -49,6 +47,9 @@ public partial class DevicesPageViewModel : ObservableObject
 
     [ObservableProperty]
     public partial bool CanShowQrCode { get; private set; }
+
+    [ObservableProperty]
+    public partial bool IsQrCodeDisplayed { get; private set; }
 
     [RelayCommand(AllowConcurrentExecutions = true)]
     private async Task ConnectBleAsync()
@@ -124,10 +125,10 @@ public partial class DevicesPageViewModel : ObservableObject
             var qrCodeSvgPath = await Task.Run(() => CoyoteHelper.CreateQrCodeSvgPathString(coyote)).WaitAsync(_cts.Token);
             _queueService.TryEnqueue(() =>
             {
+                ConnectionMessage = "已获取二维码";
                 QrCodeSvgPath = qrCodeSvgPath;
                 CanShowQrCode = true;
-                ConnectionMessage = "已获取二维码";
-                WeakReferenceMessenger.Default.Send(new WebSocketQrCodeVisibility(isVisible: true));
+                IsQrCodeDisplayed = true;
             });
             await _bindingTcs.Task.WaitAsync(_cts.Token);
             connectionMessage = "连接成功";
@@ -157,7 +158,7 @@ public partial class DevicesPageViewModel : ObservableObject
             coyote.BindingSucceed -= OnBindingSucceed;
             _queueService.TryEnqueue(DispatcherQueuePriority.Low, () =>
             {
-                WeakReferenceMessenger.Default.Send(new WebSocketQrCodeVisibility(isVisible: false));
+                IsQrCodeDisplayed = false;
                 CanShowQrCode = false;
                 ConnectionMessage = connectionMessage;
                 IsConnecting = false;
