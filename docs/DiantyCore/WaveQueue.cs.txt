@@ -10,10 +10,11 @@ public class WaveQueue
     public event EventHandler<PlayingWaveChangedEventArgs>? PlayingWaveChanged;
     public void Add(Wave wave);
     public bool Remove(Wave wave);
-    public void Replace(List<WavePlayer> wavePlayers);
+    public void Replace(IEnumerable<WavePlayer> wavePlayers);
     public void MoveUp(Wave wave);
     public void Swap(Wave a, Wave b);
     public void Play(Wave wave);
+    public void SetSpeed(Wave wave, int speed);
     public Wave? NextWave();
     public PulseData NextPulseData();
     public class PlayingWaveChangedEventArgs(Wave? wave) : EventArgs 
