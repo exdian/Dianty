@@ -31,28 +31,6 @@ public sealed partial class WavesPage : Page
         }
     }
 
-    private void OnToggleButtonClickA(object sender, RoutedEventArgs e)
-    {
-        if (ViewModel is not null && sender is ButtonBase button)
-        {
-            var command = ViewModel.SwitchWaveACommand;
-            var commandParameter = button.CommandParameter;
-            if (command.CanExecute(commandParameter))
-                command.Execute(commandParameter);
-        }
-    }
-
-    private void OnToggleButtonClickB(object sender, RoutedEventArgs e)
-    {
-        if (ViewModel is not null && sender is ButtonBase button)
-        {
-            var command = ViewModel.SwitchWaveBCommand;
-            var commandParameter = button.CommandParameter;
-            if (command.CanExecute(commandParameter))
-                command.Execute(commandParameter);
-        }
-    }
-
     private void OnQueueButtonClick(object sender, RoutedEventArgs e)
     {
         if (ViewModel is null)

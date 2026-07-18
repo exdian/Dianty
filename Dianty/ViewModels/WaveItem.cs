@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Dianty.Services;
 using DungeonToolkit.Coyote;
+using System;
 
 namespace Dianty.ViewModels;
 
@@ -20,9 +21,32 @@ public partial class WaveItem(Wave wave) : ObservableObject
     [ObservableProperty]
     public partial bool IsEnabledB { get; set; }
 
+    public event EventHandler<WaveItem, ChannelEnabledChangedEventArgs>? ChannelEnabledChanged;
+
+    private void OnChannelEnabledChanged(Channel channel)
+    {
+        var args = new ChannelEnabledChangedEventArgs(channel);
+        ChannelEnabledChanged?.Invoke(this, args);
+    }
+
     partial void OnNameChanged(string value)
     {
         Wave.Name = value;
+    }
+
+    partial void OnIsEnabledAChanged(bool value)
+    {
+        OnChannelEnabledChanged(Channel.A);
+    }
+
+    partial void OnIsEnabledBChanged(bool value)
+    {
+        OnChannelEnabledChanged(Channel.B);
+    }
+
+    public class ChannelEnabledChangedEventArgs(Channel channel) : EventArgs
+    {
+        public Channel Channel { get; } = channel;
     }
 }
 

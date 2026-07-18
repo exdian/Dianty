@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -48,7 +47,9 @@ public partial class WavesPageViewModel : ObservableObject
         };
         foreach (var wave in waves)
         {
-            WaveItems.Add(new WaveItem(wave));
+            var waveItem = new WaveItem(wave);
+            waveItem.ChannelEnabledChanged += OnWaveItemChannelEnabledChanged;
+            WaveItems.Add(waveItem);
         }
         WavePlayingItemsA.CollectionChanged += OnWavePlayingItemsACollectionChanged;
         WavePlayingItemsB.CollectionChanged += OnWavePlayingItemsBCollectionChanged;
@@ -133,7 +134,9 @@ public partial class WavesPageViewModel : ObservableObject
                 {
                     for (int i = result.Count - 1, j = 0; i >= 0; i--, j++)
                     {
-                        WaveItems.Insert(j, result[i]);
+                        var waveItem = result[i];
+                        waveItem.ChannelEnabledChanged += OnWaveItemChannelEnabledChanged;
+                        WaveItems.Insert(j, waveItem);
                     }
                 });
             }
@@ -177,24 +180,6 @@ public partial class WavesPageViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void SwitchWaveA(WaveItem waveItem)
-    {
-        if (waveItem.IsEnabledA)
-            WavePlayingItemsA.Add(new WavePlayingItem(waveItem, _queueService));
-        else
-            RemoveWavePlayingItem(waveItem, WavePlayingItemsA, _coyoteManager.ChannelA);
-    }
-
-    [RelayCommand]
-    private void SwitchWaveB(WaveItem waveItem)
-    {
-        if (waveItem.IsEnabledB)
-            WavePlayingItemsB.Add(new WavePlayingItem(waveItem, _queueService));
-        else
-            RemoveWavePlayingItem(waveItem, WavePlayingItemsB, _coyoteManager.ChannelB);
-    }
-
-    [RelayCommand]
     private void PlayWaveA(WavePlayingItem wavePlayingItem)
     {
         _coyoteManager.ChannelA.Play(wavePlayingItem.WavePlayer);
@@ -207,21 +192,37 @@ public partial class WavesPageViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void RemovePlayingItemA(WavePlayingItem wavePlayingItem)
+    private static void RemovePlayingItemA(WavePlayingItem wavePlayingItem)
     {
-        if (WavePlayingItemsA.Remove(wavePlayingItem))
-            wavePlayingItem.WaveItem.IsEnabledA = false;
-        if (_coyoteManager.ChannelA.PlayingWave == wavePlayingItem.WavePlayer)
-            _coyoteManager.ChannelA.NextWave();
+        wavePlayingItem.WaveItem.IsEnabledA = false;
     }
 
     [RelayCommand]
-    private void RemovePlayingItemB(WavePlayingItem wavePlayingItem)
+    private static void RemovePlayingItemB(WavePlayingItem wavePlayingItem)
     {
-        if (WavePlayingItemsB.Remove(wavePlayingItem))
-            wavePlayingItem.WaveItem.IsEnabledB = false;
-        if (_coyoteManager.ChannelB.PlayingWave == wavePlayingItem.WavePlayer)
-            _coyoteManager.ChannelB.NextWave();
+        wavePlayingItem.WaveItem.IsEnabledB = false;
+    }
+
+    private void OnWaveItemChannelEnabledChanged(WaveItem sender, WaveItem.ChannelEnabledChangedEventArgs e)
+    {
+        switch (e.Channel)
+        {
+            default:
+            case Channel.None:
+                break;
+            case Channel.A:
+                if (sender.IsEnabledA)
+                    WavePlayingItemsA.Add(new WavePlayingItem(sender, _queueService));
+                else
+                    RemoveWavePlayingItem(sender, WavePlayingItemsA, _coyoteManager.ChannelA);
+                break;
+            case Channel.B:
+                if (sender.IsEnabledB)
+                    WavePlayingItemsB.Add(new WavePlayingItem(sender, _queueService));
+                else
+                    RemoveWavePlayingItem(sender, WavePlayingItemsB, _coyoteManager.ChannelB);
+                break;
+        }
     }
 
     private void OnWavePlayingItemsACollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

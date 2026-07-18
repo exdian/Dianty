@@ -24,12 +24,8 @@
                         .826-1.073l4.36-11.601 7.136 24.961c.117.399.358.768.721 1.107.363.34.768.51 1.213.51.469 0 .897-.093 1.283-.281Z"/>
                 </toolkit:SettingsCard.HeaderIcon>
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource CommonControlSpacing}">
-                    <ToggleButton
-                        Content="A通道" IsChecked="{x:Bind IsEnabledA, Mode=TwoWay}"
-                        Click="OnToggleButtonClickA" CommandParameter="{x:Bind}"/>
-                    <ToggleButton
-                        Content="B通道" IsChecked="{x:Bind IsEnabledB, Mode=TwoWay}"
-                        Click="OnToggleButtonClickB" CommandParameter="{x:Bind}"/>
+                    <ToggleButton Content="A通道" IsChecked="{x:Bind IsEnabledA, Mode=TwoWay}"/>
+                    <ToggleButton Content="B通道" IsChecked="{x:Bind IsEnabledB, Mode=TwoWay}"/>
                 </StackPanel>
             </toolkit:SettingsCard>
         </DataTemplate>
@@ -45,12 +41,8 @@
                         .826-1.073l4.36-11.601 7.136 24.961c.117.399.358.768.721 1.107.363.34.768.51 1.213.51.469 0 .897-.093 1.283-.281Z"/>
                 </toolkit:SettingsCard.HeaderIcon>
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource CommonControlSpacing}">
-                    <ToggleButton
-                        Content="A通道" IsChecked="{x:Bind IsEnabledA, Mode=TwoWay}"
-                        Click="OnToggleButtonClickA" CommandParameter="{x:Bind}"/>
-                    <ToggleButton
-                        Content="B通道" IsChecked="{x:Bind IsEnabledB, Mode=TwoWay}"
-                        Click="OnToggleButtonClickB" CommandParameter="{x:Bind}"/>
+                    <ToggleButton Content="A通道" IsChecked="{x:Bind IsEnabledA, Mode=TwoWay}"/>
+                    <ToggleButton Content="B通道" IsChecked="{x:Bind IsEnabledB, Mode=TwoWay}"/>
                 </StackPanel>
             </toolkit:SettingsCard>
         </DataTemplate>
