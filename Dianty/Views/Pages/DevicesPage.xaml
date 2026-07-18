@@ -10,6 +10,29 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
+    <Page.Resources>
+        <DataTemplate x:Key="NormalCoyoteItemTemplate" x:DataType="vm:CoyoteItem">
+            <toolkit:SettingsCard
+                Header="{x:Bind Name}" Description="{x:Bind ConnectionMessage, Mode=OneWay}"
+                IsClickEnabled="True" Click="OnSettingsCardClick" Margin="0,0,0,4">
+                <toolkit:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="{x:Bind IsBleConnection, Converter={StaticResource CoyoteTypeIconConverter}}"/>
+                </toolkit:SettingsCard.HeaderIcon>
+                <ToggleSwitch IsOn="{x:Bind IsEnabled, Mode=TwoWay}"/>
+            </toolkit:SettingsCard>
+        </DataTemplate>
+        <DataTemplate x:Key="SortCoyoteItemTemplate" x:DataType="vm:CoyoteItem">
+            <toolkit:SettingsCard
+                Header="{x:Bind Name}" Description="{x:Bind ConnectionMessage, Mode=OneWay}"
+                IsClickEnabled="False" Margin="0,0,0,4">
+                <toolkit:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="{x:Bind IsBleConnection, Converter={StaticResource CoyoteTypeIconConverter}}"/>
+                </toolkit:SettingsCard.HeaderIcon>
+                <ToggleSwitch IsOn="{x:Bind IsEnabled, Mode=TwoWay}"/>
+            </toolkit:SettingsCard>
+        </DataTemplate>
+    </Page.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -17,60 +40,58 @@
         </Grid.RowDefinitions>
         <TextBlock x:Name="_pageHeader" Text="设备" Style="{StaticResource TitleTextBlockStyle}" Margin="12,6,12,12"/>
         <ListView
-            x:Name="PageContent" Grid.Row="1" Padding="12,0,12,20" SelectionMode="None"
-            ItemsSource="{x:Bind ViewModel.CoyoteItems}" ItemContainerStyle="{StaticResource StretchListViewItemStyle}">
+            x:Name="_pageContent" Grid.Row="1" Padding="12,0,12,20" SelectionMode="None" CanReorderItems="True" AllowDrop="True"
+            ItemsSource="{x:Bind ViewModel.CoyoteItems}" ItemContainerStyle="{StaticResource StretchListViewItemStyle}"
+            ItemTemplate="{StaticResource NormalCoyoteItemTemplate}">
             <ListView.Header>
-                <StackPanel Orientation="Horizontal" Spacing="{StaticResource CommonControlSpacing}" Margin="0,0,0,5">
-                    <StackPanel.ChildrenTransitions>
-                        <RepositionThemeTransition/>
-                    </StackPanel.ChildrenTransitions>
-                    <DropDownButton
-                        Content="添加设备"
-                        Visibility="{x:Bind ViewModel.IsConnecting, Mode=OneWay, Converter={StaticResource VisibleIfFalseConverter}}">
-                        <DropDownButton.Flyout>
-                            <MenuFlyout Placement="Bottom">
-                                <MenuFlyoutItem Text="蓝牙" Command="{x:Bind ViewModel.ConnectBleCommand}">
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE702;"/>
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
-                                <MenuFlyoutItem Text="Socket" Command="{x:Bind ViewModel.ConnectWsCommand}">
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE753;"/>
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
-                            </MenuFlyout>
-                        </DropDownButton.Flyout>
-                    </DropDownButton>
-                    <Button
-                        Content="取消" Command="{x:Bind ViewModel.CancelConnectCommand}"
-                        Visibility="{x:Bind ViewModel.IsConnecting, Mode=OneWay, Converter={StaticResource VisibleIfTrueConverter}}"/>
-                    <controls:QrCodeButton
-                        IsDisplayed="{x:Bind ViewModel.IsQrCodeDisplayed, Mode=OneWay}"
-                        QrCodeGeometry="{x:Bind ViewModel.QrCodeSvgPath, Mode=OneWay, Converter={StaticResource QrCodeSvgPathConverter}}"
-                        Visibility="{x:Bind ViewModel.CanShowQrCode, Mode=OneWay, Converter={StaticResource VisibleIfTrueConverter}}"/>
-                    <ProgressRing
-                        IsActive="{x:Bind ViewModel.IsConnecting, Mode=OneWay}"
-                        Visibility="{x:Bind ViewModel.IsConnecting, Mode=OneWay, Converter={StaticResource VisibleIfTrueConverter}}"/>
-                    <ContentControl Content="{x:Bind ViewModel.ConnectionMessage, Mode=OneWay}" VerticalAlignment="Center">
-                        <ContentControl.ContentTransitions>
-                            <PaneThemeTransition Edge="Bottom"/>
-                        </ContentControl.ContentTransitions>
-                    </ContentControl>
-                </StackPanel>
+                <Grid Margin="0,0,0,5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource CommonControlSpacing}">
+                        <StackPanel.ChildrenTransitions>
+                            <RepositionThemeTransition/>
+                        </StackPanel.ChildrenTransitions>
+                        <DropDownButton
+                            Content="添加设备"
+                            Visibility="{x:Bind ViewModel.IsConnecting, Mode=OneWay, Converter={StaticResource VisibleIfFalseConverter}}">
+                            <DropDownButton.Flyout>
+                                <MenuFlyout Placement="Bottom">
+                                    <MenuFlyoutItem Text="蓝牙" Command="{x:Bind ViewModel.ConnectBleCommand}">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE702;"/>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Socket" Command="{x:Bind ViewModel.ConnectWsCommand}">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE753;"/>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                </MenuFlyout>
+                            </DropDownButton.Flyout>
+                        </DropDownButton>
+                        <Button
+                            Content="取消" Command="{x:Bind ViewModel.CancelConnectCommand}"
+                            Visibility="{x:Bind ViewModel.IsConnecting, Mode=OneWay, Converter={StaticResource VisibleIfTrueConverter}}"/>
+                        <controls:QrCodeButton
+                            IsDisplayed="{x:Bind ViewModel.IsQrCodeDisplayed, Mode=OneWay}"
+                            QrCodeGeometry="{x:Bind ViewModel.QrCodeSvgPath, Mode=OneWay, Converter={StaticResource QrCodeSvgPathConverter}}"
+                            Visibility="{x:Bind ViewModel.CanShowQrCode, Mode=OneWay, Converter={StaticResource VisibleIfTrueConverter}}"/>
+                        <ProgressRing
+                            IsActive="{x:Bind ViewModel.IsConnecting, Mode=OneWay}"
+                            Visibility="{x:Bind ViewModel.IsConnecting, Mode=OneWay, Converter={StaticResource VisibleIfTrueConverter}}"/>
+                        <ContentControl Content="{x:Bind ViewModel.ConnectionMessage, Mode=OneWay}" VerticalAlignment="Center">
+                            <ContentControl.ContentTransitions>
+                                <PaneThemeTransition Edge="Bottom"/>
+                            </ContentControl.ContentTransitions>
+                        </ContentControl>
+                    </StackPanel>
+                    <ToggleButton
+                        x:Name="_sortButton" Grid.Row="1" Content="排序" Click="OnSortButtonClick"
+                        HorizontalAlignment="Left" Margin="0,5,0,0"/>
+                </Grid>
             </ListView.Header>
-            <ListView.ItemTemplate>
-                <DataTemplate x:DataType="vm:CoyoteItem">
-                    <toolkit:SettingsCard
-                        Header="{x:Bind Name}" Description="{x:Bind ConnectionMessage, Mode=OneWay}"
-                        IsClickEnabled="True" Click="OnSettingsCardClick" Margin="0,0,0,4">
-                        <toolkit:SettingsCard.HeaderIcon>
-                            <FontIcon Glyph="{x:Bind IsBleConnection, Converter={StaticResource CoyoteTypeIconConverter}}"/>
-                        </toolkit:SettingsCard.HeaderIcon>
-                        <ToggleSwitch IsOn="{x:Bind IsEnabled, Mode=TwoWay}"/>
-                    </toolkit:SettingsCard>
-                </DataTemplate>
-            </ListView.ItemTemplate>
         </ListView>
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
@@ -86,7 +107,10 @@
                     <VisualState.Setters>
                         <!-- NavigationView.DisplayMode != Minimal -->
                         <Setter Target="_pageHeader.Margin" Value="24,12"/>
-                        <Setter Target="PageContent.Padding" Value="24,0,24,20"/>
+                        <Setter Target="_pageContent.Padding" Value="24,0,24,20"/>
+                        <Setter Target="_sortButton.HorizontalAlignment" Value="Right"/>
+                        <Setter Target="_sortButton.Margin" Value="0"/>
+                        <Setter Target="_sortButton.(Grid.Row)" Value="0"/>
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
