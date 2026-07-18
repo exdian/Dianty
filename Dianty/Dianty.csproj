@@ -30,6 +30,7 @@
     <None Remove="Views\Pages\SafetyPage.xaml" />
     <None Remove="Views\Pages\SettingsPage.xaml" />
     <None Remove="Views\Pages\WavePlayingQueuePage.xaml" />
+    <None Remove="Views\Pages\WaveSettingsPage.xaml" />
     <None Remove="Views\Pages\WavesPage.xaml" />
   </ItemGroup>
 
@@ -77,6 +78,11 @@
   <ItemGroup>
     <ProjectReference Include="..\..\DiantyCore\DungeonToolkit\DungeonToolkit.csproj" />
     <ProjectReference Include="..\..\DiantyCore\GameMonitor\GameMonitor.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Pages\WaveSettingsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\Controls\WavePlayingQueueListView.xaml">

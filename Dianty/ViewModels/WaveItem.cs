@@ -15,10 +15,10 @@ public partial class WaveItem(Wave wave) : ObservableObject
     public partial string Description { get; set; } = string.Empty;
 
     [ObservableProperty]
-    public partial bool? IsEnabledA { get; set; } = false;
+    public partial bool IsEnabledA { get; set; }
 
     [ObservableProperty]
-    public partial bool? IsEnabledB { get; set; } = false;
+    public partial bool IsEnabledB { get; set; }
 
     partial void OnNameChanged(string value)
     {

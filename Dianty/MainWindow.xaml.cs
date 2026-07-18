@@ -50,6 +50,13 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
         return InputActivationListener.GetForWindowId(AppWindow.Id);
     }
 
+    public ContentDialog? CreateContentDialog()
+    {
+        if (Content is null || Content.XamlRoot is null)
+            return null;
+        return new ContentDialog { XamlRoot = Content.XamlRoot };
+    }
+
     public bool TryEnqueue(DispatcherQueueHandler callback)
     {
         return DispatcherQueue.TryEnqueue(callback);

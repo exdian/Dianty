@@ -71,5 +71,34 @@ public sealed partial class WavesPage : Page
         WeakReferenceMessenger.Default.Send(new NavigationRequest(typeof(WavePlayingQueuePage), requiredParameter, options));
     }
 
+    private void OnWaveItemCardClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not FrameworkElement element || _queueService is null)
+            return;
+
+        string[] traces = [_pageHeader.Text];
+        var options = new FrameNavigationOptions
+        {
+            IsNavigationStackEnabled = true,
+            TransitionInfoOverride = new SlideNavigationTransitionInfo
+            {
+                Effect = SlideNavigationTransitionEffect.FromRight
+            }
+        };
+        if (element.DataContext is WaveItem waveItem)
+        {
+            var requiredParameter = new WaveSettingsPage.RequiredParameter(waveItem, traces, _queueService);
+            WeakReferenceMessenger.Default.Send(new NavigationRequest(typeof(WaveSettingsPage), requiredParameter, options));
+        }
+    }
+
+    private void OnSortButtonClick(object sender, RoutedEventArgs e)
+    {
+        if (_sortButton.IsChecked ?? false)
+            _pageContent.ItemTemplate = (DataTemplate)Resources["SortWaveItemTemplate"];
+        else
+            _pageContent.ItemTemplate = (DataTemplate)Resources["NormalWaveItemTemplate"];
+    }
+
     public record class RequiredParameter(WavesPageViewModel ViewModel, IQueueService QueueService);
 }

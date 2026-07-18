@@ -22,9 +22,7 @@
             </toolkit:SettingsCard>
         </DataTemplate>
         <DataTemplate x:Key="SortCoyoteItemTemplate" x:DataType="vm:CoyoteItem">
-            <toolkit:SettingsCard
-                Header="{x:Bind Name}" Description="{x:Bind ConnectionMessage, Mode=OneWay}"
-                IsClickEnabled="False" Margin="0,0,0,4">
+            <toolkit:SettingsCard Header="{x:Bind Name}" Description="{x:Bind ConnectionMessage, Mode=OneWay}" Margin="0,0,0,4">
                 <toolkit:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="{x:Bind IsBleConnection, Converter={StaticResource CoyoteTypeIconConverter}}"/>
                 </toolkit:SettingsCard.HeaderIcon>

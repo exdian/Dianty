@@ -129,7 +129,7 @@ public sealed partial class WavePlayingQueueListView : UserControl
         InitializeComponent();
     }
 
-    private void OnPlayPauseButtonClick(object sender, RoutedEventArgs e)
+    private void OnPlayingButtonClick(object sender, RoutedEventArgs e)
     {
         var command = PlayWaveCommand;
         if (command is not null && sender is ButtonBase button)

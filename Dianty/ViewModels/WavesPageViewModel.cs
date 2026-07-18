@@ -3,19 +3,29 @@ using CommunityToolkit.Mvvm.Input;
 using Dianty.Services;
 using Dianty.Utils;
 using DungeonToolkit.Coyote;
+using Microsoft.UI;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.Windows.Storage.Pickers;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Dianty.ViewModels;
 
 public partial class WavesPageViewModel : ObservableObject
 {
-    public WavesPageViewModel(CoyoteManager coyoteManager, IQueueService queueService)
+    public WavesPageViewModel(CoyoteManager coyoteManager, IQueueService queueService, IWindowService windowService)
     {
         _coyoteManager = coyoteManager;
         _queueService = queueService;
+        _windowService = windowService;
 
         var waves = new List<Wave>
         {
@@ -57,6 +67,7 @@ public partial class WavesPageViewModel : ObservableObject
 
     private readonly CoyoteManager _coyoteManager;
     private readonly IQueueService _queueService;
+    private readonly IWindowService _windowService;
 
     public ObservableCollection<WaveItem> WaveItems { get; } = [];
     public ObservableCollection<WavePlayingItem> WavePlayingItemsA { get; } = [];
@@ -83,9 +94,84 @@ public partial class WavesPageViewModel : ObservableObject
     public partial int WaveIntervalB { get; set; }
 
     [RelayCommand]
+    private async Task ImportWaveAsync(WindowId windowId)
+    {
+        var fileOpenPicker = new FileOpenPicker(windowId);
+        fileOpenPicker.FileTypeChoices["波形文件 (*.pulse)"] = [".pulse"];
+        fileOpenPicker.FileTypeChoices["波形文件"] = [".pulse", ".txt", ".bin",];
+        fileOpenPicker.FileTypeChoices["所有文件 (*.*)"] = ["*"];
+
+        var files = await fileOpenPicker.PickMultipleFilesAsync();
+        if (files.Count > 0)
+        {
+            Dictionary<string, List<string>> exceptionMessage = [];
+            var result = new List<WaveItem>();
+            foreach (var path in files.Select(f => f.Path))
+            {
+                try
+                {
+                    var fileInfo = new FileInfo(path);
+                    if (fileInfo.Length > 1000000)
+                        throw new WaveException("文件过大");
+                    var wave = await Wave.FromFileNameAsync(path, CancellationToken.None);
+                    wave.Name = Path.GetFileNameWithoutExtension(path) ?? "新波形";
+                    result.Add(new WaveItem(wave));
+                }
+                catch (Exception ex)
+                {
+                    if (!exceptionMessage.TryGetValue(ex.Message, out var messageList))
+                    {
+                        messageList = [];
+                        exceptionMessage[ex.Message] = messageList;
+                    }
+                    messageList.Add(path);
+                }
+            }
+            if (result.Count > 0)
+            {
+                _queueService.TryEnqueue(() =>
+                {
+                    for (int i = result.Count - 1, j = 0; i >= 0; i--, j++)
+                    {
+                        WaveItems.Insert(j, result[i]);
+                    }
+                });
+            }
+            if (exceptionMessage.Count > 0)
+            {
+                var messageBuffer = new StringBuilder();
+                messageBuffer.AppendLine("读取文件时出错:");
+                foreach (var message in exceptionMessage)
+                {
+                    var fileNames = message.Value;
+                    messageBuffer.Append(message.Key);
+                    messageBuffer.AppendLine($"({fileNames.Count}个) :");
+                    for (int i = 0; i < fileNames.Count; i++)
+                    {
+                        messageBuffer.AppendLine(fileNames[i]);
+                    }
+                }
+                _queueService.TryEnqueue(async () =>
+                {
+                    var dialog = _windowService.CreateContentDialog();
+                    if (dialog is null)
+                        return;
+                    dialog.Title = result.Count > 0 ? "处理部分文件时发生错误" : "发生错误";
+                    dialog.CloseButtonText = "关闭";
+                    dialog.IsPrimaryButtonEnabled = false;
+                    dialog.IsSecondaryButtonEnabled = false;
+                    dialog.DefaultButton = ContentDialogButton.Close;
+                    dialog.Content = messageBuffer.ToString();
+                    await dialog.ShowAsync();
+                });
+            }
+        }
+    }
+
+    [RelayCommand]
     private void SwitchWaveA(WaveItem waveItem)
     {
-        if (waveItem.IsEnabledA ?? false)
+        if (waveItem.IsEnabledA)
         {
             WavePlayingItemsA.Add(new WavePlayingItem(waveItem, _queueService));
         }
@@ -105,7 +191,7 @@ public partial class WavesPageViewModel : ObservableObject
     [RelayCommand]
     private void SwitchWaveB(WaveItem waveItem)
     {
-        if (waveItem.IsEnabledB ?? false)
+        if (waveItem.IsEnabledB)
         {
             WavePlayingItemsB.Add(new WavePlayingItem(waveItem, _queueService));
         }

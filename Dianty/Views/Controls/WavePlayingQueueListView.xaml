@@ -22,7 +22,7 @@
                     <ColumnDefinition Width="*" MaxWidth="96" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.ColumnSpan="2" Text="{x:Bind Header}" Style="{ThemeResource BodyLargeTextBlockStyle}"/>
+                <TextBlock Grid.ColumnSpan="2" Text="{x:Bind Header}"/>
                 <ToggleSwitch Grid.Row="1" Grid.ColumnSpan="2" IsOn="{x:Bind IsChannelEnabled, Mode=TwoWay}" Margin="0,-2"/>
                 <ComboBox
                     Grid.Row="2" PlaceholderText="播放模式"
@@ -60,7 +60,7 @@
                     </Grid.ColumnDefinitions>
                     <RadioButton
                         MinWidth="20" IsChecked="{x:Bind IsPlaying, Mode=OneWay}"
-                        Click="OnPlayPauseButtonClick" CommandParameter="{x:Bind}"/>
+                        Click="OnPlayingButtonClick" CommandParameter="{x:Bind}"/>
                     <TextBlock Grid.Column="1" Text="{x:Bind WaveItem.Name, Mode=OneWay}" VerticalAlignment="Center"/>
                     <Button
                         Grid.Column="1" Content="&#xE74D;" FontFamily="{ThemeResource SymbolThemeFontFamily}" FontSize="18"

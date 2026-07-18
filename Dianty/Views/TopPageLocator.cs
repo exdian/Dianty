@@ -13,9 +13,6 @@ internal static class TopPageLocator
 
     public static Type? GetTopPage(string pageName)
     {
-        if (_match is null)
-            return null;
-
-        return _match.Invoke(pageName);
+        return _match?.Invoke(pageName);
     }
 }
