@@ -20,6 +20,7 @@
     <converters:BoolToObjectConverter x:Key="CoyoteConnectionTypeConverter" TrueValue="此设备通过蓝牙连接" FalseValue="此设备通过WebSocket连接"/>
     <converters:BoolToVisibilityConverter x:Key="VisibleIfTrueConverter" TrueValue="Visible" FalseValue="Collapsed"/>
     <converters:BoolToVisibilityConverter x:Key="VisibleIfFalseConverter" TrueValue="Collapsed" FalseValue="Visible"/>
+    <converters:StringFormatConverter x:Key="StringFormatConverter"/>
     <utils:IntToBatteryIconConverter x:Key="IntToBatteryIconConverter"/>
     <utils:IntToBatteryPercentageConverter x:Key="IntToBatteryPercentageConverter"/>
     <utils:QrCodeSvgPathConverter x:Key="QrCodeSvgPathConverter"/>
@@ -31,9 +32,14 @@
     <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Name="Default">
             <SolidColorBrush x:Key="NavigationViewDefaultPaneBackground" Color="#F02C2C2C"/>
+            <x:Double x:Key="BreadcrumbBarChevronFontSize">16</x:Double>
         </ResourceDictionary>
         <ResourceDictionary x:Name="Light">
             <SolidColorBrush x:Key="NavigationViewDefaultPaneBackground" Color="#F0F9F9F9"/>
+            <x:Double x:Key="BreadcrumbBarChevronFontSize">16</x:Double>
+        </ResourceDictionary>
+        <ResourceDictionary x:Name="HighContrast">
+            <x:Double x:Key="BreadcrumbBarChevronFontSize">16</x:Double>
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
 

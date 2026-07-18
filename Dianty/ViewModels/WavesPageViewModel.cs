@@ -1,18 +1,22 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Dianty.Services;
 using Dianty.Utils;
 using DungeonToolkit.Coyote;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
 
 namespace Dianty.ViewModels;
 
 public partial class WavesPageViewModel : ObservableObject
 {
-    public WavesPageViewModel(CoyoteManager coyoteManager)
+    public WavesPageViewModel(CoyoteManager coyoteManager, IQueueService queueService)
     {
         _coyoteManager = coyoteManager;
+        _queueService = queueService;
+
         var waves = new List<Wave>
         {
             Wave.FromUtf8Data("Dungeonlab+pulse:35,1,8=0,20,0,1,1/0.00-1,20.00-0,40.00-0,60.00-0,80.00-0,100.00-1,100.00-1,100.00-1"u8.ToArray(), "呼吸"),
@@ -36,29 +40,65 @@ public partial class WavesPageViewModel : ObservableObject
         {
             WaveItems.Add(new WaveItem(wave));
         }
+        WavePlayingItemsA.CollectionChanged += OnWavePlayingItemsACollectionChanged;
+        WavePlayingItemsB.CollectionChanged += OnWavePlayingItemsBCollectionChanged;
+
+        WavePlayingModeItems =
+            [new WavePlayingModeSelectionItem(WavePlayMode.RepeatAll, "\uE8EE"),
+            new WavePlayingModeSelectionItem(WavePlayMode.Shuffle, "\uE8B1"),
+            new WavePlayingModeSelectionItem(WavePlayMode.RepeatOne, "\uE8ED"),];
+        WavePlayingModeA = WavePlayingModeItems[0];
+        WavePlayingModeB = WavePlayingModeItems[0];
+
+        WaveIntervalItems = [1, 2, 3, 5, 10, 20, 30, 60, 120, 300];
+        WaveIntervalA = WaveIntervalItems[0];
+        WaveIntervalB = WaveIntervalItems[0];
     }
 
     private readonly CoyoteManager _coyoteManager;
+    private readonly IQueueService _queueService;
 
     public ObservableCollection<WaveItem> WaveItems { get; } = [];
     public ObservableCollection<WavePlayingItem> WavePlayingItemsA { get; } = [];
     public ObservableCollection<WavePlayingItem> WavePlayingItemsB { get; } = [];
+    public WavePlayingModeSelectionItem[] WavePlayingModeItems { get; }
+    public int[] WaveIntervalItems { get; }
+
+    [ObservableProperty]
+    public partial bool IsChannelEnabledA { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsChannelEnabledB { get; set; }
+
+    [ObservableProperty]
+    public partial WavePlayingModeSelectionItem WavePlayingModeA { get; set; }
+
+    [ObservableProperty]
+    public partial WavePlayingModeSelectionItem WavePlayingModeB { get; set; }
+
+    [ObservableProperty]
+    public partial int WaveIntervalA { get; set; }
+
+    [ObservableProperty]
+    public partial int WaveIntervalB { get; set; }
 
     [RelayCommand]
     private void SwitchWaveA(WaveItem waveItem)
     {
         if (waveItem.IsEnabledA ?? false)
         {
-            _coyoteManager.ChannelA.Add(waveItem.Wave);
-            WavePlayingItemsA.Add(new WavePlayingItem(waveItem));
+            WavePlayingItemsA.Add(new WavePlayingItem(waveItem, _queueService));
         }
         else
         {
-            _coyoteManager.ChannelA.Remove(waveItem.Wave);
             var index = WavePlayingItemsA.FirstIndex(w => w.WaveItem == waveItem);
             Debug.Assert(index >= 0);
             if (index >= 0)
+            {
+                if (_coyoteManager.ChannelA.PlayingWave == WavePlayingItemsA[index].WavePlayer)
+                    _coyoteManager.ChannelA.NextWave();
                 WavePlayingItemsA.RemoveAt(index);
+            }
         }
     }
 
@@ -67,16 +107,98 @@ public partial class WavesPageViewModel : ObservableObject
     {
         if (waveItem.IsEnabledB ?? false)
         {
-            _coyoteManager.ChannelB.Add(waveItem.Wave);
-            WavePlayingItemsB.Add(new WavePlayingItem(waveItem));
+            WavePlayingItemsB.Add(new WavePlayingItem(waveItem, _queueService));
         }
         else
         {
-            _coyoteManager.ChannelB.Remove(waveItem.Wave);
             var index = WavePlayingItemsB.FirstIndex(w => w.WaveItem == waveItem);
             Debug.Assert(index >= 0);
             if (index >= 0)
+            {
+                if (_coyoteManager.ChannelB.PlayingWave == WavePlayingItemsB[index].WavePlayer)
+                    _coyoteManager.ChannelB.NextWave();
                 WavePlayingItemsB.RemoveAt(index);
+            }
         }
     }
+
+    [RelayCommand]
+    private void PlayWaveA(WavePlayingItem wavePlayingItem)
+    {
+        _coyoteManager.ChannelA.Play(wavePlayingItem.WavePlayer);
+    }
+
+    [RelayCommand]
+    private void PlayWaveB(WavePlayingItem wavePlayingItem)
+    {
+        _coyoteManager.ChannelB.Play(wavePlayingItem.WavePlayer);
+    }
+
+    [RelayCommand]
+    private void RemovePlayingItemA(WavePlayingItem wavePlayingItem)
+    {
+        if (WavePlayingItemsA.Remove(wavePlayingItem))
+            wavePlayingItem.WaveItem.IsEnabledA = false;
+        if (_coyoteManager.ChannelA.PlayingWave == wavePlayingItem.WavePlayer)
+            _coyoteManager.ChannelA.NextWave();
+    }
+
+    [RelayCommand]
+    private void RemovePlayingItemB(WavePlayingItem wavePlayingItem)
+    {
+        if (WavePlayingItemsB.Remove(wavePlayingItem))
+            wavePlayingItem.WaveItem.IsEnabledB = false;
+        if (_coyoteManager.ChannelB.PlayingWave == wavePlayingItem.WavePlayer)
+            _coyoteManager.ChannelB.NextWave();
+    }
+
+    private void OnWavePlayingItemsACollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        _coyoteManager.ChannelA.Replace(GetWavePlayers(WavePlayingItemsA));
+    }
+
+    private void OnWavePlayingItemsBCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        _coyoteManager.ChannelB.Replace(GetWavePlayers(WavePlayingItemsB));
+    }
+
+    private static IEnumerable<WavePlayer> GetWavePlayers(IEnumerable<WavePlayingItem> wavePlayingItems)
+    {
+        foreach (var wavePlayingItem in wavePlayingItems)
+        {
+            yield return wavePlayingItem.WavePlayer;
+        }
+    }
+
+    partial void OnIsChannelEnabledAChanged(bool value)
+    {
+        _coyoteManager.ChannelA.IsEnabled = value;
+    }
+
+    partial void OnIsChannelEnabledBChanged(bool value)
+    {
+        _coyoteManager.ChannelB.IsEnabled = value;
+    }
+
+    partial void OnWavePlayingModeAChanged(WavePlayingModeSelectionItem value)
+    {
+        _coyoteManager.ChannelA.PlayMode = value.Mode;
+    }
+
+    partial void OnWavePlayingModeBChanged(WavePlayingModeSelectionItem value)
+    {
+        _coyoteManager.ChannelB.PlayMode = value.Mode;
+    }
+
+    partial void OnWaveIntervalAChanged(int value)
+    {
+        _coyoteManager.ChannelA.NextWaveInterval = value;
+    }
+
+    partial void OnWaveIntervalBChanged(int value)
+    {
+        _coyoteManager.ChannelB.NextWaveInterval = value;
+    }
 }
+
+public readonly record struct WavePlayingModeSelectionItem(WavePlayMode Mode, string Description);

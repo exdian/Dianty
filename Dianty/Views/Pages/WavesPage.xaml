@@ -19,13 +19,9 @@
             x:Name="PageContent" Grid.Row="1" Padding="12,0,12,20" SelectionMode="None"
             ItemsSource="{x:Bind ViewModel.WaveItems}" ItemContainerStyle="{StaticResource StretchListViewItemStyle}">
             <ListView.Header>
-                <Grid ColumnSpacing="{StaticResource CommonControlSpacing}" Margin="0,0,0,5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
+                <Grid Margin="0,0,0,5">
                     <Button Content="导入波形"/>
-                    <Button Grid.Column="1" Content="播放队列" HorizontalAlignment="Right"/>
+                    <Button Content="播放队列" HorizontalAlignment="Right" Click="OnQueueButtonClick"/>
                 </Grid>
             </ListView.Header>
             <ListView.ItemTemplate>

@@ -71,7 +71,7 @@ public partial class App : Application
         ServiceLocator.RegisterViewModel(typeof(DevicesPage), new DevicesPage.RequiredParameter(
             new DevicesPageViewModel(coyoteItems, queueService, coyoteBleDetector), queueService));
         ServiceLocator.RegisterViewModel(typeof(WavesPage), new WavesPage.RequiredParameter(
-            new WavesPageViewModel(coyoteManager), queueService));
+            new WavesPageViewModel(coyoteManager, queueService), queueService));
         ServiceLocator.RegisterViewModel(typeof(GamesPage), new GamesPage.RequiredParameter(
             new GamesPageViewModel(gameManager, queueService), queueService));
         ServiceLocator.RegisterViewModel(typeof(DebugPage), new DebugPageViewModel(queueService));
@@ -89,13 +89,12 @@ public partial class App : Application
         return pageName switch
         {
             nameof(HomePage) => typeof(HomePage),
-            nameof(DevicesPage) => typeof(DevicesPage),
-            nameof(WavesPage) => typeof(WavesPage),
+            nameof(DevicesPage) or nameof(CoyoteDetailPage) => typeof(DevicesPage),
+            nameof(WavesPage) or nameof(WavePlayingQueuePage) => typeof(WavesPage),
             nameof(GamesPage) => typeof(GamesPage),
             nameof(SafetyPage) => typeof(SafetyPage),
             nameof(DebugPage) => typeof(DebugPage),
             nameof(SettingsPage) => typeof(SettingsPage),
-            nameof(CoyoteDetailPage) => typeof(DevicesPage),
             _ => null
         };
     }

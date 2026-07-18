@@ -8,6 +8,8 @@ public class CoyoteManager : IDisposable
     public int WebSocketWaveFlow { get; set; }
     public int StrengthA { get; set; }
     public int StrengthB { get; set; }
+    public bool IsOutputting { get; set; }
+    public event EventHandler<OutputStatusChangedEventArgs>? OutputStatusChanged;
     public void AddCoyote(CoyoteBLE coyote);
     public void AddCoyote(CoyoteWS coyote);
     public bool RemoveCoyote(CoyoteBLE coyote);
@@ -16,5 +18,9 @@ public class CoyoteManager : IDisposable
     public void StartOutput();
     public void StopOutput();
     public void Dispose();
+    public class OutputStatusChangedEventArgs(bool isOutputting) : EventArgs 
+    {
+        public bool IsOutputting { get; }
+    }
 }
 

@@ -21,6 +21,7 @@
     <None Remove="Views\Controls\CoyoteWsDetailCard.xaml" />
     <None Remove="Views\Controls\GtaVcRuleCard.xaml" />
     <None Remove="Views\Controls\QrCodeButton.xaml" />
+    <None Remove="Views\Controls\WavePlayingQueueListView.xaml" />
     <None Remove="Views\Pages\CoyoteDetailPage.xaml" />
     <None Remove="Views\Pages\DebugPage.xaml" />
     <None Remove="Views\Pages\DevicesPage.xaml" />
@@ -28,6 +29,7 @@
     <None Remove="Views\Pages\HomePage.xaml" />
     <None Remove="Views\Pages\SafetyPage.xaml" />
     <None Remove="Views\Pages\SettingsPage.xaml" />
+    <None Remove="Views\Pages\WavePlayingQueuePage.xaml" />
     <None Remove="Views\Pages\WavesPage.xaml" />
   </ItemGroup>
 
@@ -75,6 +77,16 @@
   <ItemGroup>
     <ProjectReference Include="..\..\DiantyCore\DungeonToolkit\DungeonToolkit.csproj" />
     <ProjectReference Include="..\..\DiantyCore\GameMonitor\GameMonitor.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Controls\WavePlayingQueueListView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Pages\WavePlayingQueuePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\Controls\QrCodeButton.xaml">

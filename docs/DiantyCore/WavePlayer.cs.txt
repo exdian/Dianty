@@ -4,9 +4,15 @@ public class WavePlayer
 {
     public WavePlayer(Wave wave);
     public static WavePlayer Empty { get; }
+    public bool IsPlaying { get; }
     public int Speed { get; set; }
     public Wave Wave { get; }
     public PulseData CurrentPulseData { get; }
+    public event EventHandler<PlayingStatusChangedEventArgs>? PlayingStatusChanged;
     public PulseData NextPulseData();
+    public class PlayingStatusChangedEventArgs(bool isPlaying) : EventArgs 
+    {
+        public bool IsPlaying { get; }
+    }
 }
 

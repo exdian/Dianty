@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Dianty.Services;
 using DungeonToolkit.Coyote;
 
 namespace Dianty.ViewModels;
@@ -25,10 +26,37 @@ public partial class WaveItem(Wave wave) : ObservableObject
     }
 }
 
-public partial class WavePlayingItem(WaveItem waveItem) : ObservableObject
+public partial class WavePlayingItem : ObservableObject
 {
-    public WaveItem WaveItem { get; } = waveItem;
+    public WavePlayingItem(WaveItem waveItem, IQueueService queueService)
+    {
+        WaveItem = waveItem;
+        _queueService = queueService;
+        WavePlayer = new WavePlayer(waveItem.Wave);
+        Speed = waveItem.Wave.Speed;
+        IsPlaying = WavePlayer.IsPlaying;
+        WavePlayer.PlayingStatusChanged += OnPlayingStatusChanged;
+    }
+
+    private readonly IQueueService _queueService;
+
+    public WaveItem WaveItem { get; }
+
+    public WavePlayer WavePlayer { get; }
 
     [ObservableProperty]
-    public partial int Speed { get; set; } = waveItem.Wave.Speed;
+    public partial int Speed { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsPlaying { get; private set; }
+
+    private void OnPlayingStatusChanged(object? sender, WavePlayer.PlayingStatusChangedEventArgs e)
+    {
+        _queueService.TryEnqueue(() => IsPlaying = e.IsPlaying);
+    }
+
+    partial void OnSpeedChanged(int value)
+    {
+        WavePlayer.Speed = value;
+    }
 }
