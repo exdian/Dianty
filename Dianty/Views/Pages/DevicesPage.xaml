@@ -42,7 +42,7 @@
             ItemsSource="{x:Bind ViewModel.CoyoteItems}" ItemContainerStyle="{StaticResource StretchListViewItemStyle}"
             ItemTemplate="{StaticResource NormalCoyoteItemTemplate}">
             <ListView.Header>
-                <Grid Margin="0,0,0,5">
+                <Grid Margin="0,0,0,8">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>

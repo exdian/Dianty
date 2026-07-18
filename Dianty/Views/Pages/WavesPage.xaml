@@ -8,7 +8,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-    
+
     <Page.Resources>
         <DataTemplate x:Key="NormalWaveItemTemplate" x:DataType="vm:WaveItem">
             <toolkit:SettingsCard
@@ -54,6 +54,22 @@
                 </StackPanel>
             </toolkit:SettingsCard>
         </DataTemplate>
+        <DataTemplate x:Key="DeletionWaveItemTemplate" x:DataType="vm:WaveItem">
+            <toolkit:SettingsCard Header="{x:Bind Name, Mode=OneWay}" Description="{x:Bind Description}" Margin="0,0,0,4">
+                <toolkit:SettingsCard.HeaderIcon>
+                    <PathIcon
+                        Data="M28.072 35.719c.387-.188.697-.504.932-.949L35.156 22.5H42.75c.609 0 1.137-.222 1.582-.668.445-.445.668
+                        -.972.668-1.582 0-.609-.223-1.137-.668-1.582S43.359 18 42.75 18h-9c-.399 0-.786.112-1.16.334-.375.223-.657
+                        .522-.844.896l-4.184 8.333L20.18 1.617c-.141-.468-.422-.855-.844-1.16C18.914.153 18.457 0 17.965 0c-.469 0
+                        -.891.135-1.266.404-.375.27-.645.616-.808 1.037L9.703 18H2.25c-.61 0-1.137.223-1.582.668C.222 19.113 0 19.641
+                        0 20.25c0 .61.222 1.137.668 1.582.445.446.972.668 1.582.668h9c.469 0 .896-.135 1.283-.404.387-.269.662-.627
+                        .826-1.073l4.36-11.601 7.136 24.961c.117.399.358.768.721 1.107.363.34.768.51 1.213.51.469 0 .897-.093 1.283-.281Z"/>
+                </toolkit:SettingsCard.HeaderIcon>
+                <Button Click="OnWaveItemDeletionButtonClickA" CommandParameter="{x:Bind}">
+                    <SymbolIcon Symbol="Delete"/>
+                </Button>
+            </toolkit:SettingsCard>
+        </DataTemplate>
     </Page.Resources>
 
     <Grid>
@@ -67,8 +83,9 @@
             ItemsSource="{x:Bind ViewModel.WaveItems}" ItemContainerStyle="{StaticResource StretchListViewItemStyle}"
             ItemTemplate="{StaticResource NormalWaveItemTemplate}">
             <ListView.Header>
-                <Grid Margin="0,0,0,5" ColumnSpacing="{StaticResource CommonControlSpacing}">
+                <Grid Margin="0,0,0,8">
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
@@ -76,21 +93,23 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="140"/>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="A通道队列"/>
-                    <TextBlock Grid.Column="1" Grid.ColumnSpan="2" Text="B通道队列"/>
-                    <ToggleSwitch Grid.Row="1" IsOn="{x:Bind ViewModel.IsChannelEnabledA, Mode=TwoWay}" Margin="0,-2"/>
-                    <ToggleSwitch
-                        Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
-                        IsOn="{x:Bind ViewModel.IsChannelEnabledB, Mode=TwoWay}" Margin="0,-2"/>
-                    <Button
-                        Grid.Row="2" Grid.Column="0" Content="导入波形" Command="{x:Bind ViewModel.ImportWaveCommand}"
-                        CommandParameter="{x:Bind XamlRoot.ContentIslandEnvironment.AppWindowId}"/>
-                    <ToggleButton
-                        x:Name="_sortButton" Grid.Row="2" Grid.ColumnSpan="2" Content="排序"
-                        Click="OnSortButtonClick" HorizontalAlignment="Right"/>
-                    <Button Grid.Row="2" Grid.Column="2" Content="播放队列" Click="OnQueueButtonClick"/>
+                    <TextBlock Grid.Column="1" Text="B通道队列"/>
+                    <ToggleSwitch Grid.Row="1" IsOn="{x:Bind ViewModel.IsChannelEnabledA, Mode=TwoWay}"/>
+                    <ToggleSwitch Grid.Row="1" Grid.Column="1" IsOn="{x:Bind ViewModel.IsChannelEnabledB, Mode=TwoWay}"/>
+                    <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="{StaticResource CommonControlSpacing}">
+                        <Button
+                            Content="导入波形" Command="{x:Bind ViewModel.ImportWaveCommand}"
+                            CommandParameter="{x:Bind XamlRoot.ContentIslandEnvironment.AppWindowId}"/>
+                        <ToggleButton x:Name="_deletionButton" Content="删除" Click="OnDeletionButtonClick"/>
+                    </StackPanel>
+                    <StackPanel
+                        x:Name="SortAndQueueButton" Grid.Row="3" Grid.ColumnSpan="2" Margin="0,8,0,0"
+                        Orientation="Horizontal" Spacing="{StaticResource CommonControlSpacing}" HorizontalAlignment="Left">
+                        <ToggleButton x:Name="_sortButton" Content="排序" Click="OnSortButtonClick"/>
+                        <Button Content="播放队列" Click="OnQueueButtonClick"/>
+                    </StackPanel>
                 </Grid>
             </ListView.Header>
         </ListView>
@@ -109,6 +128,23 @@
                         <!-- NavigationView.DisplayMode != Minimal -->
                         <Setter Target="_pageHeader.Margin" Value="24,12"/>
                         <Setter Target="_pageContent.Padding" Value="24,0,24,20"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+            <VisualStateGroup>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1" />
+                    </VisualState.StateTriggers>
+                </VisualState>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="320" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="SortAndQueueButton.(Grid.Row)" Value="2"/>
+                        <Setter Target="SortAndQueueButton.HorizontalAlignment" Value="Right"/>
+                        <Setter Target="SortAndQueueButton.Margin" Value="0"/>
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>

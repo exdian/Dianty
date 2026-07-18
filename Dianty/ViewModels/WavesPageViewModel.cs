@@ -169,43 +169,29 @@ public partial class WavesPageViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void RemoveWave(WaveItem waveItem)
+    {
+        WaveItems.Remove(waveItem);
+        RemoveWavePlayingItem(waveItem, WavePlayingItemsA, _coyoteManager.ChannelA);
+        RemoveWavePlayingItem(waveItem, WavePlayingItemsB, _coyoteManager.ChannelB);
+    }
+
+    [RelayCommand]
     private void SwitchWaveA(WaveItem waveItem)
     {
         if (waveItem.IsEnabledA)
-        {
             WavePlayingItemsA.Add(new WavePlayingItem(waveItem, _queueService));
-        }
         else
-        {
-            var index = WavePlayingItemsA.FirstIndex(w => w.WaveItem == waveItem);
-            Debug.Assert(index >= 0);
-            if (index >= 0)
-            {
-                if (_coyoteManager.ChannelA.PlayingWave == WavePlayingItemsA[index].WavePlayer)
-                    _coyoteManager.ChannelA.NextWave();
-                WavePlayingItemsA.RemoveAt(index);
-            }
-        }
+            RemoveWavePlayingItem(waveItem, WavePlayingItemsA, _coyoteManager.ChannelA);
     }
 
     [RelayCommand]
     private void SwitchWaveB(WaveItem waveItem)
     {
         if (waveItem.IsEnabledB)
-        {
             WavePlayingItemsB.Add(new WavePlayingItem(waveItem, _queueService));
-        }
         else
-        {
-            var index = WavePlayingItemsB.FirstIndex(w => w.WaveItem == waveItem);
-            Debug.Assert(index >= 0);
-            if (index >= 0)
-            {
-                if (_coyoteManager.ChannelB.PlayingWave == WavePlayingItemsB[index].WavePlayer)
-                    _coyoteManager.ChannelB.NextWave();
-                WavePlayingItemsB.RemoveAt(index);
-            }
-        }
+            RemoveWavePlayingItem(waveItem, WavePlayingItemsB, _coyoteManager.ChannelB);
     }
 
     [RelayCommand]
@@ -253,6 +239,17 @@ public partial class WavesPageViewModel : ObservableObject
         foreach (var wavePlayingItem in wavePlayingItems)
         {
             yield return wavePlayingItem.WavePlayer;
+        }
+    }
+
+    private static void RemoveWavePlayingItem(WaveItem waveItem, Collection<WavePlayingItem> wavePlayingItems, WaveQueue channel)
+    {
+        var index = wavePlayingItems.FirstIndex(w => w.WaveItem == waveItem);
+        if (index >= 0)
+        {
+            if (channel.PlayingWave == wavePlayingItems[index].WavePlayer)
+                channel.NextWave();
+            wavePlayingItems.RemoveAt(index);
         }
     }
 

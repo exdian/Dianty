@@ -12,7 +12,7 @@
         Padding="{x:Bind Padding, Mode=OneWay}" SelectionMode="None" CanReorderItems="True" AllowDrop="True"
         ItemsSource="{x:Bind WavePlayingItemsSource}" ItemContainerStyle="{StaticResource StretchListViewItemStyle}">
         <ListView.Header>
-            <Grid Margin="0,0,0,5">
+            <Grid Margin="0,0,0,8">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
@@ -23,7 +23,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.ColumnSpan="2" Text="{x:Bind Header}"/>
-                <ToggleSwitch Grid.Row="1" Grid.ColumnSpan="2" IsOn="{x:Bind IsChannelEnabled, Mode=TwoWay}" Margin="0,-2"/>
+                <ToggleSwitch Grid.Row="1" Grid.ColumnSpan="2" IsOn="{x:Bind IsChannelEnabled, Mode=TwoWay}"/>
                 <ComboBox
                     Grid.Row="2" PlaceholderText="播放模式"
                     ItemsSource="{x:Bind PlayingModeItemsSource}" SelectedItem="{x:Bind SelectedPlayingMode, Mode=TwoWay}">

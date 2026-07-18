@@ -94,10 +94,31 @@ public sealed partial class WavesPage : Page
 
     private void OnSortButtonClick(object sender, RoutedEventArgs e)
     {
+        _deletionButton.IsChecked = false;
         if (_sortButton.IsChecked ?? false)
             _pageContent.ItemTemplate = (DataTemplate)Resources["SortWaveItemTemplate"];
         else
             _pageContent.ItemTemplate = (DataTemplate)Resources["NormalWaveItemTemplate"];
+    }
+
+    private void OnDeletionButtonClick(object sender, RoutedEventArgs e)
+    {
+        _sortButton.IsChecked = false;
+        if (_deletionButton.IsChecked ?? false)
+            _pageContent.ItemTemplate = (DataTemplate)Resources["DeletionWaveItemTemplate"];
+        else
+            _pageContent.ItemTemplate = (DataTemplate)Resources["NormalWaveItemTemplate"];
+    }
+
+    private void OnWaveItemDeletionButtonClickA(object sender, RoutedEventArgs e)
+    {
+        if (ViewModel is not null && sender is ButtonBase button)
+        {
+            var command = ViewModel.RemoveWaveCommand;
+            var commandParameter = button.CommandParameter;
+            if (command.CanExecute(commandParameter))
+                command.Execute(commandParameter);
+        }
     }
 
     public record class RequiredParameter(WavesPageViewModel ViewModel, IQueueService QueueService);
