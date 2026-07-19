@@ -4,6 +4,6 @@ namespace Dianty.Services;
 
 public interface IQueueService
 {
-    bool TryEnqueue(DispatcherQueueHandler callback);
-    bool TryEnqueue(DispatcherQueuePriority priority, DispatcherQueueHandler callback);
+    void TryEnqueue(DispatcherQueueHandler callback);
+    void TryEnqueue(DispatcherQueuePriority priority, DispatcherQueueHandler callback);
 }

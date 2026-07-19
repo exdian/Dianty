@@ -57,14 +57,14 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
         return new ContentDialog { XamlRoot = Content.XamlRoot };
     }
 
-    public bool TryEnqueue(DispatcherQueueHandler callback)
+    public void TryEnqueue(DispatcherQueueHandler callback)
     {
-        return DispatcherQueue.TryEnqueue(callback);
+        DispatcherQueue?.TryEnqueue(callback);
     }
 
-    public bool TryEnqueue(DispatcherQueuePriority priority, DispatcherQueueHandler callback)
+    public void TryEnqueue(DispatcherQueuePriority priority, DispatcherQueueHandler callback)
     {
-        return DispatcherQueue.TryEnqueue(priority, callback);
+        DispatcherQueue?.TryEnqueue(priority, callback);
     }
 
     object? ITemplateContent.CreateContent(object? item)

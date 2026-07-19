@@ -6,6 +6,7 @@ using Dianty.Views;
 using Dianty.Views.Pages;
 using DungeonToolkit.Coyote;
 using GameMonitor;
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using System;
 
@@ -31,9 +32,10 @@ public partial class App : Application
     /// Invoked when the application is launched.
     /// </summary>
     /// <param name="args">Details about the launch request and process.</param>
-    protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+    protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
         var window = new MainWindow();
+        window.AppWindow.Closing += OnAppWindowClosing;
         ServiceLocator.Init(RegisterService);
         ResourceLoader.Init(MergedDictionaries);
         TopPageLocator.Init(GetTopPage);
@@ -41,6 +43,11 @@ public partial class App : Application
         _mainWindow = window;
         _window = window;
         _window.Activate();
+    }
+
+    private void OnAppWindowClosing(AppWindow sender, AppWindowClosingEventArgs args)
+    {
+        ServiceLocator.Dispose();
     }
 
     private void RegisterService()
@@ -67,13 +74,15 @@ public partial class App : Application
         {
             GtaVcGameRule = new GtaVcGameRule(ServiceLocator.GetService<IMemoryService>())
         };
+        var gamesPageViewModel = new GamesPageViewModel(gameManager, queueService);
+        ServiceLocator.Register(gamesPageViewModel);
 
         ServiceLocator.RegisterViewModel(typeof(DevicesPage), new DevicesPage.RequiredParameter(
             new DevicesPageViewModel(coyoteItems, queueService, coyoteBleDetector), queueService));
         ServiceLocator.RegisterViewModel(typeof(WavesPage), new WavesPage.RequiredParameter(
             new WavesPageViewModel(coyoteManager, queueService, windowService), queueService));
         ServiceLocator.RegisterViewModel(typeof(GamesPage), new GamesPage.RequiredParameter(
-            new GamesPageViewModel(gameManager, queueService), queueService));
+            gamesPageViewModel, queueService));
         ServiceLocator.RegisterViewModel(typeof(DebugPage), new DebugPageViewModel(queueService));
     }
 
