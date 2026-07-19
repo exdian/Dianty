@@ -61,9 +61,9 @@ public partial class WavesPageViewModel : ObservableObject
         WavePlayingModeA = WavePlayingModeItems[0];
         WavePlayingModeB = WavePlayingModeItems[0];
 
-        WaveIntervalItems = [1, 2, 3, 5, 10, 20, 30, 60, 120, 300];
-        WaveIntervalA = WaveIntervalItems[0];
-        WaveIntervalB = WaveIntervalItems[0];
+        WaveIntervalItems = [5, 10, 20, 30, 50, 100, 200, 300, 600, 1200, 3000];
+        WaveIntervalA = 50;
+        WaveIntervalB = 50;
     }
 
     private readonly CoyoteManager _coyoteManager;

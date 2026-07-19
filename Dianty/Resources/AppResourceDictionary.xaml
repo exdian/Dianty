@@ -25,6 +25,7 @@
     <utils:IntToBatteryIconConverter x:Key="IntToBatteryIconConverter"/>
     <utils:IntToBatteryPercentageConverter x:Key="IntToBatteryPercentageConverter"/>
     <utils:QrCodeSvgPathConverter x:Key="QrCodeSvgPathConverter"/>
+    <utils:WaveIntervalConverter x:Key="WaveIntervalConverter"/>
 
     <Style x:Key="StretchListViewItemStyle" TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
         <Setter Property="Padding" Value="0"/>

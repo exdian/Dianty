@@ -43,7 +43,7 @@
                         <DataTemplate x:DataType="x:Int32">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="&#xE916;" FontFamily="{ThemeResource SymbolThemeFontFamily}" FontSize="18" VerticalAlignment="Center"/>
-                                <TextBlock Text="{x:Bind Converter={StaticResource StringFormatConverter}, ConverterParameter=' {0}秒'}" VerticalAlignment="Center"/>
+                                <TextBlock Text="{x:Bind Converter={StaticResource WaveIntervalConverter}}" VerticalAlignment="Center"/>
                             </StackPanel>
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
