@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Net.WebSockets;
+﻿using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
 
@@ -24,8 +23,8 @@ public class CoyoteWS : IDisposable
     public async Task<bool> ConnectAsync(CancellationToken token);
     public async Task DisconnectAsync();
     public async Task<bool> SetStrengthAsync(int strength, Channel channel);
-    public bool AddPulseList(PulseData pulseA, PulseData pulseB);
-    public async Task<bool> SendPulseDataAsync();
+    public bool AddPulseList(PulseData pulse, Channel channel);
+    public async Task<bool> SendPulseDataAsync(Channel channel);
     public async Task<bool> ClearPulseListAsync(Channel channel);
     public void Dispose();
     public class ClientIdChangedEventArgs(string clientId) : EventArgs 

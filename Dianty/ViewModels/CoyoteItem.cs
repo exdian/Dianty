@@ -1,5 +1,4 @@
-﻿#define Debug_QrCode
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Dianty.Services;
 using Dianty.Utils;
@@ -174,7 +173,7 @@ public partial class CoyoteBleItem : CoyoteItem
     private async void Reconnecting()
     {
         Debug.Assert(_coyoteBLE is not null);
-        if (IsConnecting)
+        if (IsConnecting || _coyoteBLE.IsConnected)
             return;
         IsConnecting = true;
 
@@ -364,7 +363,7 @@ public partial class CoyoteWsItem : CoyoteItem
     private async void Reconnecting()
     {
         Debug.Assert(_coyoteWS is not null);
-        if (IsConnecting)
+        if (IsConnecting || _coyoteWS.IsConnected)
             return;
         IsConnecting = true;
 
@@ -375,12 +374,10 @@ public partial class CoyoteWsItem : CoyoteItem
         _cts = new CancellationTokenSource();
         try
         {
-#if !DEBUG || !Debug_QrCode
             _getClientIdTcs = new TaskCompletionSource();
             if (!await _coyoteWS.ConnectAsync(_cts.Token))
                 return;
             await _getClientIdTcs.Task.WaitAsync(_cts.Token);
-#endif
             _bindingTcs = new TaskCompletionSource();
             var qrCodeSvgPath = await Task.Run(() => CoyoteHelper.CreateQrCodeSvgPathString(_coyoteWS)).WaitAsync(_cts.Token);
             _queueService.TryEnqueue(() =>
