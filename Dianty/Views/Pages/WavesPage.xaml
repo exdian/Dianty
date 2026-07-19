@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="using:Dianty.ViewModels"
     xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
+    xmlns:ui="using:CommunityToolkit.WinUI"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -75,7 +76,7 @@
             ItemsSource="{x:Bind ViewModel.WaveItems}" ItemContainerStyle="{StaticResource StretchListViewItemStyle}"
             ItemTemplate="{StaticResource NormalWaveItemTemplate}">
             <ListView.Header>
-                <Grid Margin="0,0,0,8">
+                <Grid x:Name="ListViewHeader" Margin="0,0,0,8">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
@@ -97,8 +98,8 @@
                         <ToggleButton x:Name="_deletionButton" Content="删除" Click="OnDeletionButtonClick"/>
                     </StackPanel>
                     <StackPanel
-                        x:Name="SortAndQueueButton" Grid.Row="3" Grid.ColumnSpan="2" Margin="0,8,0,0"
-                        Orientation="Horizontal" Spacing="{StaticResource CommonControlSpacing}" HorizontalAlignment="Left">
+                        x:Name="SortAndQueueButton" Grid.Row="2" Grid.ColumnSpan="2"
+                        Orientation="Horizontal" Spacing="{StaticResource CommonControlSpacing}" HorizontalAlignment="Right">
                         <ToggleButton x:Name="_sortButton" Content="排序" Click="OnSortButtonClick"/>
                         <Button Content="播放队列" Click="OnQueueButtonClick"/>
                     </StackPanel>
@@ -126,17 +127,12 @@
             <VisualStateGroup>
                 <VisualState>
                     <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="1" />
-                    </VisualState.StateTriggers>
-                </VisualState>
-                <VisualState>
-                    <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="320" />
+                        <ui:ControlSizeTrigger MaxWidth="290" TargetElement="{x:Bind ListViewHeader}" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="SortAndQueueButton.(Grid.Row)" Value="2"/>
-                        <Setter Target="SortAndQueueButton.HorizontalAlignment" Value="Right"/>
-                        <Setter Target="SortAndQueueButton.Margin" Value="0"/>
+                        <Setter Target="SortAndQueueButton.(Grid.Row)" Value="3"/>
+                        <Setter Target="SortAndQueueButton.HorizontalAlignment" Value="Left"/>
+                        <Setter Target="SortAndQueueButton.Margin" Value="0,8,0,0"/>
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>

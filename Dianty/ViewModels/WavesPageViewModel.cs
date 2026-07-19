@@ -203,6 +203,35 @@ public partial class WavesPageViewModel : ObservableObject
         wavePlayingItem.WaveItem.IsEnabledB = false;
     }
 
+    [RelayCommand]
+    private void ClearPlayingItemsA()
+    {
+        // 单个删除可以保留删除动画，视觉效果更好
+        for (int i = WavePlayingItemsA.Count - 1; i >= 0; i--)
+        {
+            WavePlayingItemsA.RemoveAt(i);
+        }
+
+        // 先清除 WavePlayingItems 再赋值 false 可以避免多次遍历 WavePlayingItems
+        foreach (var item in WaveItems)
+        {
+            item.IsEnabledA = false;
+        }
+    }
+
+    [RelayCommand]
+    private void ClearPlayingItemsB()
+    {
+        for (int i = WavePlayingItemsB.Count - 1; i >= 0; i--)
+        {
+            WavePlayingItemsB.RemoveAt(i);
+        }
+        foreach (var item in WaveItems)
+        {
+            item.IsEnabledB = false;
+        }
+    }
+
     private void OnWaveItemChannelEnabledChanged(WaveItem sender, WaveItem.ChannelEnabledChangedEventArgs e)
     {
         switch (e.Channel)

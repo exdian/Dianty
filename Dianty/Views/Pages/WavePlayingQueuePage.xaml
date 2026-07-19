@@ -8,7 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid ColumnSpacing="{StaticResource CommonControlSpacing}">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -35,9 +35,10 @@
             WaveIntervalItemsSource="{x:Bind ViewModel.WaveIntervalItems}"
             SelectedWaveInterval="{x:Bind ViewModel.WaveIntervalA, Mode=TwoWay}"
             PlayWaveCommand="{x:Bind ViewModel.PlayWaveACommand}"
-            RemoveWaveCommand="{x:Bind ViewModel.RemovePlayingItemACommand}"/>
+            RemoveWaveCommand="{x:Bind ViewModel.RemovePlayingItemACommand}"
+            ClearPlayingItemsCommand="{x:Bind ViewModel.ClearPlayingItemsACommand}"/>
         <controls:WavePlayingQueueListView
-            x:Name="ListViewB" Grid.Row="1" Grid.Column="1" Padding="0,0,12,20" Header="B通道队列"
+            x:Name="ListViewB" Grid.Row="1" Grid.Column="1" Padding="12,0,12,20" Header="B通道队列"
             IsChannelEnabled="{x:Bind ViewModel.IsChannelEnabledB, Mode=TwoWay}"
             WavePlayingItemsSource="{x:Bind ViewModel.WavePlayingItemsB}"
             PlayingModeItemsSource="{x:Bind ViewModel.WavePlayingModeItems}"
@@ -45,7 +46,8 @@
             WaveIntervalItemsSource="{x:Bind ViewModel.WaveIntervalItems}"
             SelectedWaveInterval="{x:Bind ViewModel.WaveIntervalB, Mode=TwoWay}"
             PlayWaveCommand="{x:Bind ViewModel.PlayWaveBCommand}"
-            RemoveWaveCommand="{x:Bind ViewModel.RemovePlayingItemBCommand}"/>
+            RemoveWaveCommand="{x:Bind ViewModel.RemovePlayingItemBCommand}"
+            ClearPlayingItemsCommand="{x:Bind ViewModel.ClearPlayingItemsBCommand}"/>
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
                 <VisualState>
@@ -60,8 +62,8 @@
                     <VisualState.Setters>
                         <!-- NavigationView.DisplayMode != Minimal -->
                         <Setter Target="PageHeader.Margin" Value="24,12,24,12"/>
-                        <Setter Target="ListViewA.Padding" Value="24,0,12,20"/>
-                        <Setter Target="ListViewB.Padding" Value="0,0,24,20"/>
+                        <Setter Target="ListViewA.Margin" Value="12,0,0,0"/>
+                        <Setter Target="ListViewB.Margin" Value="0,0,12,0"/>
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>

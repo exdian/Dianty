@@ -124,6 +124,19 @@ public sealed partial class WavePlayingQueueListView : UserControl
             typeof(WavePlayingQueueListView),
             new PropertyMetadata(null));
 
+    public ICommand ClearPlayingItemsCommand
+    {
+        get => (ICommand)GetValue(ClearPlayingItemsCommandProperty);
+        set => SetValue(ClearPlayingItemsCommandProperty, value);
+    }
+
+    public static readonly DependencyProperty ClearPlayingItemsCommandProperty
+        = DependencyProperty.Register(
+            nameof(ClearPlayingItemsCommand),
+            typeof(ICommand),
+            typeof(WavePlayingQueueListView),
+            new PropertyMetadata(null));
+
     public WavePlayingQueueListView()
     {
         InitializeComponent();
