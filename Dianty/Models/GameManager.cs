@@ -4,16 +4,12 @@ using System.Collections.Generic;
 
 namespace Dianty.Models;
 
-public partial class GameManager : AutomaticStrength, IDisposable
+public partial class GameManager(CoyoteManager coyoteManager) : AutomaticStrength, IDisposable
 {
-    public GameManager(CoyoteManager coyoteManager)
-    {
-        _coyoteManager = coyoteManager;
-    }
-
     private readonly List<GameRule> _gameRules = [];
-    private readonly CoyoteManager _coyoteManager;
     private bool _isDisposed;
+
+    public CoyoteManager CoyoteManager { get; } = coyoteManager;
 
     public required GtaVcGameRule GtaVcGameRule
     {
@@ -47,7 +43,7 @@ public partial class GameManager : AutomaticStrength, IDisposable
                 if (rule is IDisposable gameRule)
                     gameRule.Dispose();
             }
-            _coyoteManager.Dispose();
+            CoyoteManager.Dispose();
         }
     }
 
@@ -94,8 +90,8 @@ public partial class GameManager : AutomaticStrength, IDisposable
 
     protected override void OnOutputStrengthChanged(int strength)
     {
-        _coyoteManager.StrengthA = strength;
-        _coyoteManager.StrengthB = strength;
+        CoyoteManager.StrengthA = strength;
+        CoyoteManager.StrengthB = strength;
         base.OnOutputStrengthChanged(strength);
     }
 
