@@ -16,7 +16,12 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Viewbox x:Name="_appIcon" Width="16" Height="16" Margin="40,0,0,0">
-                <FontIcon Glyph="&#xE945;"/>
+                <Path
+                    Data="M50 0C40 0 30 0 21 3S6 12 3 21 0 40 0 50 0 70 3 79s9 15 18 18 19 3 29 3 20 0 29-3 15-9 18-18
+                    3-19 3-29 0-20-3-29S88 6 79 3 60 0 50 0ZM28 57H43.375l.961-7.684L31 50l-1-7 15.223-.781L46.125 35
+                    H27ZM64 57l1.595-8.774-14.214.729L50.375 57ZM68 35H53.125l-.857 6.858 14.621-.75ZM54.875 21 54 28
+                    H69l6 3-5 29-4 4H49.5l-1 8L70 73.5 74 64l6 3-3 10-4 3-29-2-2.75-4L42.5 64H25l-3-2-2-30 6-4H47l1-8Z"
+                    Fill="{ThemeResource SystemControlForegroundBaseHighBrush}"/>
             </Viewbox>
             <TextBlock
                 x:Name="_titleText" Grid.Column="1"

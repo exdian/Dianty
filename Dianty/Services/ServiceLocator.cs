@@ -7,22 +7,14 @@ namespace Dianty.Services;
 public static class ServiceLocator
 {
     private static readonly Dictionary<Type, object> _services = [];
-    private static Action? _register;
 
-    public static void Init(Action? register)
+    public static void Dispose()
     {
-        _services.Clear();
-        _register = register;
-    }
-
-    public static void RegisterDefault()
-    {
-        if (_register is null)
-            return;
-
-        var register = _register;
-        _register = null;
-        register.Invoke();
+        foreach (var service in _services.Values)
+        {
+            if (service is IDisposable disposable)
+                disposable.Dispose();
+        }
     }
 
     public static void Register<T>(T service)

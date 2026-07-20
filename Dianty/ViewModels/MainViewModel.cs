@@ -1,8 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Dianty.Resources;
 using Dianty.Services;
+using Dianty.Utils;
 using Microsoft.UI.Dispatching;
-using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
@@ -13,7 +12,7 @@ public partial class MainViewModel : ObservableObject
     public MainViewModel(IQueueService queueService)
     {
         _queueService = queueService;
-        _queueService.TryEnqueue(DispatcherQueuePriority.Low, LoadDataAsync);
+        _queueService.TryEnqueue(DispatcherQueuePriority.Low, LoadData);
     }
 
     private readonly IQueueService _queueService;
@@ -21,17 +20,18 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     public partial bool IsLoaded { get; private set; }
 
-    private async void LoadDataAsync()
+    private async void LoadData()
     {
         var stopwatch = Stopwatch.StartNew();
         var task = Task.Delay(300);
 
-        // 后台耗时操作
-        await Task.Run(ServiceLocator.RegisterDefault);
-        Debug.WriteLine($"后台加载耗时: {stopwatch.ElapsedMilliseconds} ms");
+        if (ToDoList.Plan is not null)
+            await Task.Run(ToDoList.Plan);
 
-        // 必须在 UI 线程的操作
-        _queueService.TryEnqueue(ResourceLoader.Load);
+        if (ToDoList.UiPlan is not null)
+            _queueService.TryEnqueue(ToDoList.UiPlan.Invoke);
+
+        Debug.WriteLine($"后台加载耗时: {stopwatch.ElapsedMilliseconds} ms");
 
         // 至少加载 300 毫秒
         await task;

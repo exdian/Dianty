@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="Dianty.Views.Pages.WaveSettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <BreadcrumbBar x:Name="PageHeader" Margin="12,6,12,12" ItemsSource="{x:Bind Paths}" ItemClicked="OnBreadcrumbBarItemClicked">
+            <BreadcrumbBar.ItemTemplate>
+                <DataTemplate x:DataType="x:String">
+                    <TextBlock Text="{x:Bind}" Style="{StaticResource TitleTextBlockStyle}"/>
+                </DataTemplate>
+            </BreadcrumbBar.ItemTemplate>
+        </BreadcrumbBar>
+        <ScrollViewer x:Name="PageContent" Grid.Row="1" Padding="12,0" VerticalScrollBarVisibility="Auto" VerticalScrollMode="Auto">
+            <StackPanel Spacing="{StaticResource CommonCardSpacing}" Margin="0,0,0,24">
+                <StackPanel.ChildrenTransitions>
+                    <RepositionThemeTransition />
+                </StackPanel.ChildrenTransitions>
+                <toolkit:SettingsCard Header="名称" HeaderIcon="Tag">
+                    <TextBox Text="{x:Bind ViewModel.Name, Mode=TwoWay}"/>
+                </toolkit:SettingsCard>
+                <toolkit:SettingsCard Header="备注">
+                    <toolkit:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE82F;"/>
+                    </toolkit:SettingsCard.HeaderIcon>
+                    <TextBox Text="{x:Bind ViewModel.Description, Mode=TwoWay}"/>
+                </toolkit:SettingsCard>
+                <toolkit:SettingsExpander Header="将波形加入到播放队列" HeaderIcon="RepeatAll">
+                    <toolkit:SettingsExpander.Items>
+                        <toolkit:SettingsCard Header="A通道播放队列">
+                            <toolkit:SettingsCard.HeaderIcon>
+                                <FontIcon Glyph="&#xF093;"/>
+                            </toolkit:SettingsCard.HeaderIcon>
+                            <ToggleSwitch IsOn="{x:Bind ViewModel.IsEnabledA, Mode=TwoWay}"/>
+                        </toolkit:SettingsCard>
+                        <toolkit:SettingsCard Header="B通道播放队列">
+                            <toolkit:SettingsCard.HeaderIcon>
+                                <FontIcon Glyph="&#xF094;"/>
+                            </toolkit:SettingsCard.HeaderIcon>
+                            <ToggleSwitch IsOn="{x:Bind ViewModel.IsEnabledB, Mode=TwoWay}"/>
+                        </toolkit:SettingsCard>
+                    </toolkit:SettingsExpander.Items>
+                </toolkit:SettingsExpander>
+            </StackPanel>
+        </ScrollViewer>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1" />
+                    </VisualState.StateTriggers>
+                </VisualState>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource MinimalModeThresholdWidth}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <!-- NavigationView.DisplayMode != Minimal -->
+                        <Setter Target="PageHeader.Margin" Value="24,12"/>
+                        <Setter Target="PageContent.Padding" Value="24,0"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+    </Grid>
+</Page>

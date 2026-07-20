@@ -56,6 +56,28 @@
                         Text="{x:Bind ViewModel.OutputStrength, Mode=OneWay}"
                         FontSize="20" FontWeight="Bold" />
                 </Grid>
+                <toolkit:SettingsExpander Header="输出模式" Description="自动模式下强度为0时自动暂停输出">
+                    <toolkit:SettingsExpander.HeaderIcon>
+                        <FontIcon Glyph="&#xE9F5;"/>
+                    </toolkit:SettingsExpander.HeaderIcon>
+                    <ComboBox
+                        PlaceholderText="默认自动"
+                        ItemsSource="{x:Bind ViewModel.IsAutoStartStopModes}"
+                        SelectedItem="{x:Bind ViewModel.IsAutoStartStopMode, Mode=TwoWay}"
+                        SelectedValuePath="Key" DisplayMemberPath="Value" />
+                    <toolkit:SettingsExpander.Items>
+                        <toolkit:SettingsCard
+                            Header="手动开关"
+                            IsEnabled="{x:Bind ViewModel.IsAutoStartStop, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}">
+                            <toolkit:SettingsCard.HeaderIcon>
+                                <FontIcon Glyph="&#xE815;"/>
+                            </toolkit:SettingsCard.HeaderIcon>
+                            <ToggleButton
+                                Content="&#xE7E8;" FontFamily="{ThemeResource SymbolThemeFontFamily}" FontSize="18"
+                                IsChecked="{x:Bind ViewModel.IsOutputting, Mode=TwoWay}"/>
+                        </toolkit:SettingsCard>
+                    </toolkit:SettingsExpander.Items>
+                </toolkit:SettingsExpander>
                 <toolkit:SettingsCard Header="强度模式" Description="多个玩法同时生效时">
                     <toolkit:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE9E9;"/>

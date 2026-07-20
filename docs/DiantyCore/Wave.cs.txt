@@ -11,6 +11,7 @@ public class Wave
     public byte[]? Data { get; }
     public static bool TryParse(string waveString, [MaybeNullWhen(false)] out Wave? wave);
     public static Wave FromUtf8Data(byte[] data);
+    public static Wave FromUtf8Data(byte[] data, string name);
     public static async Task<Wave> FromFileNameAsync(string fileName, CancellationToken token);
     public static Wave GetEmpty();
     public List<Section> GetAvailableSection();

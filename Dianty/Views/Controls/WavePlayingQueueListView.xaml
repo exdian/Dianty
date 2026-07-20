@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="Dianty.Views.Controls.WavePlayingQueueListView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:Dianty.ViewModels"
+    xmlns:ui="using:CommunityToolkit.WinUI"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ListView
+        Padding="{x:Bind Padding, Mode=OneWay}" SelectionMode="None" CanReorderItems="True" AllowDrop="True"
+        ItemsSource="{x:Bind WavePlayingItemsSource}" ItemContainerStyle="{StaticResource StretchListViewItemStyle}">
+        <ListView.Header>
+            <Grid x:Name="ListViewHeader" Margin="0,0,0,8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" MaxWidth="76" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.ColumnSpan="2" Text="{x:Bind Header}"/>
+                <ToggleSwitch Grid.Row="1" Grid.ColumnSpan="2" IsOn="{x:Bind IsChannelEnabled, Mode=TwoWay}"/>
+                <Button x:Name="ClearButton" Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Right" Content="清空" Command="{x:Bind ClearPlayingItemsCommand}"/>
+                <ComboBox
+                    Grid.Row="2" PlaceholderText="播放模式"
+                    ItemsSource="{x:Bind PlayingModeItemsSource}" SelectedItem="{x:Bind SelectedPlayingMode, Mode=TwoWay}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:WavePlayingModeSelectionItem">
+                            <TextBlock Text="{x:Bind Description}" FontFamily="{ThemeResource SymbolThemeFontFamily}" FontSize="18" VerticalAlignment="Center"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <ComboBox
+                    Grid.Row="2" Grid.Column="1" PlaceholderText="切换间隔"
+                    ItemsSource="{x:Bind WaveIntervalItemsSource}" SelectedItem="{x:Bind SelectedWaveInterval, Mode=TwoWay}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="x:Int32">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE916;" FontFamily="{ThemeResource SymbolThemeFontFamily}" FontSize="18" VerticalAlignment="Center"/>
+                                <TextBlock Text="{x:Bind Converter={StaticResource WaveIntervalConverter}}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </Grid>
+        </ListView.Header>
+        <ListView.ItemTemplate>
+            <DataTemplate x:DataType="vm:WavePlayingItem">
+                <Grid
+                    Margin="0,0,0,4" Padding="12,8" ColumnSpacing="{StaticResource CommonControlSpacing}"
+                    Background="{ThemeResource CardBackgroundFillColorDefault}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefault}" BorderThickness="1"
+                    CornerRadius="{ThemeResource ControlCornerRadius}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <RadioButton
+                        MinWidth="20" IsChecked="{x:Bind IsPlaying, Mode=OneWay}"
+                        Click="OnPlayingButtonClick" CommandParameter="{x:Bind}"/>
+                    <TextBlock Grid.Column="1" Text="{x:Bind WaveItem.Name, Mode=OneWay}" VerticalAlignment="Center"/>
+                    <Button
+                        Grid.Column="1" Content="&#xE74D;" FontFamily="{ThemeResource SymbolThemeFontFamily}" FontSize="18"
+                        Padding="6,5" HorizontalAlignment="Right" Click="OnDeletionButtonClick" CommandParameter="{x:Bind}"/>
+                </Grid>
+            </DataTemplate>
+        </ListView.ItemTemplate>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <ui:ControlSizeTrigger MaxWidth="245" TargetElement="{x:Bind ListViewHeader}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="ClearButton.(Grid.Row)" Value="3"/>
+                        <Setter Target="ClearButton.HorizontalAlignment" Value="Left"/>
+                        <Setter Target="ClearButton.Margin" Value="0,8,0,0"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+    </ListView>
+</UserControl>

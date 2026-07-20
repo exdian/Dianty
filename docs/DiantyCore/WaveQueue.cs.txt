@@ -4,21 +4,21 @@ public class WaveQueue
 {
     public bool IsEnabled { get; set; }
     public WavePlayMode PlayMode { get; set; }
-    public Wave? CurrentWave { get; }
+    public WavePlayer? PlayingWave { get; }
     public PulseData CurrentPulseData { get; }
     public int NextWaveInterval { get; set; }
     public event EventHandler<PlayingWaveChangedEventArgs>? PlayingWaveChanged;
-    public void Add(Wave wave);
-    public bool Remove(Wave wave);
-    public void Replace(List<WavePlayer> wavePlayers);
-    public void MoveUp(Wave wave);
-    public void Swap(Wave a, Wave b);
-    public void Play(Wave wave);
-    public Wave? NextWave();
+    public void Add(WavePlayer wavePlayer);
+    public bool Remove(WavePlayer wavePlayer);
+    public void Replace(IEnumerable<WavePlayer> wavePlayers);
+    public void MoveUp(WavePlayer wavePlayer);
+    public void Swap(WavePlayer a, WavePlayer b);
+    public void Play(WavePlayer wavePlayer);
+    public WavePlayer? NextWave();
     public PulseData NextPulseData();
-    public class PlayingWaveChangedEventArgs(Wave? wave) : EventArgs 
+    public class PlayingWaveChangedEventArgs(WavePlayer? wavePlayer) : EventArgs 
     {
-        public Wave? Wave { get; }
+        public WavePlayer? WavePlayer { get; }
     }
 }
 

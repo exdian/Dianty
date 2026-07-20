@@ -1,0 +1,19 @@
+﻿using Microsoft.UI.Xaml.Data;
+using System;
+
+namespace Dianty.Utils;
+
+public partial class WaveIntervalConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        if (value is not int interval)
+            return "未知";
+        return $" {interval / 10f}秒";
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        throw new NotImplementedException();
+    }
+}

@@ -18,8 +18,16 @@ public class NavigationRequest
         NavigationOptions = navigationOptions;
     }
 
+    public NavigationRequest(Type pageType, FrameNavigationOptions navigationOptions, bool needParameter)
+    {
+        PageType = pageType;
+        NavigationOptions = navigationOptions;
+        NeedParameter = needParameter;
+    }
+
     public int GoBackLevel { get; }
     public Type? PageType { get; }
     public object? Parameter { get; }
     public FrameNavigationOptions NavigationOptions { get; }
+    public bool NeedParameter { get; }
 }

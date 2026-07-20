@@ -17,9 +17,7 @@ using Windows.Graphics;
 using WinRT.Interop;
 
 namespace Dianty;
-/// <summary>
-/// An empty window that can be used on its own or navigated to within a Frame.
-/// </summary>
+
 public sealed partial class MainWindow : Window, ITitleBarService, IWindowService, IQueueService, ITemplateContent
 {
     public MainWindow()
@@ -50,14 +48,21 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
         return InputActivationListener.GetForWindowId(AppWindow.Id);
     }
 
-    public bool TryEnqueue(DispatcherQueueHandler callback)
+    public ContentDialog? CreateContentDialog()
     {
-        return DispatcherQueue.TryEnqueue(callback);
+        if (Content is null || Content.XamlRoot is null)
+            return null;
+        return new ContentDialog { XamlRoot = Content.XamlRoot };
     }
 
-    public bool TryEnqueue(DispatcherQueuePriority priority, DispatcherQueueHandler callback)
+    public void TryEnqueue(DispatcherQueueHandler callback)
     {
-        return DispatcherQueue.TryEnqueue(priority, callback);
+        DispatcherQueue?.TryEnqueue(callback);
+    }
+
+    public void TryEnqueue(DispatcherQueuePriority priority, DispatcherQueueHandler callback)
+    {
+        DispatcherQueue?.TryEnqueue(priority, callback);
     }
 
     object? ITemplateContent.CreateContent(object? item)
@@ -98,8 +103,8 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
     [LibraryImport("user32.dll", EntryPoint = "PostMessageA")]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
-    public const uint WM_NCMOUSEMOVE = 0x00A0;
-    public const int HTCAPTION = 2;
+    private const uint WM_NCMOUSEMOVE = 0x00A0;
+    private const int HTCAPTION = 2;
     private void RootElement_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
         // 当鼠标指针从标题栏按钮移到非客户区的穿透区域时，标题栏按钮仍会处于指针悬停状态

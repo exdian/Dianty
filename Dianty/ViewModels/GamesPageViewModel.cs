@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using static Dianty.Models.AutomaticStrength;
+using static DungeonToolkit.Coyote.CoyoteManager;
 
 namespace Dianty.ViewModels;
 
@@ -15,23 +16,32 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
     public GamesPageViewModel(GameManager gameManager, IQueueService queueService)
     {
         _gameManager = gameManager;
-        _gameManager.OutputStrengthChanged += GameManager_OutputStrengthChanged;
         _queueService = queueService;
+
+        _gameManager.OutputStrengthChanged += GameManager_OutputStrengthChanged;
+        _gameManager.CoyoteManager.OutputStatusChanged += OnCoyoteManagerOutputStatusChanged;
+
+        IsAutoStartStopModes = new Dictionary<bool, string>
+        {
+            [true] = "自动",
+            [false] = "手动"
+        }.ToArray();
+        IsAutoStartStopMode = IsAutoStartStopModes[0];
 
         StrengthModes = new Dictionary<Mode, string>
         {
             [Mode.Max] = "取最大值",
             [Mode.Sum] = "叠加强度"
         }.ToArray();
-
-        GamesStrengthMode = StrengthModes.First();
-        GtaVcStrengthMode = StrengthModes.First();
+        GamesStrengthMode = StrengthModes[0];
+        GtaVcStrengthMode = StrengthModes[0];
     }
 
     private readonly GameManager _gameManager;
     private readonly IQueueService _queueService;
     private bool _isDisposed;
 
+    public KeyValuePair<bool, string>[] IsAutoStartStopModes { get; }
     public KeyValuePair<Mode, string>[] StrengthModes { get; }
 
     // 概况
@@ -40,6 +50,15 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
 
     [ObservableProperty]
     public partial int OutputStrength { get; private set; }
+
+    [ObservableProperty]
+    public partial KeyValuePair<bool, string> IsAutoStartStopMode { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsAutoStartStop { get; private set; }
+
+    [ObservableProperty]
+    public partial bool IsOutputting { get; set; }
 
     [ObservableProperty]
     public partial KeyValuePair<Mode, string> GamesStrengthMode { get; set; }
@@ -124,6 +143,7 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
         if (disposing)
         {
             _gameManager.OutputStrengthChanged -= GameManager_OutputStrengthChanged;
+            _gameManager.CoyoteManager.OutputStatusChanged -= OnCoyoteManagerOutputStatusChanged;
             _gameManager.Dispose();
         }
     }
@@ -131,11 +151,32 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
     private void GameManager_OutputStrengthChanged(object? sender, EventArgs e)
     {
         var outputStrength = _gameManager.OutputStrength;
-        _queueService.TryEnqueue(() =>
-        {
-            OutputStrength = outputStrength;
-        });
+        _queueService.TryEnqueue(() => OutputStrength = outputStrength);
         WeakReferenceMessenger.Default.Send(new Log($"总强度发生变化：{outputStrength}"));
+    }
+
+    private void OnCoyoteManagerOutputStatusChanged(object? sender, OutputStatusChangedEventArgs e)
+    {
+        _queueService.TryEnqueue(() => IsOutputting = e.IsOutputting);
+    }
+
+    partial void OnIsAutoStartStopModeChanged(KeyValuePair<bool, string> value)
+    {
+        var isAutoStartStop = value.Key;
+        IsAutoStartStop = isAutoStartStop;
+        _gameManager.CoyoteManager.IsAutoStartStop = isAutoStartStop;
+        if (!isAutoStartStop)
+            _gameManager.CoyoteManager.StopOutput();
+    }
+
+    partial void OnIsOutputtingChanged(bool value)
+    {
+        if (IsAutoStartStop)
+            return;
+        if (value)
+            _gameManager.CoyoteManager.StartOutput();
+        else
+            _gameManager.CoyoteManager.StopOutput();
     }
 
     partial void OnGamesStrengthModeChanged(KeyValuePair<Mode, string> value)

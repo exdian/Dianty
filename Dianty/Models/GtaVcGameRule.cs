@@ -59,6 +59,7 @@ public partial class GtaVcGameRule : GameRule, IDisposable
             else
                 _monitor.Stop();
             field = value;
+            ComputeOutputStrength();
         }
     }
 

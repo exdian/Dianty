@@ -51,5 +51,13 @@ public sealed partial class DevicesPage : Page
         }
     }
 
+    private void OnSortButtonClick(object sender, RoutedEventArgs e)
+    {
+        if (_sortButton.IsChecked ?? false)
+            _pageContent.ItemTemplate = (DataTemplate)Resources["SortCoyoteItemTemplate"];
+        else
+            _pageContent.ItemTemplate = (DataTemplate)Resources["NormalCoyoteItemTemplate"];
+    }
+
     public record class RequiredParameter(DevicesPageViewModel ViewModel, IQueueService QueueService);
 }

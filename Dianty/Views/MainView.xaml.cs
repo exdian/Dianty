@@ -95,20 +95,20 @@ public sealed partial class MainView : UserControl
         _queueService.TryEnqueue(() =>
         {
             var isNavigationStackEnabled = message.NavigationOptions.IsNavigationStackEnabled;
-            message.NavigationOptions.IsNavigationStackEnabled = true;
             if (message.GoBackLevel > 0)
             {
                 if (message.GoBackLevel <= _contentFrame.BackStack.Count)
                 {
                     var pageStackEntry = _contentFrame.BackStack[^message.GoBackLevel];
-                    _contentFrame.NavigateToType(pageStackEntry.SourcePageType, pageStackEntry.Parameter, message.NavigationOptions);
+                    _contentFrame.Navigate(pageStackEntry.SourcePageType, pageStackEntry.Parameter, message.NavigationOptions.TransitionInfoOverride);
                     if (!isNavigationStackEnabled)
                         _contentFrame.BackStack.RemoveAt(_contentFrame.BackStack.Count - 1);
                 }
             }
             else if (message.PageType is not null)
             {
-                _contentFrame.NavigateToType(message.PageType, message.Parameter, message.NavigationOptions);
+                var viewModel = message.NeedParameter ? ServiceLocator.GetViewModel(message.PageType) : message.Parameter;
+                _contentFrame.Navigate(message.PageType, viewModel, message.NavigationOptions.TransitionInfoOverride);
                 if (!isNavigationStackEnabled && _contentFrame.BackStack.Count > 0)
                     _contentFrame.BackStack.RemoveAt(_contentFrame.BackStack.Count - 1);
             }
