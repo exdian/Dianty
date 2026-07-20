@@ -84,6 +84,7 @@ public partial class App : Application
             new WavesPageViewModel(coyoteManager, queueService, windowService), queueService));
         ServiceLocator.RegisterViewModel(typeof(GamesPage), new GamesPage.RequiredParameter(
             gamesPageViewModel, queueService));
+        ServiceLocator.RegisterViewModel(typeof(SafetyPage), new SafetyPageViewModel(coyoteItems));
         ServiceLocator.RegisterViewModel(typeof(DebugPage), new DebugPageViewModel(queueService));
     }
 
