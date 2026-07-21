@@ -78,6 +78,7 @@ public partial class App : Application
         var gamesPageViewModel = new GamesPageViewModel(gameManager, queueService);
         ServiceLocator.Register(gamesPageViewModel);
 
+        ServiceLocator.RegisterViewModel(typeof(HomePage), new HomePageViewModel(coyoteItems, gameManager, queueService));
         ServiceLocator.RegisterViewModel(typeof(DevicesPage), new DevicesPage.RequiredParameter(
             new DevicesPageViewModel(coyoteItems, queueService, coyoteBleDetector), queueService));
         ServiceLocator.RegisterViewModel(typeof(WavesPage), new WavesPage.RequiredParameter(

@@ -157,7 +157,8 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
 
     private void OnCoyoteManagerOutputStatusChanged(object? sender, OutputStatusChangedEventArgs e)
     {
-        _queueService.TryEnqueue(() => IsOutputting = e.IsOutputting);
+        if (IsAutoStartStop)
+            _queueService.TryEnqueue(() => IsOutputting = e.IsOutputting);
     }
 
     partial void OnIsAutoStartStopModeChanged(KeyValuePair<bool, string> value)

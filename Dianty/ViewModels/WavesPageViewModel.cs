@@ -217,6 +217,7 @@ public partial class WavesPageViewModel : ObservableObject
         {
             item.IsEnabledA = false;
         }
+        _coyoteManager.ChannelA.NextWave();
     }
 
     [RelayCommand]
@@ -230,6 +231,7 @@ public partial class WavesPageViewModel : ObservableObject
         {
             item.IsEnabledB = false;
         }
+        _coyoteManager.ChannelB.NextWave();
     }
 
     private void OnWaveItemChannelEnabledChanged(WaveItem sender, WaveItem.ChannelEnabledChangedEventArgs e)
