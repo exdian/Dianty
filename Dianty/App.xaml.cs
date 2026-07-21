@@ -38,7 +38,7 @@ public partial class App : Application
         var window = new MainWindow();
         window.AppWindow.Closing += OnAppWindowClosing;
         ToDoList.Plan += RegisterService;
-        ToDoList.UiPlan += MergedDictionaries;
+        ToDoList.UiPlan += MergeDictionaries;
         ToDoList.UiPlan += SetWindowIcon;
         TopPageLocator.Init(GetTopPage);
         window.ViewModel = new MainViewModel(window);
@@ -88,7 +88,7 @@ public partial class App : Application
         ServiceLocator.RegisterViewModel(typeof(DebugPage), new DebugPageViewModel(queueService));
     }
 
-    private void MergedDictionaries()
+    private void MergeDictionaries()
     {
         var newDictionary = new ResourceDictionary();
         LoadComponent(newDictionary, new Uri("ms-appx:///Resources/AppResourceDictionary.xaml", UriKind.Absolute));

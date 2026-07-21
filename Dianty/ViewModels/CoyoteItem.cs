@@ -79,7 +79,7 @@ public partial class CoyoteItem : ObservableObject, IDisposable
         }
     }
 
-    protected void UpdateConnectionMessage(bool isConnected)
+    protected virtual void UpdateConnectionMessage(bool isConnected)
     {
         ConnectionMessage = isConnected ? "已连接" : "已断开连接";
     }
@@ -359,6 +359,12 @@ public partial class CoyoteWsItem : CoyoteItem
 
     [ObservableProperty]
     public partial bool IsConnectingOrConnected { get; set; }
+
+    protected override void UpdateConnectionMessage(bool isConnected)
+    {
+        if (!isConnected)
+            ConnectionMessage = "已断开连接";
+    }
 
     private async void Reconnecting()
     {
