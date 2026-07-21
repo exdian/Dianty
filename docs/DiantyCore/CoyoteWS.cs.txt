@@ -17,7 +17,7 @@ public class CoyoteWS : IDisposable
     public byte StrengthCapB { get; }
     public event EventHandler<ConnectionStatusChangedEventArgs>? ConnectionStatusChanged;
     public event EventHandler<ClientIdChangedEventArgs>? ClientIdChanged;
-    public event EventHandler? BindingSucceed;
+    public event EventHandler<BindingStatusChangedEventArgs>? BindingStatusChanged;
     public event EventHandler<StrengthChangedEventArgs>? StrengthChanged;
     public event EventHandler<FeedbackReceivedEventArgs>? FeedbackReceived;
     public async Task<bool> ConnectAsync(CancellationToken token);
@@ -27,6 +27,10 @@ public class CoyoteWS : IDisposable
     public async Task<bool> SendPulseDataAsync(Channel channel);
     public async Task<bool> ClearPulseListAsync(Channel channel);
     public void Dispose();
+    public class BindingStatusChangedEventArgs(bool isBound) : EventArgs 
+    {
+        public bool IsBound { get; }
+    }
     public class ClientIdChangedEventArgs(string clientId) : EventArgs 
     {
         public string ClientId { get; }

@@ -322,7 +322,7 @@ public partial class CoyoteWsItem : CoyoteItem
         IsConnectingOrConnected = coyote.IsBound;
         coyote.ConnectionStatusChanged += OnConnectionStatusChanged;
         coyote.ClientIdChanged += OnClientIdChanged;
-        coyote.BindingSucceed += OnBindingSucceed;
+        coyote.BindingStatusChanged += OnBindingStatusChanged;
         coyote.StrengthChanged += OnStrengthChanged;
     }
 
@@ -466,9 +466,10 @@ public partial class CoyoteWsItem : CoyoteItem
             _getClientIdTcs?.TrySetResult();
     }
 
-    private void OnBindingSucceed(object? sender, EventArgs e)
+    private void OnBindingStatusChanged(object? sender, CoyoteWS.BindingStatusChangedEventArgs e)
     {
-        _bindingTcs?.TrySetResult();
+        if (e.IsBound)
+            _bindingTcs?.TrySetResult();
     }
 
     private void OnStrengthChanged(object? sender, CoyoteWS.StrengthChangedEventArgs e)
