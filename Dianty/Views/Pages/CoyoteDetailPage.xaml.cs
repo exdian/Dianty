@@ -54,16 +54,7 @@ public sealed partial class CoyoteDetailPage : Page
             Paths.RemoveAt(i);
         }
 
-        // 当文本框修改时点击导航，文本框绑定的属性不能及时更新，因此需要将导航放到低优先级队列
-        if (_queueService is null)
-        {
-            WeakReferenceMessenger.Default.Send(navigationRequest);
-        }
-        else
-        {
-            _queueService.TryEnqueue(DispatcherQueuePriority.Low,
-                () => WeakReferenceMessenger.Default.Send(navigationRequest));
-        }
+        WeakReferenceMessenger.Default.Send(navigationRequest);
     }
 
     private void OnScrollViewerLoaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)

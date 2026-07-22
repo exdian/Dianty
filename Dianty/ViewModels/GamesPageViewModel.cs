@@ -4,8 +4,6 @@ using Dianty.Models;
 using Dianty.Services;
 using Dianty.Utils.Messages;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using static Dianty.Models.AutomaticStrength;
 using static DungeonToolkit.Coyote.CoyoteManager;
 
@@ -21,28 +19,24 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
         _gameManager.OutputStrengthChanged += GameManager_OutputStrengthChanged;
         _gameManager.CoyoteManager.OutputStatusChanged += OnCoyoteManagerOutputStatusChanged;
 
-        IsAutoStartStopModes = new Dictionary<bool, string>
-        {
-            [true] = "自动",
-            [false] = "手动"
-        }.ToArray();
-        IsAutoStartStopMode = IsAutoStartStopModes[0];
+        AutoStartStopModeSelectionItems =
+            [new AutoStartStopModeSelectionItem(true, "自动"),
+            new AutoStartStopModeSelectionItem(false, "手动")];
+        IsAutoStartStopMode = AutoStartStopModeSelectionItems[0];
 
-        StrengthModes = new Dictionary<Mode, string>
-        {
-            [Mode.Max] = "取最大值",
-            [Mode.Sum] = "叠加强度"
-        }.ToArray();
-        GamesStrengthMode = StrengthModes[0];
-        GtaVcStrengthMode = StrengthModes[0];
+        StrengthModeSelectionItems =
+            [new StrengthModeSelectionItem(Mode.Max, "取最大值"),
+            new StrengthModeSelectionItem(Mode.Sum, "叠加强度")];
+        GamesStrengthMode = StrengthModeSelectionItems[0];
+        GtaVcStrengthMode = StrengthModeSelectionItems[0];
     }
 
     private readonly GameManager _gameManager;
     private readonly IQueueService _queueService;
     private bool _isDisposed;
 
-    public KeyValuePair<bool, string>[] IsAutoStartStopModes { get; }
-    public KeyValuePair<Mode, string>[] StrengthModes { get; }
+    public AutoStartStopModeSelectionItem[] AutoStartStopModeSelectionItems { get; }
+    public StrengthModeSelectionItem[] StrengthModeSelectionItems { get; }
 
     // 概况
     [ObservableProperty]
@@ -52,7 +46,7 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
     public partial int OutputStrength { get; private set; }
 
     [ObservableProperty]
-    public partial KeyValuePair<bool, string> IsAutoStartStopMode { get; set; }
+    public partial AutoStartStopModeSelectionItem IsAutoStartStopMode { get; set; }
 
     [ObservableProperty]
     public partial bool IsAutoStartStop { get; private set; }
@@ -61,7 +55,7 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
     public partial bool IsOutputting { get; set; }
 
     [ObservableProperty]
-    public partial KeyValuePair<Mode, string> GamesStrengthMode { get; set; }
+    public partial StrengthModeSelectionItem GamesStrengthMode { get; set; }
 
     // 规则
     // 罪恶都市
@@ -69,7 +63,7 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
     public partial bool GtaVcEnabled { get; set; }
 
     [ObservableProperty]
-    public partial KeyValuePair<Mode, string> GtaVcStrengthMode { get; set; }
+    public partial StrengthModeSelectionItem GtaVcStrengthMode { get; set; }
 
     [ObservableProperty]
     public partial bool GtaVcDamageRuleEnabled { get; set; }
@@ -161,9 +155,9 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
             _queueService.TryEnqueue(() => IsOutputting = e.IsOutputting);
     }
 
-    partial void OnIsAutoStartStopModeChanged(KeyValuePair<bool, string> value)
+    partial void OnIsAutoStartStopModeChanged(AutoStartStopModeSelectionItem value)
     {
-        var isAutoStartStop = value.Key;
+        var isAutoStartStop = value.IsAutoStartStop;
         IsAutoStartStop = isAutoStartStop;
         _gameManager.CoyoteManager.IsAutoStartStop = isAutoStartStop;
         if (!isAutoStartStop)
@@ -180,9 +174,9 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
             _gameManager.CoyoteManager.StopOutput();
     }
 
-    partial void OnGamesStrengthModeChanged(KeyValuePair<Mode, string> value)
+    partial void OnGamesStrengthModeChanged(StrengthModeSelectionItem value)
     {
-        _gameManager.StrengthMode = value.Key;
+        _gameManager.StrengthMode = value.Mode;
     }
 
     partial void OnGtaVcEnabledChanged(bool value)
@@ -194,9 +188,9 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
         _gameManager.GtaVcGameRule.IsEnabled = value;
     }
 
-    partial void OnGtaVcStrengthModeChanged(KeyValuePair<Mode, string> value)
+    partial void OnGtaVcStrengthModeChanged(StrengthModeSelectionItem value)
     {
-        _gameManager.GtaVcGameRule.StrengthMode = value.Key;
+        _gameManager.GtaVcGameRule.StrengthMode = value.Mode;
     }
 
     partial void OnGtaVcDamageRuleEnabledChanged(bool value)
@@ -294,3 +288,7 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
         _gameManager.GtaVcGameRule.FellOffBikeRuleDuration = (int)value;
     }
 }
+
+public readonly record struct AutoStartStopModeSelectionItem(bool IsAutoStartStop, string Description);
+
+public readonly record struct StrengthModeSelectionItem(Mode Mode, string Description);

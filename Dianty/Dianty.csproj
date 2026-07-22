@@ -181,5 +181,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyVersion>1.11.10.101</AssemblyVersion>
     <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
+    <PublishAot>True</PublishAot>
   </PropertyGroup>
 </Project>
