@@ -34,6 +34,23 @@ internal class SettingsCardHelper
                         state.Setters.RemoveAt(4);
                     }
                 }
+                var currentState = visualStateGroup.CurrentState;
+                if (currentState is null)
+                {
+                    VisualStateManager.GoToState(settingsCard, "Right", false);
+                }
+                else
+                {
+                    foreach (var state in visualStateGroup.States)
+                    {
+                        if (state != currentState)
+                        {
+                            VisualStateManager.GoToState(settingsCard, state.Name, false);
+                            VisualStateManager.GoToState(settingsCard, currentState.Name, false);
+                            break;
+                        }
+                    }
+                }
                 break;
             }
         }

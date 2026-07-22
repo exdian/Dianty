@@ -77,7 +77,8 @@ public sealed partial class CoyoteDeletionCard : UserControl
                 CloseButtonText = "取消",
                 IsSecondaryButtonEnabled = false,
                 DefaultButton = ContentDialogButton.None,
-                Content = $"从列表中移除“{TargetName}”"
+                Content = $"从列表中移除“{TargetName}”",
+                RequestedTheme = ActualTheme
             };
 
             if (await dialog.ShowAsync() == ContentDialogResult.Primary)

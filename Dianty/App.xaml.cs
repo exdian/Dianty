@@ -87,6 +87,7 @@ public partial class App : Application
             gamesPageViewModel, queueService));
         ServiceLocator.RegisterViewModel(typeof(SafetyPage), new SafetyPageViewModel(coyoteItems));
         ServiceLocator.RegisterViewModel(typeof(DebugPage), new DebugPageViewModel(queueService));
+        ServiceLocator.RegisterViewModel(typeof(SettingsPage), new SettingsPageViewModel(queueService, windowService));
     }
 
     private void MergeDictionaries()
@@ -101,7 +102,7 @@ public partial class App : Application
         if (_window is null)
             return;
 
-        var file = "Assets\\AppIcon.ico";
+        var file = "Assets/AppIcon.ico";
         try
         {
             var fileInfo = new FileInfo(file);

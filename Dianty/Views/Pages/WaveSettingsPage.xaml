@@ -34,7 +34,7 @@
                     </toolkit:SettingsCard.HeaderIcon>
                     <TextBox Text="{x:Bind ViewModel.Description, Mode=TwoWay}"/>
                 </toolkit:SettingsCard>
-                <toolkit:SettingsExpander Header="将波形加入到播放队列" HeaderIcon="RepeatAll">
+                <toolkit:SettingsExpander Header="将波形加入到播放队列" HeaderIcon="RepeatAll" TabIndex="1">
                     <toolkit:SettingsExpander.Items>
                         <toolkit:SettingsCard Header="A通道播放队列">
                             <toolkit:SettingsCard.HeaderIcon>
