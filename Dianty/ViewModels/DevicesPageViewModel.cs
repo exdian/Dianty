@@ -113,7 +113,7 @@ public partial class DevicesPageViewModel : ObservableObject
         var coyote = new CoyoteWS();
         coyote.ConnectionStatusChanged += OnConnectionStatusChanged;
         coyote.ClientIdChanged += OnClientIdChanged;
-        coyote.BindingSucceed += OnBindingSucceed;
+        coyote.BindingStatusChanged += OnBindingStatusChanged;
         _cts = new CancellationTokenSource();
         try
         {
@@ -155,7 +155,7 @@ public partial class DevicesPageViewModel : ObservableObject
             _bindingTcs = null;
             coyote.ConnectionStatusChanged -= OnConnectionStatusChanged;
             coyote.ClientIdChanged -= OnClientIdChanged;
-            coyote.BindingSucceed -= OnBindingSucceed;
+            coyote.BindingStatusChanged -= OnBindingStatusChanged;
             _queueService.TryEnqueue(DispatcherQueuePriority.Low, () =>
             {
                 IsQrCodeDisplayed = false;
@@ -197,8 +197,9 @@ public partial class DevicesPageViewModel : ObservableObject
             _getClientIdTcs?.TrySetResult();
     }
 
-    private void OnBindingSucceed(object? sender, EventArgs e)
+    private void OnBindingStatusChanged(object? sender, CoyoteWS.BindingStatusChangedEventArgs e)
     {
-        _bindingTcs?.TrySetResult();
+        if (e.IsBound)
+            _bindingTcs?.TrySetResult();
     }
 }

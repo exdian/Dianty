@@ -34,6 +34,23 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
 
     public MainViewModel? ViewModel { get; set; }
 
+    public ElementTheme ColorTheme
+    {
+        get
+        {
+            if (Content is FrameworkElement rootElement)
+                return rootElement.RequestedTheme;
+            else
+                return ElementTheme.Default;
+        }
+
+        set
+        {
+            if (Content is FrameworkElement rootElement && rootElement.RequestedTheme != value)
+                rootElement.RequestedTheme = value;
+        }
+    }
+
     public InputNonClientPointerSource? GetInputNonClientPointerSource()
     {
         if (AppWindow is null)
@@ -52,7 +69,12 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
     {
         if (Content is null || Content.XamlRoot is null)
             return null;
-        return new ContentDialog { XamlRoot = Content.XamlRoot };
+        var dialog = new ContentDialog
+        {
+            XamlRoot = Content.XamlRoot,
+            RequestedTheme = ColorTheme
+        };
+        return dialog;
     }
 
     public void TryEnqueue(DispatcherQueueHandler callback)

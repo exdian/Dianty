@@ -10,7 +10,7 @@
     mc:Ignorable="d">
 
     <ListView
-        Padding="{x:Bind Padding, Mode=OneWay}" SelectionMode="None" CanReorderItems="True" AllowDrop="True"
+        x:Name="RootListView" Padding="{x:Bind Padding, Mode=OneWay}" SelectionMode="None" CanReorderItems="True" AllowDrop="True"
         ItemsSource="{x:Bind WavePlayingItemsSource}" ItemContainerStyle="{StaticResource StretchListViewItemStyle}">
         <ListView.Header>
             <Grid x:Name="ListViewHeader" Margin="0,0,0,8">
@@ -60,14 +60,24 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <RadioButton
                         MinWidth="20" IsChecked="{x:Bind IsPlaying, Mode=OneWay}"
                         Click="OnPlayingButtonClick" CommandParameter="{x:Bind}"/>
-                    <TextBlock Grid.Column="1" Text="{x:Bind WaveItem.Name, Mode=OneWay}" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="1" Text="{x:Bind WaveItem.Name, Mode=OneWay}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
                     <Button
-                        Grid.Column="1" Content="&#xE74D;" FontFamily="{ThemeResource SymbolThemeFontFamily}" FontSize="18"
-                        Padding="6,5" HorizontalAlignment="Right" Click="OnDeletionButtonClick" CommandParameter="{x:Bind}"/>
+                        Grid.Column="2" Padding="6,5" HorizontalAlignment="Right"
+                        Command="{x:Bind SwitchWaveSpeedCommand}" CommandParameter="{x:Bind}">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <TextBlock Text="&#xEB9D;" FontFamily="{ThemeResource SymbolThemeFontFamily}" FontSize="18"/>
+                            <TextBlock Text="{x:Bind Speed, Mode=OneWay}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button
+                        Grid.Column="3" Content="&#xE74D;" FontFamily="{ThemeResource SymbolThemeFontFamily}" FontSize="18"
+                        Padding="6,5" Click="OnDeletionButtonClick" CommandParameter="{x:Bind}"/>
                 </Grid>
             </DataTemplate>
         </ListView.ItemTemplate>
@@ -81,6 +91,99 @@
                         <Setter Target="ClearButton.(Grid.Row)" Value="3"/>
                         <Setter Target="ClearButton.HorizontalAlignment" Value="Left"/>
                         <Setter Target="ClearButton.Margin" Value="0,8,0,0"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+            <VisualStateGroup>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <ui:ControlSizeTrigger MinWidth="150" MaxWidth="245" TargetElement="{x:Bind ListViewHeader}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="RootListView.ItemTemplate">
+                            <Setter.Value>
+                                <DataTemplate x:DataType="vm:WavePlayingItem">
+                                    <Grid
+                                        Margin="0,0,0,4" Padding="12,8" ColumnSpacing="{StaticResource CommonControlSpacing}"
+                                        Background="{ThemeResource CardBackgroundFillColorDefault}"
+                                        BorderBrush="{ThemeResource CardStrokeColorDefault}" BorderThickness="1"
+                                        CornerRadius="{ThemeResource ControlCornerRadius}">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <RadioButton
+                                            MinWidth="20" IsChecked="{x:Bind IsPlaying, Mode=OneWay}"
+                                            Click="OnPlayingButtonClick" CommandParameter="{x:Bind}"/>
+                                        <TextBlock
+                                            Grid.Column="1" Grid.ColumnSpan="2" Text="{x:Bind WaveItem.Name, Mode=OneWay}"
+                                            TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                                        <Button
+                                            Grid.Row="1" Grid.Column="1" Padding="6,5"
+                                            Command="{x:Bind SwitchWaveSpeedCommand}" CommandParameter="{x:Bind}">
+                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                <TextBlock Text="&#xEB9D;" FontFamily="{ThemeResource SymbolThemeFontFamily}" FontSize="18"/>
+                                                <TextBlock Text="{x:Bind Speed, Mode=OneWay}" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Button>
+                                        <Button
+                                            Grid.Row="1" Grid.Column="2" Content="&#xE74D;" FontFamily="{ThemeResource SymbolThemeFontFamily}" FontSize="18"
+                                            Padding="6,5" Click="OnDeletionButtonClick" CommandParameter="{x:Bind}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <ui:ControlSizeTrigger MaxWidth="150" TargetElement="{x:Bind ListViewHeader}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="RootListView.ItemTemplate">
+                            <Setter.Value>
+                                <DataTemplate x:DataType="vm:WavePlayingItem">
+                                    <Grid
+                                        Margin="0,0,0,4" Padding="12,8" ColumnSpacing="{StaticResource CommonControlSpacing}"
+                                        Background="{ThemeResource CardBackgroundFillColorDefault}"
+                                        BorderBrush="{ThemeResource CardStrokeColorDefault}" BorderThickness="1"
+                                        CornerRadius="{ThemeResource ControlCornerRadius}">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto" MinHeight="{StaticResource CommonControlSpacing}"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <RadioButton
+                                            MinWidth="20" IsChecked="{x:Bind IsPlaying, Mode=OneWay}"
+                                            Click="OnPlayingButtonClick" CommandParameter="{x:Bind}"/>
+                                        <TextBlock
+                                            Grid.Column="1" Text="{x:Bind WaveItem.Name, Mode=OneWay}"
+                                            TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                                        <Button
+                                            Grid.Row="1" Grid.Column="1" Padding="6,5"
+                                            Command="{x:Bind SwitchWaveSpeedCommand}" CommandParameter="{x:Bind}">
+                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                <TextBlock Text="&#xEB9D;" FontFamily="{ThemeResource SymbolThemeFontFamily}" FontSize="18"/>
+                                                <TextBlock Text="{x:Bind Speed, Mode=OneWay}" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Button>
+                                        <Button
+                                            Grid.Row="3" Grid.Column="1" Content="&#xE74D;" FontFamily="{ThemeResource SymbolThemeFontFamily}" FontSize="18"
+                                            Padding="6,5" Click="OnDeletionButtonClick" CommandParameter="{x:Bind}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </Setter.Value>
+                        </Setter>
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>

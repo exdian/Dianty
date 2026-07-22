@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Dianty.Services;
 using DungeonToolkit.Coyote;
 using System;
@@ -73,6 +74,16 @@ public partial class WavePlayingItem : ObservableObject
 
     [ObservableProperty]
     public partial bool IsPlaying { get; private set; }
+
+    [RelayCommand]
+    private static void SwitchWaveSpeed(WavePlayingItem wavePlayingItem)
+    {
+        var speed = wavePlayingItem.Speed;
+        if (speed == 1 || speed == 2)
+            wavePlayingItem.Speed = speed << 1;
+        else
+            wavePlayingItem.Speed = 1;
+    }
 
     private void OnPlayingStatusChanged(object? sender, WavePlayer.PlayingStatusChangedEventArgs e)
     {

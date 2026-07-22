@@ -26,11 +26,16 @@ public partial class MainViewModel : ObservableObject
         var task = Task.Delay(300);
 
         if (ToDoList.Plan is not null)
+        {
             await Task.Run(ToDoList.Plan);
+            ToDoList.Plan = null;
+        }
 
         if (ToDoList.UiPlan is not null)
+        {
             _queueService.TryEnqueue(ToDoList.UiPlan.Invoke);
-
+            ToDoList.UiPlan = null;
+        }
         Debug.WriteLine($"后台加载耗时: {stopwatch.ElapsedMilliseconds} ms");
 
         // 至少加载 300 毫秒

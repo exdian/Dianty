@@ -3,6 +3,7 @@
     x:Class="Dianty.Views.Controls.GtaVcRuleCard"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:Dianty.ViewModels"
     xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -20,9 +21,14 @@
                 </toolkit:SettingsCard.HeaderIcon>
                 <ComboBox
                     PlaceholderText="选择处理模式"
-                    ItemsSource="{x:Bind ViewModel.StrengthModes}"
-                    SelectedItem="{x:Bind ViewModel.GtaVcStrengthMode, Mode=TwoWay}"
-                    SelectedValuePath="Key" DisplayMemberPath="Value" />
+                    ItemsSource="{x:Bind ViewModel.StrengthModeSelectionItems}"
+                    SelectedItem="{x:Bind ViewModel.GtaVcStrengthMode, Mode=TwoWay}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:StrengthModeSelectionItem">
+                            <TextBlock Text="{x:Bind Description}" VerticalAlignment="Center"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
             </toolkit:SettingsCard>
             <toolkit:SettingsCard>
                 <toolkit:SettingsCard.Header>

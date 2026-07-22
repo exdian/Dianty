@@ -98,9 +98,11 @@ public partial class WavesPageViewModel : ObservableObject
     private async Task ImportWaveAsync(WindowId windowId)
     {
         var fileOpenPicker = new FileOpenPicker(windowId);
-        fileOpenPicker.FileTypeChoices["波形文件 (*.pulse)"] = [".pulse"];
-        fileOpenPicker.FileTypeChoices["波形文件"] = [".pulse", ".txt", ".bin",];
-        fileOpenPicker.FileTypeChoices["所有文件 (*.*)"] = ["*"];
+#pragma warning disable IDE0028 // 此处使用集合表达式会影响 AOT 编译
+        fileOpenPicker.FileTypeChoices["波形文件 (*.pulse)"] = new List<string> { ".pulse" };
+        fileOpenPicker.FileTypeChoices["波形文件"] = new List<string> { ".pulse", ".txt", ".bin" };
+        fileOpenPicker.FileTypeChoices["所有文件 (*.*)"] = new List<string> { "*" };
+#pragma warning restore IDE0028
 
         var files = await fileOpenPicker.PickMultipleFilesAsync();
         if (files.Count > 0)
@@ -217,6 +219,7 @@ public partial class WavesPageViewModel : ObservableObject
         {
             item.IsEnabledA = false;
         }
+        _coyoteManager.ChannelA.NextWave();
     }
 
     [RelayCommand]
@@ -230,6 +233,7 @@ public partial class WavesPageViewModel : ObservableObject
         {
             item.IsEnabledB = false;
         }
+        _coyoteManager.ChannelB.NextWave();
     }
 
     private void OnWaveItemChannelEnabledChanged(WaveItem sender, WaveItem.ChannelEnabledChangedEventArgs e)

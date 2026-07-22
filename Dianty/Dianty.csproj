@@ -179,7 +179,8 @@
   <PropertyGroup>
     <WindowsPackageType>None</WindowsPackageType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <AssemblyVersion>1.10.10.100</AssemblyVersion>
+    <AssemblyVersion>1.11.10.101</AssemblyVersion>
     <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
+    <PublishAot>True</PublishAot>
   </PropertyGroup>
 </Project>

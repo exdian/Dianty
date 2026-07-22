@@ -14,7 +14,7 @@
             <RepositionThemeTransition />
         </StackPanel.ChildrenTransitions>
         <toolkit:SettingsCard Header="设备名称" HeaderIcon="Tag">
-            <TextBox Text="{x:Bind ViewModel.Name, Mode=TwoWay}"/>
+            <TextBox Text="{x:Bind ViewModel.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         </toolkit:SettingsCard>
         <toolkit:SettingsCard
             Header="连接状态" HeaderIcon="Link"

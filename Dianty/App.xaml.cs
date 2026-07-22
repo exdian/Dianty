@@ -38,7 +38,7 @@ public partial class App : Application
         var window = new MainWindow();
         window.AppWindow.Closing += OnAppWindowClosing;
         ToDoList.Plan += RegisterService;
-        ToDoList.UiPlan += MergedDictionaries;
+        ToDoList.UiPlan += MergeDictionaries;
         ToDoList.UiPlan += SetWindowIcon;
         TopPageLocator.Init(GetTopPage);
         window.ViewModel = new MainViewModel(window);
@@ -78,16 +78,18 @@ public partial class App : Application
         var gamesPageViewModel = new GamesPageViewModel(gameManager, queueService);
         ServiceLocator.Register(gamesPageViewModel);
 
+        ServiceLocator.RegisterViewModel(typeof(HomePage), new HomePageViewModel(coyoteItems, gameManager, queueService));
         ServiceLocator.RegisterViewModel(typeof(DevicesPage), new DevicesPage.RequiredParameter(
             new DevicesPageViewModel(coyoteItems, queueService, coyoteBleDetector), queueService));
-        ServiceLocator.RegisterViewModel(typeof(WavesPage), new WavesPage.RequiredParameter(
-            new WavesPageViewModel(coyoteManager, queueService, windowService), queueService));
+        ServiceLocator.RegisterViewModel(typeof(WavesPage), new WavesPageViewModel(coyoteManager, queueService, windowService));
         ServiceLocator.RegisterViewModel(typeof(GamesPage), new GamesPage.RequiredParameter(
             gamesPageViewModel, queueService));
+        ServiceLocator.RegisterViewModel(typeof(SafetyPage), new SafetyPageViewModel(coyoteItems));
         ServiceLocator.RegisterViewModel(typeof(DebugPage), new DebugPageViewModel(queueService));
+        ServiceLocator.RegisterViewModel(typeof(SettingsPage), new SettingsPageViewModel(queueService, windowService));
     }
 
-    private void MergedDictionaries()
+    private void MergeDictionaries()
     {
         var newDictionary = new ResourceDictionary();
         LoadComponent(newDictionary, new Uri("ms-appx:///Resources/AppResourceDictionary.xaml", UriKind.Absolute));
@@ -99,7 +101,7 @@ public partial class App : Application
         if (_window is null)
             return;
 
-        var file = "Assets\\AppIcon.ico";
+        var file = "Assets/AppIcon.ico";
         try
         {
             var fileInfo = new FileInfo(file);

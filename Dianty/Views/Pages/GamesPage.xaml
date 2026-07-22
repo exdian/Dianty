@@ -3,6 +3,7 @@
     x:Class="Dianty.Views.Pages.GamesPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:Dianty.ViewModels"
     xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -62,9 +63,14 @@
                     </toolkit:SettingsExpander.HeaderIcon>
                     <ComboBox
                         PlaceholderText="默认自动"
-                        ItemsSource="{x:Bind ViewModel.IsAutoStartStopModes}"
-                        SelectedItem="{x:Bind ViewModel.IsAutoStartStopMode, Mode=TwoWay}"
-                        SelectedValuePath="Key" DisplayMemberPath="Value" />
+                        ItemsSource="{x:Bind ViewModel.AutoStartStopModeSelectionItems}"
+                        SelectedItem="{x:Bind ViewModel.IsAutoStartStopMode, Mode=TwoWay}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="vm:AutoStartStopModeSelectionItem">
+                                <TextBlock Text="{x:Bind Description}" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
                     <toolkit:SettingsExpander.Items>
                         <toolkit:SettingsCard
                             Header="手动开关"
@@ -84,9 +90,14 @@
                     </toolkit:SettingsCard.HeaderIcon>
                     <ComboBox
                         PlaceholderText="选择处理模式"
-                        ItemsSource="{x:Bind ViewModel.StrengthModes}"
-                        SelectedItem="{x:Bind ViewModel.GamesStrengthMode, Mode=TwoWay}"
-                        SelectedValuePath="Key" DisplayMemberPath="Value" />
+                        ItemsSource="{x:Bind ViewModel.StrengthModeSelectionItems}"
+                        SelectedItem="{x:Bind ViewModel.GamesStrengthMode, Mode=TwoWay}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="vm:StrengthModeSelectionItem">
+                                <TextBlock Text="{x:Bind Description}" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
                 </toolkit:SettingsCard>
                 <TextBlock Text="规则" Style="{StaticResource BodyStrongTextBlockStyle}" Margin="1,14,0,4"/>
                 <toolkit:SettingsExpander Header="敬请期待">

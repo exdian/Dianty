@@ -1,5 +1,4 @@
 using CommunityToolkit.Mvvm.Messaging;
-using Dianty.Services;
 using Dianty.Utils.Messages;
 using Dianty.ViewModels;
 using Microsoft.UI.Xaml;
@@ -17,17 +16,14 @@ public sealed partial class WavesPage : Page
         InitializeComponent();
     }
 
-    private IQueueService? _queueService;
-
     private WavesPageViewModel? ViewModel { get; set; }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
-        if (e.Parameter is RequiredParameter parameter)
+        if (e.Parameter is WavesPageViewModel viewModel)
         {
-            ViewModel = parameter.ViewModel;
-            _queueService = parameter.QueueService;
+            ViewModel = viewModel;
         }
     }
 
@@ -51,7 +47,7 @@ public sealed partial class WavesPage : Page
 
     private void OnWaveItemCardClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not FrameworkElement element || _queueService is null)
+        if (sender is not FrameworkElement element)
             return;
 
         string[] traces = [_pageHeader.Text];
@@ -65,7 +61,7 @@ public sealed partial class WavesPage : Page
         };
         if (element.DataContext is WaveItem waveItem)
         {
-            var requiredParameter = new WaveSettingsPage.RequiredParameter(waveItem, traces, _queueService);
+            var requiredParameter = new WaveSettingsPage.RequiredParameter(waveItem, traces);
             WeakReferenceMessenger.Default.Send(new NavigationRequest(typeof(WaveSettingsPage), requiredParameter, options));
         }
     }
@@ -98,6 +94,4 @@ public sealed partial class WavesPage : Page
                 command.Execute(commandParameter);
         }
     }
-
-    public record class RequiredParameter(WavesPageViewModel ViewModel, IQueueService QueueService);
 }

@@ -26,15 +26,15 @@
                     <RepositionThemeTransition />
                 </StackPanel.ChildrenTransitions>
                 <toolkit:SettingsCard Header="名称" HeaderIcon="Tag">
-                    <TextBox Text="{x:Bind ViewModel.Name, Mode=TwoWay}"/>
+                    <TextBox Text="{x:Bind ViewModel.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 </toolkit:SettingsCard>
                 <toolkit:SettingsCard Header="备注">
                     <toolkit:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE82F;"/>
                     </toolkit:SettingsCard.HeaderIcon>
-                    <TextBox Text="{x:Bind ViewModel.Description, Mode=TwoWay}"/>
+                    <TextBox Text="{x:Bind ViewModel.Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 </toolkit:SettingsCard>
-                <toolkit:SettingsExpander Header="将波形加入到播放队列" HeaderIcon="RepeatAll">
+                <toolkit:SettingsExpander Header="将波形加入到播放队列" HeaderIcon="RepeatAll" TabIndex="1">
                     <toolkit:SettingsExpander.Items>
                         <toolkit:SettingsCard Header="A通道播放队列">
                             <toolkit:SettingsCard.HeaderIcon>

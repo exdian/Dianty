@@ -1,8 +1,6 @@
 using CommunityToolkit.Mvvm.Messaging;
-using Dianty.Services;
 using Dianty.Utils.Messages;
 using Dianty.ViewModels;
-using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
@@ -17,8 +15,6 @@ public sealed partial class WaveSettingsPage : Page
         InitializeComponent();
     }
 
-    private IQueueService? _queueService;
-
     private WaveItem? ViewModel { get; set; }
 
     private ObservableCollection<string>? Paths { get; set; }
@@ -30,7 +26,6 @@ public sealed partial class WaveSettingsPage : Page
         {
             ViewModel = parameter.ViewModel;
             Paths = [.. parameter.Paths, "详细信息"];
-            _queueService = parameter.QueueService;
         }
     }
 
@@ -53,17 +48,8 @@ public sealed partial class WaveSettingsPage : Page
             Paths.RemoveAt(i);
         }
 
-        // 文本框输入状态下点击导航，文本框绑定的属性不能及时更新，因此需要将导航放到低优先级队列
-        if (_queueService is null)
-        {
-            WeakReferenceMessenger.Default.Send(navigationRequest);
-        }
-        else
-        {
-            _queueService.TryEnqueue(DispatcherQueuePriority.Low,
-                () => WeakReferenceMessenger.Default.Send(navigationRequest));
-        }
+        WeakReferenceMessenger.Default.Send(navigationRequest);
     }
 
-    public record class RequiredParameter(WaveItem ViewModel, string[] Paths, IQueueService QueueService);
+    public record class RequiredParameter(WaveItem ViewModel, string[] Paths);
 }
