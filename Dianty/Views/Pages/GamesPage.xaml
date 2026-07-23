@@ -106,7 +106,7 @@
                     </toolkit:SettingsExpander.HeaderIcon>
                     <toolkit:SettingsExpander.Items>
                         <toolkit:SettingsCard Header="查看更新" IsClickEnabled="True">
-                            <HyperlinkButton Content="https://github.com/exdian/Dianty" NavigateUri="https://github.com/exdian/Dianty" />
+                            <HyperlinkButton Content="https://github.com/exdian/Dianty/releases" NavigateUri="https://github.com/exdian/Dianty/releases" />
                             <toolkit:SettingsCard.ActionIcon>
                                 <FontIcon Glyph="&#xE8A7;" />
                             </toolkit:SettingsCard.ActionIcon>
