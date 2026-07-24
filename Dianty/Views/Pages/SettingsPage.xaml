@@ -48,6 +48,7 @@
                     <toolkit:SettingsExpander.HeaderIcon>
                         <BitmapIcon ShowAsMonochrome="False" UriSource="Assets/AppIcon-48.png"/>
                     </toolkit:SettingsExpander.HeaderIcon>
+                    <TextBlock Text="{x:Bind ViewModel.Version}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                     <toolkit:SettingsExpander.Items>
                         <toolkit:SettingsCard Header="查看源代码" IsClickEnabled="True">
                             <HyperlinkButton Content="https://github.com/exdian/Dianty" NavigateUri="https://github.com/exdian/Dianty" />

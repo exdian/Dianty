@@ -37,6 +37,7 @@ public partial class App : Application
     {
         var window = new MainWindow();
         window.AppWindow.Closing += OnAppWindowClosing;
+        ToDoList.Plan += VersionHelper.Init;
         ToDoList.Plan += RegisterService;
         ToDoList.UiPlan += MergeDictionaries;
         ToDoList.UiPlan += SetWindowIcon;
