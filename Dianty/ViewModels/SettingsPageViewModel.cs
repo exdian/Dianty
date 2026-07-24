@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Dianty.Services;
+using Dianty.Utils;
 using Microsoft.UI.Xaml;
 using System.Linq;
 
@@ -12,6 +13,7 @@ public partial class SettingsPageViewModel : ObservableObject
         _queueService = queueService;
         _windowService = windowService;
 
+        Version = VersionHelper.Version ?? string.Empty;
         AppThemeSelectionItems =
             [new AppThemeSelectionItem(ElementTheme.Light, "浅色"),
             new AppThemeSelectionItem(ElementTheme.Dark, "深色"),
@@ -22,6 +24,8 @@ public partial class SettingsPageViewModel : ObservableObject
 
     private readonly IQueueService _queueService;
     private readonly IWindowService _windowService;
+
+    public string Version { get; }
 
     public AppThemeSelectionItem[] AppThemeSelectionItems { get; }
 

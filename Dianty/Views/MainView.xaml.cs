@@ -79,14 +79,9 @@ public sealed partial class MainView : UserControl
         _queueService.TryEnqueue(DispatcherQueuePriority.Low, () =>
         {
             if (_navView.MenuItems.Contains(_debugMenuItem))
-            {
                 _navView.MenuItems.Remove(_debugMenuItem);
-                NavView_BackRequested(null!, null!);
-            }
             else
-            {
                 _navView.MenuItems.Add(_debugMenuItem);
-            }
         });
     }
 

@@ -48,6 +48,7 @@
                     <toolkit:SettingsExpander.HeaderIcon>
                         <BitmapIcon ShowAsMonochrome="False" UriSource="Assets/AppIcon-48.png"/>
                     </toolkit:SettingsExpander.HeaderIcon>
+                    <TextBlock Text="{x:Bind ViewModel.Version}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                     <toolkit:SettingsExpander.Items>
                         <toolkit:SettingsCard Header="查看源代码" IsClickEnabled="True">
                             <HyperlinkButton Content="https://github.com/exdian/Dianty" NavigateUri="https://github.com/exdian/Dianty" />
@@ -59,7 +60,8 @@
                             <StackPanel Margin="-12,0,0,0">
                                 <HyperlinkButton Content="Windows App SDK, Windows App Runtime" NavigateUri="https://aka.ms/windowsappsdk" />
                                 <HyperlinkButton Content="WinUI 3" NavigateUri="https://aka.ms/winui" />
-                                <HyperlinkButton Content="Windows Community Toolkit" NavigateUri="https://aka.ms/toolkit/windows" />
+                                <HyperlinkButton Content="Windows Community Toolkit (Windows)" NavigateUri="https://github.com/CommunityToolkit/Windows" />
+                                <HyperlinkButton Content="Windows Community Toolkit (.NET)" NavigateUri="https://github.com/CommunityToolkit/dotnet" />
                                 <HyperlinkButton Content="SimpleMem" NavigateUri="https://github.com/hburn7/SimpleMem" />
                                 <HyperlinkButton Content="QRCoder" NavigateUri="https://github.com/Shane32/QRCoder" />
                             </StackPanel>

@@ -22,7 +22,6 @@ public partial class CoyoteItem : ObservableObject, IDisposable
         IsEnabled = coyote.IsEnabled;
         UpdateConnectionMessage(coyote.IsConnected);
         IsBleConnection = true;
-        coyote.ConnectionStatusChanged += OnConnectionStatusChanged;
     }
 
     public CoyoteItem(CoyoteWS coyote, IQueueService queueService, ICoyoteListService coyoteListService)
@@ -33,7 +32,6 @@ public partial class CoyoteItem : ObservableObject, IDisposable
         Name = coyote.DeviceName;
         IsEnabled = coyote.IsEnabled;
         UpdateConnectionMessage(coyote.IsBound);
-        coyote.ConnectionStatusChanged += OnConnectionStatusChanged;
     }
 
     protected readonly CoyoteBLE? _coyoteBLE;
@@ -79,14 +77,9 @@ public partial class CoyoteItem : ObservableObject, IDisposable
         }
     }
 
-    protected virtual void UpdateConnectionMessage(bool isConnected)
+    protected void UpdateConnectionMessage(bool isConnected)
     {
         ConnectionMessage = isConnected ? "已连接" : "已断开连接";
-    }
-
-    private void OnConnectionStatusChanged(object? sender, ConnectionStatusChangedEventArgs e)
-    {
-        _queueService.TryEnqueue(() => UpdateConnectionMessage(e.IsConnected));
     }
 
     partial void OnNameChanged(string value)
@@ -220,7 +213,12 @@ public partial class CoyoteBleItem : CoyoteItem
 
     private void OnConnectionStatusChanged(object? sender, ConnectionStatusChangedEventArgs e)
     {
-        _queueService.TryEnqueue(() => IsConnectingOrConnected = e.IsConnected);
+        _queueService.TryEnqueue(() =>
+        {
+            IsConnectingOrConnected = e.IsConnected;
+            if (!e.IsConnected)
+                UpdateConnectionMessage(false);
+        });
     }
 
     private void OnStrengthChanged(object? sender, CoyoteBLE.StrengthChangedEventArgs e)
@@ -360,12 +358,6 @@ public partial class CoyoteWsItem : CoyoteItem
     [ObservableProperty]
     public partial bool IsConnectingOrConnected { get; set; }
 
-    protected override void UpdateConnectionMessage(bool isConnected)
-    {
-        if (!isConnected)
-            ConnectionMessage = "已断开连接";
-    }
-
     private async void Reconnecting()
     {
         Debug.Assert(_coyoteWS is not null);
@@ -470,6 +462,8 @@ public partial class CoyoteWsItem : CoyoteItem
     {
         if (e.IsBound)
             _bindingTcs?.TrySetResult();
+        else
+            _queueService.TryEnqueue(() => UpdateConnectionMessage(false));
     }
 
     private void OnStrengthChanged(object? sender, CoyoteWS.StrengthChangedEventArgs e)
