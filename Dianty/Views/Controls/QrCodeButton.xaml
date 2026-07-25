@@ -13,11 +13,9 @@
             Content="&#xED14;" FontFamily="{ThemeResource SymbolThemeFontFamily}" FontSize="20" Padding="4.67"/>
         <TeachingTip x:Name="_qrCodeTip" Target="{x:Bind DisplayButton}" PreferredPlacement="Bottom" CloseButtonContent="隐藏">
             <TeachingTip.Content>
-                <Border Background="Black">
+                <Border Background="White" Padding="24">
                     <Viewbox>
-                        <Path
-                            Data="{x:Bind QrCodeGeometry, Mode=OneWay}"
-                            Fill="White"/>
+                        <Path Data="{x:Bind QrCodeGeometry, Mode=OneWay}" Fill="Black"/>
                     </Viewbox>
                 </Border>
             </TeachingTip.Content>

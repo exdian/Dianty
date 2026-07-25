@@ -13,6 +13,6 @@ internal class CoyoteHelper
             "https://www.dungeon-lab.com/app-download.php#DGLAB-SOCKET#" +
             $"wss://ws.dungeon-lab.cn/{clientId}", QRCodeGenerator.ECCLevel.L);
         using SvgQRCode svgQrCode = new(qrCodeData);
-        return svgQrCode.GetSvgPath(needMargin: true);
+        return svgQrCode.GetSvgPath(needMargin: false);
     }
 }
