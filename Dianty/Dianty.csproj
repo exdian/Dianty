@@ -179,7 +179,7 @@
   <PropertyGroup>
     <WindowsPackageType>None</WindowsPackageType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <AssemblyVersion>1.11.11.102</AssemblyVersion>
+    <AssemblyVersion>1.11.12.103</AssemblyVersion>
     <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
     <PublishAot>True</PublishAot>
   </PropertyGroup>
