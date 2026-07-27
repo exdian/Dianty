@@ -1,0 +1,14 @@
+﻿namespace DungeonToolkit;
+
+public enum LightColor 
+{
+    None,
+    Yellow,
+    Red,
+    Purple,
+    Blue,
+    Cyan,
+    Green,
+    White,
+}
+
