@@ -77,12 +77,12 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
         return dialog;
     }
 
-    public void TryEnqueue(DispatcherQueueHandler callback)
+    void IQueueService.TryEnqueue(DispatcherQueueHandler callback)
     {
         DispatcherQueue?.TryEnqueue(callback);
     }
 
-    public void TryEnqueue(DispatcherQueuePriority priority, DispatcherQueueHandler callback)
+    void IQueueService.TryEnqueue(DispatcherQueuePriority priority, DispatcherQueueHandler callback)
     {
         DispatcherQueue?.TryEnqueue(priority, callback);
     }
