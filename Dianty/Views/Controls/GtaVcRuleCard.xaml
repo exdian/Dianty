@@ -13,7 +13,17 @@
         <toolkit:SettingsExpander.HeaderIcon>
             <FontIcon Glyph="&#xE804;"/>
         </toolkit:SettingsExpander.HeaderIcon>
-        <ToggleSwitch IsOn="{x:Bind ViewModel.GtaVcEnabled, Mode=TwoWay}"/>
+        <StackPanel Orientation="Horizontal" Spacing="{StaticResource CommonControlSpacing}">
+            <ProgressRing IsActive="{x:Bind ViewModel.IsAccessing, Mode=OneWay}"/>
+            <ContentControl Content="{x:Bind ViewModel.StateMessage, Mode=OneWay}" VerticalAlignment="Center">
+                <ContentControl.ContentTransitions>
+                    <PaneThemeTransition Edge="Bottom"/>
+                </ContentControl.ContentTransitions>
+            </ContentControl>
+            <ToggleSwitch
+                IsOn="{x:Bind ViewModel.IsEnabled, Mode=TwoWay}"
+                OnContent="{x:Null}" OffContent="{x:Null}" Margin="-8,0,0,0"/>
+        </StackPanel>
         <toolkit:SettingsExpander.Items>
             <toolkit:SettingsCard Header="此玩法的规则强度模式" Description="多条规则同时生效时">
                 <toolkit:SettingsCard.HeaderIcon>
@@ -22,7 +32,7 @@
                 <ComboBox
                     PlaceholderText="选择处理模式"
                     ItemsSource="{x:Bind ViewModel.StrengthModeSelectionItems}"
-                    SelectedItem="{x:Bind ViewModel.GtaVcStrengthMode, Mode=TwoWay}">
+                    SelectedItem="{x:Bind ViewModel.StrengthMode, Mode=TwoWay}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate x:DataType="vm:StrengthModeSelectionItem">
                             <TextBlock Text="{x:Bind Description}" VerticalAlignment="Center"/>
@@ -37,26 +47,26 @@
                             <TextBlock Text="每累计受到伤害" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
                             <NumberBox
                                 SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
-                                Value="{x:Bind ViewModel.GtaVcDamageRuleThreshold, Mode=TwoWay}"
+                                Value="{x:Bind ViewModel.DamageRuleThreshold, Mode=TwoWay}"
                                 SmallChange="1" LargeChange="20" Minimum="-200" Maximum="200"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="惩罚强度" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
                             <NumberBox
                                 SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
-                                Value="{x:Bind ViewModel.GtaVcDamageRuleStrength, Mode=TwoWay}"
+                                Value="{x:Bind ViewModel.DamageRuleStrength, Mode=TwoWay}"
                                 SmallChange="1" LargeChange="20" Minimum="-200" Maximum="200"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="持续时间（秒）" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
                             <NumberBox
                                 SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
-                                Value="{x:Bind ViewModel.GtaVcDamageRuleDuration, Mode=TwoWay}"
+                                Value="{x:Bind ViewModel.DamageRuleDuration, Mode=TwoWay}"
                                 SmallChange="1" LargeChange="10" Minimum="0" Maximum="200"/>
                         </StackPanel>
                     </StackPanel>
                 </toolkit:SettingsCard.Header>
-                <ToggleSwitch IsOn="{x:Bind ViewModel.GtaVcDamageRuleEnabled, Mode=TwoWay}"/>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.DamageRuleEnabled, Mode=TwoWay}"/>
             </toolkit:SettingsCard>
             <toolkit:SettingsCard>
                 <toolkit:SettingsCard.Header>
@@ -66,19 +76,19 @@
                             <TextBlock Text="惩罚强度" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
                             <NumberBox
                                 SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
-                                Value="{x:Bind ViewModel.GtaVcBustedRuleStrength, Mode=TwoWay}"
+                                Value="{x:Bind ViewModel.BustedRuleStrength, Mode=TwoWay}"
                                 SmallChange="1" LargeChange="20" Minimum="-200" Maximum="200"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="持续时间（秒）" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
                             <NumberBox
                                 SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
-                                Value="{x:Bind ViewModel.GtaVcBustedRuleDuration, Mode=TwoWay}"
+                                Value="{x:Bind ViewModel.BustedRuleDuration, Mode=TwoWay}"
                                 SmallChange="1" LargeChange="10" Minimum="0" Maximum="200"/>
                         </StackPanel>
                     </StackPanel>
                 </toolkit:SettingsCard.Header>
-                <ToggleSwitch IsOn="{x:Bind ViewModel.GtaVcBustedRuleEnabled, Mode=TwoWay}"/>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.BustedRuleEnabled, Mode=TwoWay}"/>
             </toolkit:SettingsCard>
             <toolkit:SettingsCard>
                 <toolkit:SettingsCard.Header>
@@ -88,19 +98,19 @@
                             <TextBlock Text="惩罚强度" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
                             <NumberBox
                                 SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
-                                Value="{x:Bind ViewModel.GtaVcWastedRuleStrength, Mode=TwoWay}"
+                                Value="{x:Bind ViewModel.WastedRuleStrength, Mode=TwoWay}"
                                 SmallChange="1" LargeChange="20" Minimum="-200" Maximum="200"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="持续时间（秒）" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
                             <NumberBox
                                 SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
-                                Value="{x:Bind ViewModel.GtaVcWastedRuleDuration, Mode=TwoWay}"
+                                Value="{x:Bind ViewModel.WastedRuleDuration, Mode=TwoWay}"
                                 SmallChange="1" LargeChange="10" Minimum="0" Maximum="200"/>
                         </StackPanel>
                     </StackPanel>
                 </toolkit:SettingsCard.Header>
-                <ToggleSwitch IsOn="{x:Bind ViewModel.GtaVcWastedRuleEnabled, Mode=TwoWay}"/>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.WastedRuleEnabled, Mode=TwoWay}"/>
             </toolkit:SettingsCard>
             <toolkit:SettingsCard>
                 <toolkit:SettingsCard.Header>
@@ -110,19 +120,19 @@
                             <TextBlock Text="惩罚强度" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
                             <NumberBox
                                 SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
-                                Value="{x:Bind ViewModel.GtaVcMiTangRuleStrength, Mode=TwoWay}"
+                                Value="{x:Bind ViewModel.MiTangRuleStrength, Mode=TwoWay}"
                                 SmallChange="1" LargeChange="20" Minimum="-200" Maximum="200"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="持续时间（秒）" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
                             <NumberBox
                                 SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
-                                Value="{x:Bind ViewModel.GtaVcMiTangRuleDuration, Mode=TwoWay}"
+                                Value="{x:Bind ViewModel.MiTangRuleDuration, Mode=TwoWay}"
                                 SmallChange="1" LargeChange="10" Minimum="0" Maximum="200"/>
                         </StackPanel>
                     </StackPanel>
                 </toolkit:SettingsCard.Header>
-                <ToggleSwitch IsOn="{x:Bind ViewModel.GtaVcMiTangRuleEnabled, Mode=TwoWay}"/>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.MiTangRuleEnabled, Mode=TwoWay}"/>
             </toolkit:SettingsCard>
             <toolkit:SettingsCard>
                 <toolkit:SettingsCard.Header>
@@ -132,19 +142,19 @@
                             <TextBlock Text="惩罚强度" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
                             <NumberBox
                                 SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
-                                Value="{x:Bind ViewModel.GtaVcWantedLevelRuleStrength, Mode=TwoWay}"
+                                Value="{x:Bind ViewModel.WantedLevelRuleStrength, Mode=TwoWay}"
                                 SmallChange="1" LargeChange="20" Minimum="-200" Maximum="200"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="持续时间（秒）" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
                             <NumberBox
                                 SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
-                                Value="{x:Bind ViewModel.GtaVcWantedLevelRuleDuration, Mode=TwoWay}"
+                                Value="{x:Bind ViewModel.WantedLevelRuleDuration, Mode=TwoWay}"
                                 SmallChange="1" LargeChange="10" Minimum="0" Maximum="200"/>
                         </StackPanel>
                     </StackPanel>
                 </toolkit:SettingsCard.Header>
-                <ToggleSwitch IsOn="{x:Bind ViewModel.GtaVcWantedLevelRuleEnabled, Mode=TwoWay}"/>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.WantedLevelRuleEnabled, Mode=TwoWay}"/>
             </toolkit:SettingsCard>
             <toolkit:SettingsCard>
                 <toolkit:SettingsCard.Header>
@@ -154,19 +164,19 @@
                             <TextBlock Text="惩罚强度" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
                             <NumberBox
                                 SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
-                                Value="{x:Bind ViewModel.GtaVcFellOffBikeRuleStrength, Mode=TwoWay}"
+                                Value="{x:Bind ViewModel.FellOffBikeRuleStrength, Mode=TwoWay}"
                                 SmallChange="1" LargeChange="20" Minimum="-200" Maximum="200"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="持续时间（秒）" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
                             <NumberBox
                                 SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
-                                Value="{x:Bind ViewModel.GtaVcFellOffBikeRuleDuration, Mode=TwoWay}"
+                                Value="{x:Bind ViewModel.FellOffBikeRuleDuration, Mode=TwoWay}"
                                 SmallChange="1" LargeChange="10" Minimum="0" Maximum="200"/>
                         </StackPanel>
                     </StackPanel>
                 </toolkit:SettingsCard.Header>
-                <ToggleSwitch IsOn="{x:Bind ViewModel.GtaVcFellOffBikeRuleEnabled, Mode=TwoWay}"/>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.FellOffBikeRuleEnabled, Mode=TwoWay}"/>
             </toolkit:SettingsCard>
         </toolkit:SettingsExpander.Items>
     </toolkit:SettingsExpander>

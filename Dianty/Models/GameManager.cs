@@ -17,10 +17,26 @@ public partial class GameManager(CoyoteManager coyoteManager) : AutomaticStrengt
         init
         {
             field = value;
-            field.OutputStrengthChanged += GameRule_OutputStrengthChanged;
+            field.IsEnabledChanged += OnGameRuleIsEnabledChanged;
+            field.OutputStrengthChanged += OnGameRuleOutputStrengthChanged;
             _gameRules.Add(field);
         }
     }
+
+    public int EnabledGameCount
+    {
+        get;
+        private set
+        {
+            if (field != value)
+            {
+                field = value;
+                OnEnabledGameCountChanged(value);
+            }
+        }
+    }
+
+    public event EventHandler<EnabledGameCountChangedEventArgs>? EnabledGameCountChanged;
 
     public void Dispose()
     {
@@ -39,7 +55,8 @@ public partial class GameManager(CoyoteManager coyoteManager) : AutomaticStrengt
             for (int i = 0; i < _gameRules.Count; i++)
             {
                 var rule = _gameRules[i];
-                rule.OutputStrengthChanged -= GameRule_OutputStrengthChanged;
+                rule.IsEnabledChanged -= OnGameRuleIsEnabledChanged;
+                rule.OutputStrengthChanged -= OnGameRuleOutputStrengthChanged;
                 if (rule is IDisposable gameRule)
                     gameRule.Dispose();
             }
@@ -47,7 +64,15 @@ public partial class GameManager(CoyoteManager coyoteManager) : AutomaticStrengt
         }
     }
 
-    private void GameRule_OutputStrengthChanged(object? sender, EventArgs e)
+    private void OnGameRuleIsEnabledChanged(object? sender, GameRule.IsEnabledChangedEventArgs e)
+    {
+        if (e.IsEnabled)
+            EnabledGameCount++;
+        else
+            EnabledGameCount--;
+    }
+
+    private void OnGameRuleOutputStrengthChanged(object? sender, EventArgs e)
     {
         ComputeOutputStrength();
     }
@@ -95,12 +120,48 @@ public partial class GameManager(CoyoteManager coyoteManager) : AutomaticStrengt
         base.OnOutputStrengthChanged(strength);
     }
 
+    private void OnEnabledGameCountChanged(int count)
+    {
+        var args = new EnabledGameCountChangedEventArgs(count);
+        EnabledGameCountChanged?.Invoke(this, args);
+    }
+
     public abstract class GameRule : AutomaticStrength
     {
         public string Name { get; set; } = string.Empty;
 
         public string Description { get; set; } = string.Empty;
 
-        public virtual bool IsEnabled { get; set; }
+        public bool IsEnabled
+        {
+            get;
+            set
+            {
+                if (field != value)
+                {
+                    field = value;
+                    OnIsEnabledChanged(value);
+                    ComputeOutputStrength();
+                }
+            }
+        }
+
+        public event EventHandler<IsEnabledChangedEventArgs>? IsEnabledChanged;
+
+        protected virtual void OnIsEnabledChanged(bool isEnabled)
+        {
+            var args = new IsEnabledChangedEventArgs(isEnabled);
+            IsEnabledChanged?.Invoke(this, args);
+        }
+
+        public class IsEnabledChangedEventArgs(bool isEnabled) : EventArgs
+        {
+            public bool IsEnabled { get; } = isEnabled;
+        }
+    }
+
+    public class EnabledGameCountChangedEventArgs(int count) : EventArgs
+    {
+        public int Count { get; } = count;
     }
 }
