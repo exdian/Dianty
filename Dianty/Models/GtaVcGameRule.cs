@@ -15,15 +15,15 @@ public partial class GtaVcGameRule : GameRule, IDisposable
 {
     public GtaVcGameRule(IMemoryService memoryService)
     {
-        _monitor = new GtaVcMonitor(memoryService);
+        Monitor = new GtaVcMonitor(memoryService);
         _stopwatch = Stopwatch.StartNew();
         _timer = new Timer(RecoverStrength, null, Timeout.Infinite, Timeout.Infinite);
 
-        _monitor.PlayerTookDamage += Monitor_PlayerTookDamage;
-        _monitor.PlayerBusted += Monitor_PlayerBusted;
-        _monitor.PlayerWasted += Monitor_PlayerWasted;
-        _monitor.PlayerWantedLevelChanged += Monitor_PlayerWantedLevelChanged;
-        _monitor.PlayerFellOffBike += Monitor_PlayerFellOffBike;
+        Monitor.PlayerTookDamage += Monitor_PlayerTookDamage;
+        Monitor.PlayerBusted += Monitor_PlayerBusted;
+        Monitor.PlayerWasted += Monitor_PlayerWasted;
+        Monitor.PlayerWantedLevelChanged += Monitor_PlayerWantedLevelChanged;
+        Monitor.PlayerFellOffBike += Monitor_PlayerFellOffBike;
 
         _dueTime = new Dictionary<Rule, long>
         {
@@ -36,7 +36,6 @@ public partial class GtaVcGameRule : GameRule, IDisposable
         };
     }
 
-    private readonly GtaVcMonitor _monitor;
     private readonly Stopwatch _stopwatch;
     private readonly Timer _timer;
     private readonly Dictionary<Rule, long> _dueTime;
@@ -49,19 +48,7 @@ public partial class GtaVcGameRule : GameRule, IDisposable
     private long _fellOffBikeRuleStartTick;
     private bool _isDisposed;
 
-    public override bool IsEnabled
-    {
-        get;
-        set
-        {
-            if (value)
-                _monitor.Start();
-            else
-                _monitor.Stop();
-            field = value;
-            ComputeOutputStrength();
-        }
-    }
+    public GtaVcMonitor Monitor { get; }
 
     public bool DamageRuleEnabled
     {
@@ -358,16 +345,16 @@ public partial class GtaVcGameRule : GameRule, IDisposable
 
         if (disposing)
         {
-            _monitor.Stop();
-            _monitor.Dispose();
+            Monitor.Stop();
+            Monitor.Dispose();
             _stopwatch.Stop();
             _timer.Dispose();
 
-            _monitor.PlayerTookDamage -= Monitor_PlayerTookDamage;
-            _monitor.PlayerBusted -= Monitor_PlayerBusted;
-            _monitor.PlayerWasted -= Monitor_PlayerWasted;
-            _monitor.PlayerWantedLevelChanged -= Monitor_PlayerWantedLevelChanged;
-            _monitor.PlayerFellOffBike -= Monitor_PlayerFellOffBike;
+            Monitor.PlayerTookDamage -= Monitor_PlayerTookDamage;
+            Monitor.PlayerBusted -= Monitor_PlayerBusted;
+            Monitor.PlayerWasted -= Monitor_PlayerWasted;
+            Monitor.PlayerWantedLevelChanged -= Monitor_PlayerWantedLevelChanged;
+            Monitor.PlayerFellOffBike -= Monitor_PlayerFellOffBike;
         }
     }
 
@@ -408,6 +395,15 @@ public partial class GtaVcGameRule : GameRule, IDisposable
         if (dueTime <= 0)
             setOutputStrength.Invoke(0);
         _dueTime[rule] = dueTime;
+    }
+
+    protected override void OnIsEnabledChanged(bool isEnabled)
+    {
+        if (isEnabled)
+            Monitor.Start();
+        else
+            Monitor.Stop();
+        base.OnIsEnabledChanged(isEnabled);
     }
 
     protected override int GetMaxStrength()

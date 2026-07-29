@@ -72,12 +72,18 @@ public partial class App : Application
         var coyoteManager = new CoyoteManager();
         var coyoteItems = new CoyoteCollection(coyoteManager);
         ServiceLocator.Register<ICoyoteListService>(coyoteItems);
+        var gtaVcGameRule = new GtaVcGameRule(ServiceLocator.GetService<IMemoryService>());
         var gameManager = new GameManager(coyoteManager)
         {
-            GtaVcGameRule = new GtaVcGameRule(ServiceLocator.GetService<IMemoryService>())
+            GtaVcGameRule = gtaVcGameRule
         };
-        var gamesPageViewModel = new GamesPageViewModel(gameManager, queueService);
+        var gtaVcRuleCardViewModel = new GtaVcRuleCardViewModel(gtaVcGameRule);
+        var gamesPageViewModel = new GamesPageViewModel(gameManager, queueService)
+        {
+            GtaVcRuleCardViewModel = gtaVcRuleCardViewModel
+        };
         ServiceLocator.Register(gamesPageViewModel);
+        ServiceLocator.Register(gtaVcRuleCardViewModel);
 
         ServiceLocator.RegisterViewModel(typeof(HomePage), new HomePageViewModel(coyoteItems, gameManager, queueService));
         ServiceLocator.RegisterViewModel(typeof(DevicesPage), new DevicesPage.RequiredParameter(
