@@ -13,7 +13,17 @@
         <toolkit:SettingsExpander.HeaderIcon>
             <FontIcon Glyph="&#xE804;"/>
         </toolkit:SettingsExpander.HeaderIcon>
-        <ToggleSwitch IsOn="{x:Bind ViewModel.IsEnabled, Mode=TwoWay}"/>
+        <StackPanel Orientation="Horizontal" Spacing="{StaticResource CommonControlSpacing}">
+            <ProgressRing IsActive="{x:Bind ViewModel.IsAccessing, Mode=OneWay}"/>
+            <ContentControl Content="{x:Bind ViewModel.StateMessage, Mode=OneWay}" VerticalAlignment="Center">
+                <ContentControl.ContentTransitions>
+                    <PaneThemeTransition Edge="Bottom"/>
+                </ContentControl.ContentTransitions>
+            </ContentControl>
+            <ToggleSwitch
+                IsOn="{x:Bind ViewModel.IsEnabled, Mode=TwoWay}"
+                OnContent="{x:Null}" OffContent="{x:Null}" Margin="-8,0,0,0"/>
+        </StackPanel>
         <toolkit:SettingsExpander.Items>
             <toolkit:SettingsCard Header="此玩法的规则强度模式" Description="多条规则同时生效时">
                 <toolkit:SettingsCard.HeaderIcon>

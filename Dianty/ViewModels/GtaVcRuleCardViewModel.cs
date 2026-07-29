@@ -1,23 +1,36 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Dianty.Models;
+using Dianty.Services;
 using System;
+using static GameMonitor.GtaVcMonitor;
 
 namespace Dianty.ViewModels;
 
 public partial class GtaVcRuleCardViewModel : ObservableObject, IDisposable
 {
-    public GtaVcRuleCardViewModel(GtaVcGameRule gameRule)
+    public GtaVcRuleCardViewModel(GtaVcGameRule gameRule, IQueueService queueService)
     {
         _gameRule = gameRule;
+        _queueService = queueService;
+
+        _gameRule.Monitor.StateChanged += OnMonitorStateChanged;
 
         StrengthModeSelectionItems = StrengthModeSelectionItem.StrengthModeSelectionItems;
         StrengthMode = StrengthModeSelectionItems[0];
+        UpdateStateMessage(_gameRule.Monitor.State);
     }
 
     private bool _isDisposed;
     private readonly GtaVcGameRule _gameRule;
+    private readonly IQueueService _queueService;
 
     public StrengthModeSelectionItem[] StrengthModeSelectionItems { get; }
+
+    [ObservableProperty]
+    public partial bool IsAccessing { get; private set; }
+
+    [ObservableProperty]
+    public partial string StateMessage { get; private set; } = string.Empty;
 
     [ObservableProperty]
     public partial bool IsEnabled { get; set; }
@@ -96,8 +109,37 @@ public partial class GtaVcRuleCardViewModel : ObservableObject, IDisposable
 
         if (disposing)
         {
+            _gameRule.Monitor.StateChanged -= OnMonitorStateChanged;
             _gameRule.Dispose();
         }
+    }
+
+    private void OnMonitorStateChanged(object? sender, StateChangedEventArgs e)
+    {
+        UpdateStateMessage(e.State);
+    }
+
+    private void UpdateStateMessage(MonitoringState state)
+    {
+        _queueService.TryEnqueue(() =>
+        {
+            switch (state)
+            {
+                default:
+                case MonitoringState.Stopped:
+                    IsAccessing = false;
+                    StateMessage = "未接入游戏";
+                    break;
+                case MonitoringState.FindTargetProcess:
+                    IsAccessing = true;
+                    StateMessage = "查找游戏进程";
+                    break;
+                case MonitoringState.AccessedTargetProcess:
+                    IsAccessing = false;
+                    StateMessage = "已接入";
+                    break;
+            }
+        });
     }
 
     partial void OnIsEnabledChanged(bool value)
