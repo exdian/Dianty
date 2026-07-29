@@ -3,13 +3,15 @@
 public class GtaVcMonitor : IDisposable 
 {
     public GtaVcMonitor(IMemoryService memoryService);
-    public int? CurrentPid { get; }
+    public MonitoringState State { get; }
+    public int? TargetPid { get; }
     public bool IsReplaying { get; }
     public uint PlayingTime { get; }
     public PlayerState CurrentPlayerState { get; }
     public int PlayerWantedLevel { get; }
     public float CurrentHealth { get; }
     public float CurrentArmor { get; }
+    public event EventHandler<StateChangedEventArgs>? StateChanged;
     public event EventHandler<PlayerTookDamageEventArgs>? PlayerTookDamage;
     public event EventHandler<PlayerBustedEventArgs>? PlayerBusted;
     public event EventHandler<PlayerWastedEventArgs>? PlayerWasted;
@@ -18,6 +20,10 @@ public class GtaVcMonitor : IDisposable
     public void Start();
     public void Stop();
     public void Dispose();
+    public class StateChangedEventArgs(MonitoringState state) : EventArgs 
+    {
+        public MonitoringState State { get; }
+    }
     public class PlayerTookDamageEventArgs(float damage) : EventArgs 
     {
         public float Damage { get; }
@@ -39,6 +45,12 @@ public class GtaVcMonitor : IDisposable
         public VehicleId VehicleId { get; }
         public VehicleType VehicleType { get; }
         public string VehicleName { get; }
+    }
+    public enum MonitoringState 
+    {
+        Stopped,
+        FindTargetProcess,
+        AccessedTargetProcess,
     }
     public enum PlayerState : int
     {
