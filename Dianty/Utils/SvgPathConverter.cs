@@ -22,7 +22,7 @@ public class SvgPathConverter
     private Point _lastEndPoint;
     private int _index;
 
-    // 测试用例 M5 .0 -.0e-1 5 .1e02 5C8.3333 3.3333 6.6667 1.6667 .5e1 -0
+    // 测试用例 M5 +.0 -.0e-1 5 .1e+02 5C8.3333 3.3333 6.6667 1.6667 .5e1 -0
     // 一个三角形 5,0  0,5  10,5
     public static PathGeometry? Parse(ReadOnlyMemory<char> svgPath)
     {
@@ -84,6 +84,7 @@ public class SvgPathConverter
                 case '\n':
                     _index++;
                     break;
+                case '+':
                 case '-':
                 case '.':
                 case >= '0' and <= '9':
@@ -624,6 +625,7 @@ public class SvgPathConverter
                 case '\r':
                 case '\n':
                     continue;
+                case '+':
                 case '-':
                 case >= '0' and <= '9':
                     start = i;
@@ -714,7 +716,7 @@ public class SvgPathConverter
     {
         int i = index;
         char c = svgPath[i];
-        if (c == '-' || (c >= '0' && c <= '9'))
+        if (c == '+' || c == '-' || (c >= '0' && c <= '9'))
         {
             for (i++; i < svgPath.Length; i++)
             {
