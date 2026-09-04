@@ -1,0 +1,20 @@
+{
+  "Language": "English",
+  "MainWindowText": {
+    "MainViewText": {
+      "HomeMenuItem": "Home",
+      "DevicesMenuItem": "Device",
+      "WavesMenuItem": "Wave",
+      "GamesMenuItem": "Game",
+      "SafetyMenuItem": "Safety",
+      "DebugMenuItem": "Debug",
+      "HomePageText": {},
+      "DevicesPageText": {},
+      "WavesPageText": {},
+      "GamesPageText": {},
+      "SafetyPageText": {},
+      "DebugPageText": {},
+      "SettingsPageText": {}
+    }
+  }
+}

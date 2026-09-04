@@ -59,6 +59,7 @@
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
                 <NavigationViewItem Icon="ReportHacked" Content="安全" Tag="{x:Bind SafetyPage}"/>
+                <NavigationViewItem x:Name="_debugMenuItem" Icon="Repair" Content="调试" Tag="{x:Bind DebugPage}"/>
             </NavigationView.MenuItems>
         </NavigationView>
         <VisualStateManager.VisualStateGroups>

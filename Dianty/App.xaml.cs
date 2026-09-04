@@ -1,4 +1,5 @@
-﻿using Dianty.Models;
+﻿using Dianty.Localization;
+using Dianty.Models;
 using Dianty.Services;
 using Dianty.Utils;
 using Dianty.ViewModels;
@@ -68,6 +69,9 @@ public partial class App : Application
         ICoyoteBleDetector coyoteBleDetector = new CoyoteBleDetector();
         ServiceLocator.Register(coyoteBleDetector);
         ServiceLocator.Register<IMemoryService>(static () => new MemoryService());
+        Localizer.Init();
+        ILocalizationService localizationService = Localizer.Instance;
+        ServiceLocator.Register(localizationService);
 
         var coyoteManager = new CoyoteManager();
         var coyoteItems = new CoyoteCollection(coyoteManager);

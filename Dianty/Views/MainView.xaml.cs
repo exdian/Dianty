@@ -33,7 +33,10 @@ public sealed partial class MainView : UserControl
         _navView.IsPaneOpen = false;
         _navView.IsPaneOpen = true;
 
-        _debugMenuItem = DebugPage.GetNavigationViewItem();
+#if !DEBUG
+        _debugMenuItem.Visibility = Visibility.Collapsed;
+#endif
+
         _keySequenceTrigger.AddKeySequence("debug", ToggleDebugMenuItem);
         Loaded += MainView_Loaded;
         Unloaded += MainView_Unloaded;
@@ -44,18 +47,20 @@ public sealed partial class MainView : UserControl
     private readonly IQueueService _queueService;
     private readonly List<FrameworkElement> _interactableElements = [];
     private readonly KeySequenceTrigger _keySequenceTrigger = new();
-    private readonly NavigationViewItem _debugMenuItem;
     private RectInt32[] _previousPassthroughRects = [];
     private Button? _backButton;
     private Button? _closePaneButton;
     private Button? _togglePaneButton;
 
+#pragma warning disable CA1822 // 将成员标记为 static
     private Type HomePage => typeof(HomePage);
     private Type DevicesPage => typeof(DevicesPage);
     private Type WavesPage => typeof(WavesPage);
     private Type GamesPage => typeof(GamesPage);
     private Type SafetyPage => typeof(SafetyPage);
-    private static Type SettingsPage => typeof(SettingsPage);
+    private Type DebugPage => typeof(DebugPage);
+    private Type SettingsPage => typeof(SettingsPage);
+#pragma warning restore CA1822 // 将成员标记为 static
 
     private void MainView_Loaded(object sender, RoutedEventArgs e)
     {
@@ -78,10 +83,10 @@ public sealed partial class MainView : UserControl
     {
         _queueService.TryEnqueue(DispatcherQueuePriority.Low, () =>
         {
-            if (_navView.MenuItems.Contains(_debugMenuItem))
-                _navView.MenuItems.Remove(_debugMenuItem);
+            if (_debugMenuItem.Visibility == Visibility.Visible)
+                _debugMenuItem.Visibility = Visibility.Collapsed;
             else
-                _navView.MenuItems.Add(_debugMenuItem);
+                _debugMenuItem.Visibility = Visibility.Visible;
         });
     }
 

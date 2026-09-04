@@ -1,0 +1,20 @@
+{
+  "Language": "简体中文",
+  "MainWindowText": {
+    "MainViewText": {
+      "HomeMenuItem": "主页",
+      "DevicesMenuItem": "设备",
+      "WavesMenuItem": "波形",
+      "GamesMenuItem": "玩法",
+      "SafetyMenuItem": "安全",
+      "DebugMenuItem": "调试",
+      "HomePageText": {},
+      "DevicesPageText": {},
+      "WavesPageText": {},
+      "GamesPageText": {},
+      "SafetyPageText": {},
+      "DebugPageText": {},
+      "SettingsPageText": {}
+    }
+  }
+}

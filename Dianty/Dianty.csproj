@@ -183,4 +183,10 @@
     <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
     <PublishAot>True</PublishAot>
   </PropertyGroup>
+
+  <ItemGroup>
+  	<Content Include="Localization\Text\*.json">
+  	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  	</Content>
+  </ItemGroup>
 </Project>

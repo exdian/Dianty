@@ -19,16 +19,6 @@ public sealed partial class DebugPage : Page
 
     private DebugPageViewModel? ViewModel { get; set; }
 
-    public static NavigationViewItem GetNavigationViewItem()
-    {
-        return new NavigationViewItem
-        {
-            Icon = new SymbolIcon(Symbol.Repair),
-            Content = "调试",
-            Tag = typeof(DebugPage)
-        };
-    }
-
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
