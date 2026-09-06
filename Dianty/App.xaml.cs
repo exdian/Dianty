@@ -89,15 +89,18 @@ public partial class App : Application
         ServiceLocator.Register(gamesPageViewModel);
         ServiceLocator.Register(gtaVcRuleCardViewModel);
 
-        ServiceLocator.RegisterViewModel(typeof(HomePage), new HomePageViewModel(coyoteItems, gameManager, queueService));
+        ServiceLocator.RegisterViewModel(typeof(HomePage),
+            new HomePageViewModel(coyoteItems, gameManager, queueService, localizationService));
         ServiceLocator.RegisterViewModel(typeof(DevicesPage), new DevicesPage.RequiredParameter(
             new DevicesPageViewModel(coyoteItems, queueService, coyoteBleDetector), queueService));
-        ServiceLocator.RegisterViewModel(typeof(WavesPage), new WavesPageViewModel(coyoteManager, queueService, windowService));
+        ServiceLocator.RegisterViewModel(typeof(WavesPage),
+            new WavesPageViewModel(coyoteManager, queueService, windowService));
         ServiceLocator.RegisterViewModel(typeof(GamesPage), new GamesPage.RequiredParameter(
             gamesPageViewModel, queueService));
         ServiceLocator.RegisterViewModel(typeof(SafetyPage), new SafetyPageViewModel(coyoteItems));
         ServiceLocator.RegisterViewModel(typeof(DebugPage), new DebugPageViewModel(queueService));
-        ServiceLocator.RegisterViewModel(typeof(SettingsPage), new SettingsPageViewModel(queueService, windowService, localizationService));
+        ServiceLocator.RegisterViewModel(typeof(SettingsPage),
+            new SettingsPageViewModel(queueService, windowService, localizationService));
     }
 
     private void MergeDictionaries()

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dianty.Localization;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -6,6 +7,8 @@ namespace Dianty.Services;
 
 public interface ILocalizationService
 {
+    AppText AppText { get; }
+    string TextDirectory { get; set; }
     string CurrentLanguageFileName { get; }
 
     event EventHandler<CurrentLanguageFileNameChangedEventArgs>? CurrentLanguageFileNameChanged;

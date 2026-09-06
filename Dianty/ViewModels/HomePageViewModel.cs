@@ -10,26 +10,32 @@ namespace Dianty.ViewModels;
 
 public partial class HomePageViewModel : ObservableObject
 {
-    public HomePageViewModel(CoyoteCollection coyoteItems, GameManager gameManager, IQueueService queueService)
+    public HomePageViewModel(
+        CoyoteCollection coyoteItems, GameManager gameManager, IQueueService queueService,
+        ILocalizationService localizationService)
     {
         _coyoteItems = coyoteItems;
         _gameManager = gameManager;
         _queueService = queueService;
-
+        _localizationService = localizationService;
         _coyoteItems.CollectionChanged += OnCoyoteCollectionChanged;
         _gameManager.CoyoteManager.ChannelA.PlayingWaveChanged += OnChannelAPlayingWaveChanged;
         _gameManager.CoyoteManager.ChannelB.PlayingWaveChanged += OnChannelBPlayingWaveChanged;
         _gameManager.CoyoteManager.OutputStatusChanged += OnCoyoteManagerOutputStatusChanged;
         _gameManager.OutputStrengthChanged += OnGameManagerOutputStrengthChanged;
+        _localizationService.CurrentLanguageFileNameChanged += OnCurrentLanguageFileNameChanged;
 
-        Localizer.Instance.CurrentLanguageFileNameChanged += OnCurrentLanguageFileNameChanged;
+        WaveNameA = StringNone;
+        WaveNameB = StringNone;
+        CurrentStrength = StringNone;
     }
 
     private readonly CoyoteCollection _coyoteItems;
     private readonly GameManager _gameManager;
     private readonly IQueueService _queueService;
+    private readonly ILocalizationService _localizationService;
 
-    private static string StringNone => Localizer.Instance.AppText.MainWindowText.MainViewText.HomePageText.None;
+    private string StringNone => _localizationService.AppText.MainWindowText.MainViewText.HomePageText.None;
 
     [ObservableProperty]
     public partial int ConnectedCount { get; private set; }
@@ -38,13 +44,13 @@ public partial class HomePageViewModel : ObservableObject
     public partial int AddedCount { get; private set; }
 
     [ObservableProperty]
-    public partial string WaveNameA { get; private set; } = StringNone;
+    public partial string WaveNameA { get; private set; }
 
     [ObservableProperty]
-    public partial string WaveNameB { get; private set; } = StringNone;
+    public partial string WaveNameB { get; private set; }
 
     [ObservableProperty]
-    public partial string CurrentStrength { get; private set; } = StringNone;
+    public partial string CurrentStrength { get; private set; }
 
     private void OnCoyoteCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
