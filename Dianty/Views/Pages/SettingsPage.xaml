@@ -35,6 +35,20 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
                 </toolkit:SettingsCard>
+                <toolkit:SettingsCard Header="语言">
+                    <toolkit:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xF2B7;"/>
+                    </toolkit:SettingsCard.HeaderIcon>
+                    <ComboBox
+                        PlaceholderText="选择语言" ItemsSource="{x:Bind ViewModel.LanguageSelectionItems, Mode=OneWay}"
+                        SelectedItem="{x:Bind ViewModel.SelectedLanguage, Mode=TwoWay}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="vm:LanguageSelectionItem">
+                                <TextBlock Text="{x:Bind Description}" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </toolkit:SettingsCard>
                 <TextBlock Text="其他" Style="{StaticResource BodyStrongTextBlockStyle}" Margin="1,14,0,4"/>
                 <toolkit:SettingsExpander Header="其他设置" HeaderIcon="Setting">
                     <toolkit:SettingsExpander.Items>

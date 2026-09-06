@@ -91,7 +91,7 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
     {
         if (item is bool value && value)
         {
-            return new MainView(this, this, this);
+            return new MainView(this, this, this, ServiceLocator.GetService<ILocalizationService>());
         }
         else
         {

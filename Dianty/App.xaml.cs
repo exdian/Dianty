@@ -97,7 +97,7 @@ public partial class App : Application
             gamesPageViewModel, queueService));
         ServiceLocator.RegisterViewModel(typeof(SafetyPage), new SafetyPageViewModel(coyoteItems));
         ServiceLocator.RegisterViewModel(typeof(DebugPage), new DebugPageViewModel(queueService));
-        ServiceLocator.RegisterViewModel(typeof(SettingsPage), new SettingsPageViewModel(queueService, windowService));
+        ServiceLocator.RegisterViewModel(typeof(SettingsPage), new SettingsPageViewModel(queueService, windowService, localizationService));
     }
 
     private void MergeDictionaries()

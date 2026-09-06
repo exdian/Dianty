@@ -20,6 +20,7 @@ public class MainViewText
     public string GamesMenuItem { get; set; } = "玩法";
     public string SafetyMenuItem { get; set; } = "安全";
     public string DebugMenuItem { get; set; } = "调试";
+    public string SettingsMenuItem { get; set; } = "设置";
 
     public HomePageText HomePageText { get; set; } = new();
     public DevicesPageText DevicesPageText { get; set; } = new();

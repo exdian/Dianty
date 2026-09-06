@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.Messaging;
+using Dianty.Localization;
 using Dianty.Services;
 using Dianty.Utils;
 using Dianty.Utils.Messages;
@@ -17,17 +18,21 @@ using System.Collections.Generic;
 using System.Linq;
 using Windows.Foundation;
 using Windows.Graphics;
+using static Dianty.Services.ILocalizationService;
 
 namespace Dianty.Views;
 
 public sealed partial class MainView : UserControl
 {
-    public MainView(ITitleBarService titleBarService, IWindowService windowService, IQueueService queueService)
+    public MainView(ITitleBarService titleBarService, IWindowService windowService, IQueueService queueService, ILocalizationService localizationService)
     {
         InitializeComponent();
         _titleBarService = titleBarService;
         _windowService = windowService;
         _queueService = queueService;
+        _localizationService = localizationService;
+
+        _localizationService.CurrentLanguageFileNameChanged += OnLocalizationServiceCurrentLanguageFileNameChanged;
 
         // 导航按钮不居中，需要手动刷新一下
         _navView.IsPaneOpen = false;
@@ -45,6 +50,7 @@ public sealed partial class MainView : UserControl
     private readonly ITitleBarService _titleBarService;
     private readonly IWindowService _windowService;
     private readonly IQueueService _queueService;
+    private readonly ILocalizationService _localizationService;
     private readonly List<FrameworkElement> _interactableElements = [];
     private readonly KeySequenceTrigger _keySequenceTrigger = new();
     private RectInt32[] _previousPassthroughRects = [];
@@ -145,18 +151,10 @@ public sealed partial class MainView : UserControl
 
             // 图标区域在窗口发生交互时很可能会被重置，因此需要重新设置
             var nonClientPointerSource = _windowService.GetInputNonClientPointerSource();
-            if (nonClientPointerSource is not null)
-            {
-                nonClientPointerSource.ExitedMoveSize += MainView_ExitedMoveSize;
-                _appIcon.Unloaded += (_, _) => nonClientPointerSource.ExitedMoveSize -= MainView_ExitedMoveSize;
-            }
+            nonClientPointerSource?.ExitedMoveSize += MainView_ExitedMoveSize;
 
             var activationListener = _windowService.GetInputActivationListener();
-            if (activationListener is not null)
-            {
-                activationListener.InputActivationChanged += ActivationListener_InputActivationChanged;
-                _appIcon.Unloaded += (_, _) => activationListener.InputActivationChanged -= ActivationListener_InputActivationChanged;
-            }
+            activationListener?.InputActivationChanged += ActivationListener_InputActivationChanged;
 
             // 获取所有可能位于标题栏区域的元素
             _backButton = VisualTreeHelperExtension.FindChildByName(_navView, "NavigationViewBackButton") as Button;
@@ -174,6 +172,15 @@ public sealed partial class MainView : UserControl
                 rectangle.Clip = clip;
             }
         }
+    }
+
+    private void NavView_Unloaded(object sender, RoutedEventArgs e)
+    {
+        var nonClientPointerSource = _windowService.GetInputNonClientPointerSource();
+        nonClientPointerSource?.ExitedMoveSize -= MainView_ExitedMoveSize;
+
+        var activationListener = _windowService.GetInputActivationListener();
+        activationListener?.InputActivationChanged -= ActivationListener_InputActivationChanged;
     }
 
     private void UpdateDragRegion()
@@ -351,6 +358,14 @@ public sealed partial class MainView : UserControl
         if (_navView.IsPaneOpen && (_navView.DisplayMode is NavigationViewDisplayMode.Compact or NavigationViewDisplayMode.Minimal))
         {
             _navView.IsPaneOpen = false;
+        }
+    }
+
+    private void OnLocalizationServiceCurrentLanguageFileNameChanged(object? sender, CurrentLanguageFileNameChangedEventArgs e)
+    {
+        if (_navView.SettingsItem is ContentControl contentControl && contentControl.Content is string)
+        {
+            contentControl.Content = Localizer.Instance.AppText.MainWindowText.MainViewText.SettingsMenuItem;
         }
     }
 }
