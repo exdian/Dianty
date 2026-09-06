@@ -87,6 +87,12 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
         DispatcherQueue?.TryEnqueue(priority, callback);
     }
 
+    public void Crash(string message)
+    {
+        // 使用 DispatcherQueue.TryEnqueue 时，在 async void 引发的异常才能触发 Application.UnhandledException
+        DispatcherQueue?.TryEnqueue(DispatcherQueuePriority.Low, async () => throw new Exception(message));
+    }
+
     object? ITemplateContent.CreateContent(object? item)
     {
         if (item is bool value && value)

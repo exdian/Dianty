@@ -2,6 +2,8 @@
 using Dianty.Services;
 using Dianty.Utils;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -61,8 +63,36 @@ public partial class SettingsPageViewModel : ObservableObject
 
     partial void OnSelectedLanguageChanged(LanguageSelectionItem value)
     {
-        if (LanguageSelectionItems.Length > 0)
-            _queueService.TryEnqueue(() => _localizationService.SetLanguageAsync(value.FileName));
+        if (LanguageSelectionItems.Length == 0)
+            return;
+
+        _queueService.TryEnqueue(async () =>
+        {
+            bool isExceptionOccurred = false;
+            string message = string.Empty;
+            try
+            {
+                await _localizationService.SetLanguageAsync(value.FileName);
+            }
+            catch (Exception ex)
+            {
+                isExceptionOccurred = true;
+                message = ex.Message;
+            }
+            if (isExceptionOccurred)
+            {
+                var dialog = _windowService.CreateContentDialog();
+                if (dialog is null)
+                    return;
+                dialog.Title = "语言切换失败";
+                dialog.CloseButtonText = "关闭";
+                dialog.IsPrimaryButtonEnabled = false;
+                dialog.IsSecondaryButtonEnabled = false;
+                dialog.DefaultButton = ContentDialogButton.Close;
+                dialog.Content = message;
+                await dialog.ShowAsync();
+            }
+        });
     }
 }
 

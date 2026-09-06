@@ -118,21 +118,20 @@ public partial class Localizer : ObservableObject, ILocalizationService
         return result;
     }
 
-    public async Task<bool> SetLanguageAsync(string fileName)
+    public async Task SetLanguageAsync(string fileName)
     {
         var filePath = Path.Combine(TextDirectory, fileName);
-        if (File.Exists(filePath))
+        var json = await File.ReadAllTextAsync(filePath);
+        var appText = JsonSerializer.Deserialize(json, AppTextJsonContext.Unsafe.AppText);
+        if (appText is not null)
         {
-            var json = await File.ReadAllTextAsync(filePath);
-            var appText = JsonSerializer.Deserialize(json, AppTextJsonContext.Unsafe.AppText);
-            if (appText is not null)
-            {
-                AppText = appText;
-                CurrentLanguageFileName = fileName;
-                return true;
-            }
+            AppText = appText;
+            CurrentLanguageFileName = fileName;
         }
-        return false;
+        else
+        {
+            throw new Exception("Json Exception");
+        }
     }
 
     private void OnCurrentLanguageFileNameChanged(string currentLanguageFileName)

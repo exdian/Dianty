@@ -2,6 +2,8 @@
 using Dianty.Services;
 using Dianty.Utils;
 using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml.Controls;
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
@@ -9,16 +11,51 @@ namespace Dianty.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
-    public MainViewModel(IQueueService queueService)
+    public MainViewModel(IQueueService queueService, IWindowService windowService)
     {
         _queueService = queueService;
-        _queueService.TryEnqueue(DispatcherQueuePriority.Low, () => _ = InitializeDataAsync());
+        _windowService = windowService;
+
+        InitializeData();
     }
 
     private readonly IQueueService _queueService;
+    private readonly IWindowService _windowService;
 
     [ObservableProperty]
     public partial bool IsLoaded { get; private set; }
+
+    private void InitializeData()
+    {
+        _queueService.TryEnqueue(DispatcherQueuePriority.Low, async () =>
+        {
+            bool isExceptionOccurred = false;
+            string message = string.Empty;
+            try
+            {
+                await InitializeDataAsync();
+            }
+            catch (Exception ex)
+            {
+                isExceptionOccurred = true;
+                message = ex.Message;
+            }
+            if (isExceptionOccurred)
+            {
+                var dialog = _windowService.CreateContentDialog();
+                if (dialog is null)
+                    return;
+                dialog.Title = "Error";
+                dialog.CloseButtonText = "Close";
+                dialog.IsPrimaryButtonEnabled = false;
+                dialog.IsSecondaryButtonEnabled = false;
+                dialog.DefaultButton = ContentDialogButton.Close;
+                dialog.Content = message;
+                await dialog.ShowAsync();
+                _queueService.Crash(message);
+            }
+        });
+    }
 
     private async Task InitializeDataAsync()
     {

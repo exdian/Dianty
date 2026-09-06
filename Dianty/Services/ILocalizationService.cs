@@ -14,7 +14,7 @@ public interface ILocalizationService
     event EventHandler<CurrentLanguageFileNameChangedEventArgs>? CurrentLanguageFileNameChanged;
 
     Task<IEnumerable<KeyValuePair<string, string>>> GetAvailableLanguagesAsync();
-    Task<bool> SetLanguageAsync(string fileName);
+    Task SetLanguageAsync(string fileName);
 
     public class CurrentLanguageFileNameChangedEventArgs(string currentLanguageFileName) : EventArgs
     {

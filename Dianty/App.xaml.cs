@@ -9,6 +9,7 @@ using DungeonToolkit.Coyote;
 using GameMonitor;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.IO;
 using System.Security.Cryptography;
@@ -20,6 +21,7 @@ namespace Dianty;
 public partial class App : Application
 {
     private MainWindow? _window;
+    private bool _isUnhandledExceptionOccurred;
 
     /// <summary>
     /// Initializes the singleton application object.  This is the first line of authored code
@@ -28,6 +30,27 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
+        UnhandledException += Shutdown;
+    }
+
+    private async void Shutdown(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
+    {
+        e.Handled = true;
+        if (_isUnhandledExceptionOccurred)
+            return;
+        _isUnhandledExceptionOccurred = true;
+
+        var dialog = _window?.CreateContentDialog();
+        if (dialog is null)
+            return;
+        dialog.Title = "Unhandled exception";
+        dialog.CloseButtonText = "Shutdown";
+        dialog.IsPrimaryButtonEnabled = false;
+        dialog.IsSecondaryButtonEnabled = false;
+        dialog.DefaultButton = ContentDialogButton.Close;
+        dialog.Content = e.Message;
+        await dialog.ShowAsync();
+        _window?.Close();
     }
 
     /// <summary>
@@ -43,7 +66,7 @@ public partial class App : Application
         ToDoList.UiPlan += MergeDictionaries;
         ToDoList.UiPlan += SetWindowIcon;
         TopPageLocator.Init(GetTopPage);
-        window.ViewModel = new MainViewModel(window);
+        window.ViewModel = new MainViewModel(window, window);
         _window = window;
         _window.Activate();
     }
