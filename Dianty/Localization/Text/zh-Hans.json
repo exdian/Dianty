@@ -9,7 +9,17 @@
       "SafetyMenuItem": "安全",
       "DebugMenuItem": "调试",
       "SettingsMenuItem": "设置",
-      "HomePageText": {},
+      "HomePageText": {
+        "DeviceManagement": "设备管理",
+        "ConnectedCount": "已连接 ",
+        "AddedCount": "已添加 ",
+        "NowPlaying": "正在播放",
+        "AChannel": "A通道 ",
+        "BChannel": "B通道 ",
+        "OutputStrength": "输出强度",
+        "CurrentStrength": "当前强度 ",
+        "None": "无"
+      },
       "DevicesPageText": {},
       "WavesPageText": {},
       "GamesPageText": {},

@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Dianty.Localization;
 using Dianty.Models;
 using Dianty.Services;
 using DungeonToolkit.Coyote;
@@ -20,11 +21,15 @@ public partial class HomePageViewModel : ObservableObject
         _gameManager.CoyoteManager.ChannelB.PlayingWaveChanged += OnChannelBPlayingWaveChanged;
         _gameManager.CoyoteManager.OutputStatusChanged += OnCoyoteManagerOutputStatusChanged;
         _gameManager.OutputStrengthChanged += OnGameManagerOutputStrengthChanged;
+
+        Localizer.Instance.CurrentLanguageFileNameChanged += OnCurrentLanguageFileNameChanged;
     }
 
     private readonly CoyoteCollection _coyoteItems;
     private readonly GameManager _gameManager;
     private readonly IQueueService _queueService;
+
+    private static string StringNone => Localizer.Instance.AppText.MainWindowText.MainViewText.HomePageText.None;
 
     [ObservableProperty]
     public partial int ConnectedCount { get; private set; }
@@ -33,13 +38,13 @@ public partial class HomePageViewModel : ObservableObject
     public partial int AddedCount { get; private set; }
 
     [ObservableProperty]
-    public partial string WaveNameA { get; private set; } = "无";
+    public partial string WaveNameA { get; private set; } = StringNone;
 
     [ObservableProperty]
-    public partial string WaveNameB { get; private set; } = "无";
+    public partial string WaveNameB { get; private set; } = StringNone;
 
     [ObservableProperty]
-    public partial string CurrentStrength { get; private set; } = "无";
+    public partial string CurrentStrength { get; private set; } = StringNone;
 
     private void OnCoyoteCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
@@ -135,12 +140,12 @@ public partial class HomePageViewModel : ObservableObject
 
     private void OnChannelAPlayingWaveChanged(object? sender, WaveQueue.PlayingWaveChangedEventArgs e)
     {
-        _queueService.TryEnqueue(() => WaveNameA = e.WavePlayer?.Wave.Name ?? "无");
+        _queueService.TryEnqueue(() => WaveNameA = e.WavePlayer?.Wave.Name ?? StringNone);
     }
 
     private void OnChannelBPlayingWaveChanged(object? sender, WaveQueue.PlayingWaveChangedEventArgs e)
     {
-        _queueService.TryEnqueue(() => WaveNameB = e.WavePlayer?.Wave.Name ?? "无");
+        _queueService.TryEnqueue(() => WaveNameB = e.WavePlayer?.Wave.Name ?? StringNone);
     }
 
     private void OnCoyoteManagerOutputStatusChanged(object? sender, CoyoteManager.OutputStatusChangedEventArgs e)
@@ -148,12 +153,25 @@ public partial class HomePageViewModel : ObservableObject
         if (e.IsOutputting)
             _queueService.TryEnqueue(() => CurrentStrength = _gameManager.OutputStrength.ToString());
         else
-            _queueService.TryEnqueue(() => CurrentStrength = "无");
+            _queueService.TryEnqueue(() => CurrentStrength = StringNone);
     }
 
     private void OnGameManagerOutputStrengthChanged(object? sender, AutomaticStrength.OutputStrengthChangedEventArgs e)
     {
         if (_gameManager.CoyoteManager.IsOutputting)
             _queueService.TryEnqueue(() => CurrentStrength = e.Strength.ToString());
+    }
+
+    private void OnCurrentLanguageFileNameChanged(object? sender, ILocalizationService.CurrentLanguageFileNameChangedEventArgs e)
+    {
+        _queueService.TryEnqueue(() =>
+        {
+            if (_gameManager.CoyoteManager.ChannelA.PlayingWave is null)
+                WaveNameA = StringNone;
+            if (_gameManager.CoyoteManager.ChannelB.PlayingWave is null)
+                WaveNameB = StringNone;
+            if (_gameManager.CoyoteManager.IsOutputting == false)
+                CurrentStrength = StringNone;
+        });
     }
 }

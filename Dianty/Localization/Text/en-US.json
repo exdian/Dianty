@@ -9,7 +9,17 @@
       "SafetyMenuItem": "Safety",
       "DebugMenuItem": "Debug",
       "SettingsMenuItem": "Settings",
-      "HomePageText": {},
+      "HomePageText": {
+        "DeviceManagement": "Device Management",
+        "ConnectedCount": "Connected Count: ",
+        "AddedCount": "Added Count: ",
+        "NowPlaying": "Now Playing",
+        "AChannel": "A Channel: ",
+        "BChannel": "B Channel: ",
+        "OutputStrength": "Output Strength",
+        "CurrentStrength": "Current Strength: ",
+        "None": "None"
+      },
       "DevicesPageText": {},
       "WavesPageText": {},
       "GamesPageText": {},

@@ -4,6 +4,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
+    xmlns:txt="using:Dianty.Localization"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -21,17 +22,21 @@
                 <toolkit:SettingsCard CornerRadius="8,8,0,0">
                     <toolkit:SettingsCard.Header>
                         <StackPanel Spacing="6">
-                            <TextBlock Text="设备管理" Style="{ThemeResource SubtitleTextBlockStyle}" Margin="0,0,0,6"/>
                             <TextBlock
-                                Text="{x:Bind ViewModel.ConnectedCount, Mode=OneWay, Converter={StaticResource StringFormatConverter}, ConverterParameter='已连接 {0}'}"
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                            <TextBlock
-                                Text="{x:Bind ViewModel.AddedCount, Mode=OneWay, Converter={StaticResource StringFormatConverter}, ConverterParameter='已添加 {0}'}"
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.HomePageText.DeviceManagement, Mode=OneWay}"
+                                Style="{ThemeResource SubtitleTextBlockStyle}" Margin="0,0,0,6"/>
+                            <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}">
+                                <Run Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.HomePageText.ConnectedCount, Mode=OneWay}"/><Run Text="{x:Bind ViewModel.ConnectedCount, Mode=OneWay}"/>
+                            </TextBlock>
+                            <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}">
+                                <Run Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.HomePageText.AddedCount, Mode=OneWay}"/><Run Text="{x:Bind ViewModel.AddedCount, Mode=OneWay}"/>
+                            </TextBlock>
                         </StackPanel>
                     </toolkit:SettingsCard.Header>
                 </toolkit:SettingsCard>
-                <toolkit:SettingsCard Header="设备" IsClickEnabled="True" CornerRadius="0,0,8,8" Click="OnDeviceCardClick">
+                <toolkit:SettingsCard
+                    Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesMenuItem, Mode=OneWay}"
+                    IsClickEnabled="True" CornerRadius="0,0,8,8" Click="OnDeviceCardClick">
                     <toolkit:SettingsCard.HeaderIcon>
                         <PathIcon
                             Data="M0 20 20 0H84l20 20V146L84 166H20L0 146ZM10 26V52L22 64v38L10 114v26l16 16H78l16-16V
@@ -43,17 +48,21 @@
                 <toolkit:SettingsCard CornerRadius="8,8,0,0">
                     <toolkit:SettingsCard.Header>
                         <StackPanel Spacing="6">
-                            <TextBlock Text="正在播放" Style="{ThemeResource SubtitleTextBlockStyle}" Margin="0,0,0,6"/>
                             <TextBlock
-                                Text="{x:Bind ViewModel.WaveNameA, Mode=OneWay, Converter={StaticResource StringFormatConverter}, ConverterParameter='A通道 {0}'}"
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                            <TextBlock
-                                Text="{x:Bind ViewModel.WaveNameB, Mode=OneWay, Converter={StaticResource StringFormatConverter}, ConverterParameter='B通道 {0}'}"
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.HomePageText.NowPlaying, Mode=OneWay}"
+                                Style="{ThemeResource SubtitleTextBlockStyle}" Margin="0,0,0,6"/>
+                            <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}">
+                                <Run Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.HomePageText.AChannel, Mode=OneWay}"/><Run Text="{x:Bind ViewModel.WaveNameA, Mode=OneWay}"/>
+                            </TextBlock>
+                            <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}">
+                                <Run Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.HomePageText.BChannel, Mode=OneWay}"/><Run Text="{x:Bind ViewModel.WaveNameB, Mode=OneWay}"/>
+                            </TextBlock>
                         </StackPanel>
                     </toolkit:SettingsCard.Header>
                 </toolkit:SettingsCard>
-                <toolkit:SettingsCard Header="波形" IsClickEnabled="True" CornerRadius="0,0,8,8" Click="OnWaveCardClick">
+                <toolkit:SettingsCard
+                    Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.WavesMenuItem, Mode=OneWay}"
+                    IsClickEnabled="True" CornerRadius="0,0,8,8" Click="OnWaveCardClick">
                     <toolkit:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE9D9;"/>
                     </toolkit:SettingsCard.HeaderIcon>
@@ -63,14 +72,18 @@
                 <toolkit:SettingsCard CornerRadius="8,8,0,0">
                     <toolkit:SettingsCard.Header>
                         <StackPanel Spacing="6">
-                            <TextBlock Text="输出强度" Style="{ThemeResource SubtitleTextBlockStyle}" Margin="0,0,0,6"/>
                             <TextBlock
-                                Text="{x:Bind ViewModel.CurrentStrength, Mode=OneWay, Converter={StaticResource StringFormatConverter}, ConverterParameter='当前强度 {0}'}"
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.HomePageText.OutputStrength, Mode=OneWay}"
+                                Style="{ThemeResource SubtitleTextBlockStyle}" Margin="0,0,0,6"/>
+                            <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}">
+                                <Run Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.HomePageText.CurrentStrength, Mode=OneWay}"/><Run Text="{x:Bind ViewModel.CurrentStrength, Mode=OneWay}"/>
+                            </TextBlock>
                         </StackPanel>
                     </toolkit:SettingsCard.Header>
                 </toolkit:SettingsCard>
-                <toolkit:SettingsCard Header="玩法" IsClickEnabled="True" CornerRadius="0,0,8,8" Click="OnGameCardClick">
+                <toolkit:SettingsCard
+                    Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesMenuItem, Mode=OneWay}"
+                    IsClickEnabled="True" CornerRadius="0,0,8,8" Click="OnGameCardClick">
                     <toolkit:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE7FC;"/>
                     </toolkit:SettingsCard.HeaderIcon>

@@ -33,7 +33,15 @@ public class MainViewText
 
 public class HomePageText
 {
-
+    public string DeviceManagement { get; set; } = "设备管理";
+    public string ConnectedCount { get; set; } = "已连接 ";
+    public string AddedCount { get; set; } = "已添加 ";
+    public string NowPlaying { get; set; } = "正在播放";
+    public string AChannel { get; set; } = "A通道 ";
+    public string BChannel { get; set; } = "B通道 ";
+    public string OutputStrength { get; set; } = "输出强度";
+    public string CurrentStrength { get; set; } = "当前强度 ";
+    public string None { get; set; } = "无";
 }
 
 public class DevicesPageText
