@@ -3,15 +3,19 @@
     x:Class="Dianty.Views.Controls.QrCodeButton"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:txt="using:Dianty.Localization"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
     <Grid>
         <Button
-            x:Name="DisplayButton" ToolTipService.ToolTip="查看二维码" Click="OnDisplayButtonClick"
+            x:Name="DisplayButton" Click="OnDisplayButtonClick"
+            ToolTipService.ToolTip="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.QrCodeButtonText.ToolTip, Mode=OneWay}"
             Content="&#xED14;" FontFamily="{ThemeResource SymbolThemeFontFamily}" FontSize="20" Padding="4.67"/>
-        <TeachingTip x:Name="_qrCodeTip" Target="{x:Bind DisplayButton}" PreferredPlacement="Bottom" CloseButtonContent="隐藏">
+        <TeachingTip
+            x:Name="_qrCodeTip" Target="{x:Bind DisplayButton}" PreferredPlacement="Bottom"
+            CloseButtonContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.QrCodeButtonText.CloseButtonText, Mode=OneWay}">
             <TeachingTip.Content>
                 <Border Background="White" Padding="24">
                     <Viewbox>

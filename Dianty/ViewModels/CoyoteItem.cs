@@ -8,29 +8,36 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using static Dianty.Services.ILocalizationService;
 
 namespace Dianty.ViewModels;
 
 public partial class CoyoteItem : ObservableObject, IDisposable
 {
-    public CoyoteItem(CoyoteBLE coyote, IQueueService queueService, ICoyoteListService coyoteListService)
+    public CoyoteItem(CoyoteBLE coyote, IQueueService queueService, ICoyoteListService coyoteListService, ILocalizationService localizationService)
     {
         _coyoteBLE = coyote;
         _queueService = queueService;
         _coyoteListService = coyoteListService;
+        _localizationService = localizationService;
+        IsBleConnection = true;
         Name = coyote.DeviceName;
         IsEnabled = coyote.IsEnabled;
+        ConnectionTypeDescription = _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionStatusCardBluetoothDescription;
+        _localizationService.CurrentLanguageFileNameChanged += OnCurrentLanguageFileNameChanged;
         UpdateConnectionMessage(coyote.IsConnected);
-        IsBleConnection = true;
     }
 
-    public CoyoteItem(CoyoteWS coyote, IQueueService queueService, ICoyoteListService coyoteListService)
+    public CoyoteItem(CoyoteWS coyote, IQueueService queueService, ICoyoteListService coyoteListService, ILocalizationService localizationService)
     {
         _coyoteWS = coyote;
         _queueService = queueService;
         _coyoteListService = coyoteListService;
+        _localizationService = localizationService;
         Name = coyote.DeviceName;
         IsEnabled = coyote.IsEnabled;
+        ConnectionTypeDescription = _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionStatusCardSocketDescription;
+        _localizationService.CurrentLanguageFileNameChanged += OnCurrentLanguageFileNameChanged;
         UpdateConnectionMessage(coyote.IsBound);
     }
 
@@ -38,12 +45,16 @@ public partial class CoyoteItem : ObservableObject, IDisposable
     protected readonly CoyoteWS? _coyoteWS;
     protected readonly IQueueService _queueService;
     protected readonly ICoyoteListService _coyoteListService;
+    protected readonly ILocalizationService _localizationService;
     private bool _isDisposed;
+
+    public bool IsBleConnection { get; }
 
     [ObservableProperty]
     public partial string Name { get; set; }
 
-    public bool IsBleConnection { get; }
+    [ObservableProperty]
+    public partial string ConnectionTypeDescription { get; private set; }
 
     [ObservableProperty]
     public partial string ConnectionMessage { get; protected set; } = string.Empty;
@@ -72,14 +83,27 @@ public partial class CoyoteItem : ObservableObject, IDisposable
 
         if (disposing)
         {
+            _localizationService.CurrentLanguageFileNameChanged -= OnCurrentLanguageFileNameChanged;
             _coyoteBLE?.Dispose();
             _coyoteWS?.Dispose();
         }
     }
 
+    protected virtual void OnCurrentLanguageFileNameChanged(object? sender, CurrentLanguageFileNameChangedEventArgs e)
+    {
+        _queueService.TryEnqueue(() =>
+        {
+            ConnectionTypeDescription = IsBleConnection
+                ? _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionStatusCardBluetoothDescription
+                : _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionStatusCardSocketDescription;
+        });
+    }
+
     protected void UpdateConnectionMessage(bool isConnected)
     {
-        ConnectionMessage = isConnected ? "已连接" : "已断开连接";
+        ConnectionMessage = isConnected
+            ? _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectedStateText
+            : _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.DisconnectedStateText;
     }
 
     partial void OnNameChanged(string value)
@@ -97,9 +121,9 @@ public partial class CoyoteItem : ObservableObject, IDisposable
 
 public partial class CoyoteBleItem : CoyoteItem
 {
-    public CoyoteBleItem(CoyoteBLE coyote, IQueueService queueService,
-        ICoyoteListService coyoteListService, ICoyoteBleDetector coyoteBleDetector)
-        : base(coyote, queueService, coyoteListService)
+    public CoyoteBleItem(CoyoteBLE coyote, IQueueService queueService, ICoyoteListService coyoteListService,
+        ICoyoteBleDetector coyoteBleDetector, ILocalizationService localizationService)
+        : base(coyote, queueService, coyoteListService, localizationService)
     {
         _coyoteBleDetector = coyoteBleDetector;
         _bfCommandTimer = new Timer(SendBfCommand, null, Timeout.Infinite, Timeout.Infinite);
@@ -124,6 +148,15 @@ public partial class CoyoteBleItem : CoyoteItem
     private const int BfCommandCooldownTime = 1500;
     private CancellationTokenSource? _cts;
     private int _reconnectingCount;
+
+    private string ConnectingStateText =>
+        _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectingStateText;
+    private string ConnectionFailedStateText =>
+        _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionFailedStateText;
+    private string ConnectionSuccessfulStateText =>
+        _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionSuccessfulStateText;
+    private string ConnectionCanceledStateText =>
+        _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionCanceledStateText;
 
     public CoyoteBLE Coyote => _coyoteBLE!;
 
@@ -172,17 +205,17 @@ public partial class CoyoteBleItem : CoyoteItem
 
         _reconnectingCount++;
         var count = _reconnectingCount;
-        ConnectionMessage = "正在连接";
-        string connectionMessage = "连接失败";
+        ConnectionMessage = ConnectingStateText;
+        string? connectionMessage = null;
         _cts = new CancellationTokenSource();
         try
         {
             if (await _coyoteBLE.ReconnectingAsync(_coyoteBleDetector, _cts.Token))
-                connectionMessage = "连接成功";
+                connectionMessage = ConnectionSuccessfulStateText;
         }
         catch (OperationCanceledException)
         {
-            connectionMessage = "已取消连接";
+            connectionMessage = ConnectionCanceledStateText;
         }
         catch { }
         finally
@@ -194,7 +227,7 @@ public partial class CoyoteBleItem : CoyoteItem
             _cts = null;
             _queueService.TryEnqueue(() =>
             {
-                ConnectionMessage = connectionMessage;
+                ConnectionMessage = connectionMessage ?? ConnectionFailedStateText;
                 IsConnecting = false;
             });
 
@@ -306,12 +339,26 @@ public partial class CoyoteBleItem : CoyoteItem
             _bfCommandTimer.Dispose();
         }
     }
+
+    protected override void OnCurrentLanguageFileNameChanged(object? sender, CurrentLanguageFileNameChangedEventArgs e)
+    {
+        Debug.Assert(_coyoteBLE is not null);
+        base.OnCurrentLanguageFileNameChanged(sender, e);
+        _queueService.TryEnqueue(() =>
+        {
+            if (!IsConnecting)
+            {
+                UpdateConnectionMessage(_coyoteBLE.IsConnected);
+            }
+        });
+    }
 }
 
 public partial class CoyoteWsItem : CoyoteItem
 {
-    public CoyoteWsItem(CoyoteWS coyote, IQueueService queueService, ICoyoteListService coyoteListService)
-        : base(coyote, queueService, coyoteListService)
+    public CoyoteWsItem(CoyoteWS coyote, IQueueService queueService, ICoyoteListService coyoteListService,
+        ILocalizationService localizationService)
+        : base(coyote, queueService, coyoteListService, localizationService)
     {
         CurrentStrengthA = coyote.CurrentStrengthA;
         CurrentStrengthB = coyote.CurrentStrengthB;
@@ -328,6 +375,17 @@ public partial class CoyoteWsItem : CoyoteItem
     private TaskCompletionSource? _bindingTcs;
     private CancellationTokenSource? _cts;
     private int _reconnectingCount;
+
+    private string WaitingSocketServerStateText =>
+        _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.WaitingSocketServerStateText;
+    private string WaitingScanQrCodeStateText =>
+        _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.WaitingScanQrCodeStateText;
+    private string ConnectionFailedStateText =>
+        _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionFailedStateText;
+    private string ConnectionSuccessfulStateText =>
+        _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionSuccessfulStateText;
+    private string ConnectionCanceledStateText =>
+        _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionCanceledStateText;
 
     public CoyoteWS Coyote => _coyoteWS!;
 
@@ -367,8 +425,8 @@ public partial class CoyoteWsItem : CoyoteItem
 
         _reconnectingCount++;
         var count = _reconnectingCount;
-        ConnectionMessage = "正在连接服务器获取二维码";
-        string connectionMessage = "连接失败";
+        ConnectionMessage = WaitingSocketServerStateText;
+        string? connectionMessage = null;
         _cts = new CancellationTokenSource();
         try
         {
@@ -380,17 +438,17 @@ public partial class CoyoteWsItem : CoyoteItem
             var qrCodeSvgPath = await Task.Run(() => CoyoteHelper.CreateQrCodeSvgPathString(_coyoteWS)).WaitAsync(_cts.Token);
             _queueService.TryEnqueue(() =>
             {
-                ConnectionMessage = "已获取二维码";
+                ConnectionMessage = WaitingScanQrCodeStateText;
                 QrCodeSvgPath = qrCodeSvgPath;
                 CanShowQrCode = true;
                 IsQrCodeDisplayed = true;
             });
             await _bindingTcs.Task.WaitAsync(_cts.Token);
-            connectionMessage = "连接成功";
+            connectionMessage = ConnectionSuccessfulStateText;
         }
         catch (OperationCanceledException)
         {
-            connectionMessage = "已取消连接";
+            connectionMessage = ConnectionCanceledStateText;
         }
         catch { }
         finally
@@ -411,7 +469,7 @@ public partial class CoyoteWsItem : CoyoteItem
             {
                 IsQrCodeDisplayed = false;
                 CanShowQrCode = false;
-                ConnectionMessage = connectionMessage;
+                ConnectionMessage = connectionMessage ?? ConnectionFailedStateText;
                 IsConnecting = false;
             });
 
@@ -474,6 +532,19 @@ public partial class CoyoteWsItem : CoyoteItem
             CurrentStrengthB = e.CurrentStrengthB;
             StrengthCapA = e.StrengthCapA;
             StrengthCapB = e.StrengthCapB;
+        });
+    }
+
+    protected override void OnCurrentLanguageFileNameChanged(object? sender, CurrentLanguageFileNameChangedEventArgs e)
+    {
+        Debug.Assert(_coyoteWS is not null);
+        base.OnCurrentLanguageFileNameChanged(sender, e);
+        _queueService.TryEnqueue(() =>
+        {
+            if (!IsConnecting)
+            {
+                UpdateConnectionMessage(_coyoteWS.IsBound);
+            }
         });
     }
 }

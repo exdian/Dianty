@@ -11,6 +11,9 @@ public class MainWindowText
 {
     public CrashDialogText CrashDialogText { get; set; } = new();
     public MainViewText MainViewText { get; set; } = new();
+    public ToggleSwitchText ToggleSwitchText { get; set; } = new();
+    public QrCodeButtonText QrCodeButtonText { get; set; } = new();
+    public DeviceDeletionCardText DeviceDeletionCardText { get; set; } = new();
 }
 
 public class CrashDialogText
@@ -53,7 +56,41 @@ public class HomePageText
 
 public class DevicesPageText
 {
-
+    public string AddDeviceButtonText { get; set; } = "添加设备";
+    public string BluetoothLabel { get; set; } = "蓝牙";
+    public string SocketLabel { get; set; } = "Socket";
+    public string CancelButtonText { get; set; } = "取消";
+    public string SortButtonText { get; set; } = "排序";
+    public string WaitingBluetoothConnectionStateText { get; set; } = "正在搜索并连接";
+    public string WaitingSocketServerStateText { get; set; } = "正在连接服务器获取二维码";
+    public string WaitingScanQrCodeStateText { get; set; } = "已获取二维码";
+    public string ConnectionFailedStateText { get; set; } = "连接失败";
+    public string ConnectionSuccessfulStateText { get; set; } = "连接成功";
+    public string ConnectionCanceledStateText { get; set; } = "已取消连接";
+    public string DefaultDeviceNameLabel { get; set; } = "新设备";
+    public string DetailsMenuPath { get; set; } = "详细信息";
+    public string DeviceNameCardHeader { get; set; } = "设备名称";
+    public string ConnectionStatusCardHeader { get; set; } = "连接状态";
+    public string ConnectionStatusCardBluetoothDescription { get; set; } = "此设备通过蓝牙连接";
+    public string ConnectionStatusCardSocketDescription { get; set; } = "此设备通过WebSocket连接";
+    public string ConnectingStateText { get; set; } = "正在连接";
+    public string ConnectedStateText { get; set; } = "已连接";
+    public string DisconnectedStateText { get; set; } = "已断开连接";
+    public string OutputSwitchCardHeader { get; set; } = "是否允许输出";
+    public string StrengthLimitCardHeader { get; set; } = "强度上限";
+    public string OutputParametersCardHeader { get; set; } = "输出参数";
+    public string OutputParametersCardDescription { get; set; } = "轻柔模式、频率与强度平衡参数";
+    public string GentleModeCardHeader { get; set; } = "轻柔模式";
+    public string ChannelAFrequencyBalanceSliderHeader { get; set; } = "A通道频率平衡参数";
+    public string ChannelAStrengthBalanceSliderHeader { get; set; } = "A通道强度平衡参数";
+    public string ChannelBFrequencyBalanceSliderHeader { get; set; } = "B通道频率平衡参数";
+    public string ChannelBStrengthBalanceSliderHeader { get; set; } = "B通道强度平衡参数";
+    public string MoreInfoCardHeader { get; set; } = "更多";
+    public string CurrentChannelAStrengthCardHeader { get; set; } = "当前A通道强度";
+    public string CurrentChannelBStrengthCardHeader { get; set; } = "当前B通道强度";
+    public string BatteryLevelCardHeader { get; set; } = "电池电量";
+    public string ChannelAStrengthLimitCardHeader { get; set; } = "A通道强度上限";
+    public string ChannelBStrengthLimitCardHeader { get; set; } = "B通道强度上限";
 }
 
 public class WavesPageText
@@ -79,4 +116,32 @@ public class DebugPageText
 public class SettingsPageText
 {
 
+}
+
+public class ToggleSwitchText
+{
+    public string OffText { get; set; } = "关";
+    public string OnText { get; set; } = "开";
+}
+
+public class QrCodeButtonText
+{
+    public string ToolTip { get; set; } = "查看二维码";
+    public string CloseButtonText { get; set; } = "隐藏";
+}
+
+public class DeviceDeletionCardText
+{
+    public string Header { get; set; } = "删除此设备";
+    public string Description { get; set; } = "滑动到右侧可从列表中移除此设备";
+
+    public DeviceDeletionConfirmationDialogText ConfirmationDialogText { get; set; } = new();
+}
+
+public class DeviceDeletionConfirmationDialogText
+{
+    public string Title { get; set; } = "是否删除？";
+    public string PrimaryButtonText { get; set; } = "确认删除";
+    public string CloseButtonText { get; set; } = "取消";
+    public string ContentFormat { get; set; } = "从列表中移除“{0}”";
 }

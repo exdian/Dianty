@@ -40,7 +40,7 @@ public class KeySequenceTrigger
         {
             // 调整缓存区大小
             _maxCachedKeys = sequenceLength;
-            if (_cachedKeys == null || _cachedKeys.Length != sequenceLength)
+            if (_cachedKeys is null || _cachedKeys.Length != sequenceLength)
             {
                 var newCache = new VirtualKey[sequenceLength];
                 if (_cachedKeys != null && _keyCount > 0)

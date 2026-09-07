@@ -4,11 +4,15 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
+    xmlns:txt="using:Dianty.Localization"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <toolkit:SettingsCard Header="删除此设备" HeaderIcon="Delete" Description="滑动到右侧可从列表中移除此设备">
+    <toolkit:SettingsCard
+        HeaderIcon="Delete"
+        Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.DeviceDeletionCardText.Header, Mode=OneWay}"
+        Description="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.DeviceDeletionCardText.Description, Mode=OneWay}">
         <Slider
             x:Name="_deletionSlider" ValueChanged="OnDeletionSliderValueChanged"
             Minimum="0" Maximum="100" StepFrequency="10" TickFrequency="100" TickPlacement="Outside" IsThumbToolTipEnabled="False"/>

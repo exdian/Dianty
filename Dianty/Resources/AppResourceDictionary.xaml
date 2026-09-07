@@ -18,7 +18,6 @@
 
     <converters:BoolNegationConverter x:Key="BoolNegationConverter"/>
     <converters:BoolToObjectConverter x:Key="CoyoteTypeIconConverter" TrueValue="&#xE702;" FalseValue="&#xE753;"/>
-    <converters:BoolToObjectConverter x:Key="CoyoteConnectionTypeConverter" TrueValue="此设备通过蓝牙连接" FalseValue="此设备通过WebSocket连接"/>
     <converters:BoolToVisibilityConverter x:Key="VisibleIfTrueConverter" TrueValue="Visible" FalseValue="Collapsed"/>
     <converters:BoolToVisibilityConverter x:Key="VisibleIfFalseConverter" TrueValue="Collapsed" FalseValue="Visible"/>
     <utils:IntToBatteryIconConverter x:Key="IntToBatteryIconConverter"/>

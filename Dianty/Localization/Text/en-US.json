@@ -24,12 +24,66 @@
         "CurrentStrengthFormat": "Current Strength {0}",
         "NoneLabel": "None"
       },
-      "DevicesPageText": {},
+      "DevicesPageText": {
+        "AddDeviceButtonText": "Add Device",
+        "BluetoothLabel": "Bluetooth",
+        "SocketLabel": "Socket",
+        "CancelButtonText": "Cancel",
+        "SortButtonText": "Sort",
+        "WaitingBluetoothConnectionStateText": "Searching and connecting",
+        "WaitingSocketServerStateText": "Connecting to server to get QR code",
+        "WaitingScanQrCodeStateText": "QR code obtained",
+        "ConnectionFailedStateText": "Connection failed",
+        "ConnectionSuccessfulStateText": "Connection successful",
+        "ConnectionCanceledStateText": "Connection canceled",
+        "DefaultDeviceNameLabel": "New device",
+        "DetailsMenuPath": "Details",
+        "DeviceNameCardHeader": "Device Name",
+        "ConnectionStatusCardHeader": "Connection Status",
+        "ConnectionStatusCardBluetoothDescription": "This device is connected via Bluetooth",
+        "ConnectionStatusCardSocketDescription": "This device is connected via WebSocket",
+        "ConnectingStateText": "Connecting",
+        "ConnectedStateText": "Connected",
+        "DisconnectedStateText": "Disconnected",
+        "OutputSwitchCardHeader": "Allow Output",
+        "StrengthLimitCardHeader": "Strength Limit",
+        "OutputParametersCardHeader": "Output Parameters",
+        "OutputParametersCardDescription": "Gentle mode, frequency and strength balance parameters",
+        "GentleModeCardHeader": "Gentle Mode",
+        "ChannelAFrequencyBalanceSliderHeader": "Channel A Frequency Balance Parameter",
+        "ChannelAStrengthBalanceSliderHeader": "Channel A Strength Balance Parameter",
+        "ChannelBFrequencyBalanceSliderHeader": "Channel B Frequency Balance Parameter",
+        "ChannelBStrengthBalanceSliderHeader": "Channel B Strength Balance Parameter",
+        "MoreInfoCardHeader": "More",
+        "CurrentChannelAStrengthCardHeader": "Current Channel A Strength",
+        "CurrentChannelBStrengthCardHeader": "Current Channel B Strength",
+        "BatteryLevelCardHeader": "Battery Level",
+        "ChannelAStrengthLimitCardHeader": "Channel A Strength Limit",
+        "ChannelBStrengthLimitCardHeader": "Channel B Strength Limit"
+      },
       "WavesPageText": {},
       "GamesPageText": {},
       "SafetyPageText": {},
       "DebugPageText": {},
       "SettingsPageText": {}
+    },
+    "ToggleSwitchText": {
+      "OffText": "Off",
+      "OnText": "On"
+    },
+    "QrCodeButtonText": {
+      "ToolTip": "View QR code",
+      "CloseButtonText": "Hide"
+    },
+    "DeviceDeletionCardText": {
+      "Header": "Delete this device",
+      "Description": "Swipe right to remove this device from the list",
+      "ConfirmationDialogText": {
+        "Title": "Delete?",
+        "PrimaryButtonText": "Confirm Delete",
+        "CloseButtonText": "Cancel",
+        "ContentFormat": "Remove \"{0}\" from the list"
+      }
     }
   }
 }

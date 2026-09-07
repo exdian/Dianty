@@ -116,7 +116,8 @@ public partial class App : Application
         ServiceLocator.RegisterViewModel(typeof(HomePage),
             new HomePageViewModel(coyoteItems, gameManager, queueService, localizationService));
         ServiceLocator.RegisterViewModel(typeof(DevicesPage), new DevicesPage.RequiredParameter(
-            new DevicesPageViewModel(coyoteItems, queueService, coyoteBleDetector), queueService));
+            new DevicesPageViewModel(coyoteItems, queueService, coyoteBleDetector, localizationService),
+            queueService, localizationService));
         ServiceLocator.RegisterViewModel(typeof(WavesPage),
             new WavesPageViewModel(coyoteManager, queueService, windowService));
         ServiceLocator.RegisterViewModel(typeof(GamesPage), new GamesPage.RequiredParameter(

@@ -32,8 +32,6 @@ public sealed partial class MainView : UserControl
         _queueService = queueService;
         _localizationService = localizationService;
 
-        _localizationService.CurrentLanguageFileNameChanged += OnLocalizationServiceCurrentLanguageFileNameChanged;
-
         // 导航按钮不居中，需要手动刷新一下
         _navView.IsPaneOpen = false;
         _navView.IsPaneOpen = true;
@@ -72,12 +70,14 @@ public sealed partial class MainView : UserControl
     {
         WeakReferenceMessenger.Default.Register<KeyDownMessage>(this, ProcessKey);
         WeakReferenceMessenger.Default.Register<NavigationRequest>(this, ProcessNavigationRequest);
+        _localizationService.CurrentLanguageFileNameChanged += OnLocalizationServiceCurrentLanguageFileNameChanged;
     }
 
     private void MainView_Unloaded(object sender, RoutedEventArgs e)
     {
         WeakReferenceMessenger.Default.Unregister<KeyDownMessage>(this);
         WeakReferenceMessenger.Default.Unregister<NavigationRequest>(this);
+        _localizationService.CurrentLanguageFileNameChanged -= OnLocalizationServiceCurrentLanguageFileNameChanged;
     }
 
     private void ProcessKey(object recipient, KeyDownMessage message)
@@ -363,9 +363,12 @@ public sealed partial class MainView : UserControl
 
     private void OnLocalizationServiceCurrentLanguageFileNameChanged(object? sender, CurrentLanguageFileNameChangedEventArgs e)
     {
-        if (_navView.SettingsItem is ContentControl contentControl && contentControl.Content is string)
+        _queueService.TryEnqueue(() =>
         {
-            contentControl.Content = _localizationService.AppText.MainWindowText.MainViewText.MenuSettings;
-        }
+            if (_navView.SettingsItem is ContentControl contentControl && contentControl.Content is string)
+            {
+                contentControl.Content = _localizationService.AppText.MainWindowText.MainViewText.MenuSettings;
+            }
+        });
     }
 }

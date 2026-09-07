@@ -4,10 +4,13 @@ using Dianty.Utils.Messages;
 using Dianty.ViewModels;
 using Dianty.Views.Controls;
 using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
+using System;
 using System.Collections.ObjectModel;
+using static Dianty.Services.ILocalizationService;
 
 namespace Dianty.Views.Pages;
 
@@ -16,9 +19,12 @@ public sealed partial class CoyoteDetailPage : Page
     public CoyoteDetailPage()
     {
         InitializeComponent();
+        Unloaded += OnCoyoteDetailPageUnloaded;
     }
 
     private IQueueService? _queueService;
+    private ILocalizationService? _localizationService;
+    private Func<string[]>? _pathsGetter;
 
     private CoyoteItem? ViewModel { get; set; }
 
@@ -29,10 +35,36 @@ public sealed partial class CoyoteDetailPage : Page
         base.OnNavigatedTo(e);
         if (e.Parameter is RequiredParameter parameter)
         {
-            ViewModel = parameter.ViewModel;
-            Paths = [.. parameter.Paths, "详细信息"];
             _queueService = parameter.QueueService;
+            _localizationService = parameter.LocalizationService;
+            ViewModel = parameter.ViewModel;
+            _pathsGetter = parameter.PathsGetter;
+
+            Paths = [.. _pathsGetter.Invoke(),
+                _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.DetailsMenuPath];
+            _localizationService.CurrentLanguageFileNameChanged += OnCurrentLanguageFileNameChanged;
         }
+    }
+
+    private void OnCoyoteDetailPageUnloaded(object sender, RoutedEventArgs e)
+    {
+        _localizationService?.CurrentLanguageFileNameChanged -= OnCurrentLanguageFileNameChanged;
+    }
+
+    private void OnCurrentLanguageFileNameChanged(object? sender, CurrentLanguageFileNameChangedEventArgs e)
+    {
+        if (Paths is null || _queueService is null || _localizationService is null || _pathsGetter is null)
+            return;
+        string[] paths = [.. _pathsGetter.Invoke(),
+            _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.DetailsMenuPath];
+        _queueService.TryEnqueue(() =>
+        {
+            Paths.Clear();
+            foreach (string path in paths)
+            {
+                Paths.Add(path);
+            }
+        });
     }
 
     private void OnBreadcrumbBarItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args)
@@ -57,7 +89,7 @@ public sealed partial class CoyoteDetailPage : Page
         WeakReferenceMessenger.Default.Send(navigationRequest);
     }
 
-    private void OnScrollViewerLoaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    private void OnScrollViewerLoaded(object sender, RoutedEventArgs e)
     {
         if (_queueService is null)
             return;
@@ -71,5 +103,7 @@ public sealed partial class CoyoteDetailPage : Page
         });
     }
 
-    public record class RequiredParameter(CoyoteItem ViewModel, string[] Paths, IQueueService QueueService);
+    public record class RequiredParameter(
+        CoyoteItem ViewModel, Func<string[]> PathsGetter, IQueueService QueueService,
+        ILocalizationService LocalizationService);
 }

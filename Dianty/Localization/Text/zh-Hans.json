@@ -24,12 +24,66 @@
         "CurrentStrengthFormat": "当前强度 {0}",
         "NoneLabel": "无"
       },
-      "DevicesPageText": {},
+      "DevicesPageText": {
+        "AddDeviceButtonText": "添加设备",
+        "BluetoothLabel": "蓝牙",
+        "SocketLabel": "Socket",
+        "CancelButtonText": "取消",
+        "SortButtonText": "排序",
+        "WaitingBluetoothConnectionStateText": "正在搜索并连接",
+        "WaitingSocketServerStateText": "正在连接服务器获取二维码",
+        "WaitingScanQrCodeStateText": "已获取二维码",
+        "ConnectionFailedStateText": "连接失败",
+        "ConnectionSuccessfulStateText": "连接成功",
+        "ConnectionCanceledStateText": "已取消连接",
+        "DefaultDeviceNameLabel": "新设备",
+        "DetailsMenuPath": "详细信息",
+        "DeviceNameCardHeader": "设备名称",
+        "ConnectionStatusCardHeader": "连接状态",
+        "ConnectionStatusCardBluetoothDescription": "此设备通过蓝牙连接",
+        "ConnectionStatusCardSocketDescription": "此设备通过WebSocket连接",
+        "ConnectingStateText": "正在连接",
+        "ConnectedStateText": "已连接",
+        "DisconnectedStateText": "已断开连接",
+        "OutputSwitchCardHeader": "是否允许输出",
+        "StrengthLimitCardHeader": "强度上限",
+        "OutputParametersCardHeader": "输出参数",
+        "OutputParametersCardDescription": "轻柔模式、频率与强度平衡参数",
+        "GentleModeCardHeader": "轻柔模式",
+        "ChannelAFrequencyBalanceSliderHeader": "A通道频率平衡参数",
+        "ChannelAStrengthBalanceSliderHeader": "A通道强度平衡参数",
+        "ChannelBFrequencyBalanceSliderHeader": "B通道频率平衡参数",
+        "ChannelBStrengthBalanceSliderHeader": "B通道强度平衡参数",
+        "MoreInfoCardHeader": "更多",
+        "CurrentChannelAStrengthCardHeader": "当前A通道强度",
+        "CurrentChannelBStrengthCardHeader": "当前B通道强度",
+        "BatteryLevelCardHeader": "电池电量",
+        "ChannelAStrengthLimitCardHeader": "A通道强度上限",
+        "ChannelBStrengthLimitCardHeader": "B通道强度上限"
+      },
       "WavesPageText": {},
       "GamesPageText": {},
       "SafetyPageText": {},
       "DebugPageText": {},
       "SettingsPageText": {}
+    },
+    "ToggleSwitchText": {
+      "OffText": "关",
+      "OnText": "开"
+    },
+    "QrCodeButtonText": {
+      "ToolTip": "查看二维码",
+      "CloseButtonText": "隐藏"
+    },
+    "DeviceDeletionCardText": {
+      "Header": "删除此设备",
+      "Description": "滑动到右侧可从列表中移除此设备",
+      "ConfirmationDialogText": {
+        "Title": "是否删除？",
+        "PrimaryButtonText": "确认删除",
+        "CloseButtonText": "取消",
+        "ContentFormat": "从列表中移除“{0}”"
+      }
     }
   }
 }
