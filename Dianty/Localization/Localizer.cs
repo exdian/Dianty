@@ -71,7 +71,7 @@ public partial class Localizer : ObservableObject, ILocalizationService
             {
                 // 系统语言是中文或者英文文件不存在则生成中文
                 fileName = simplifiedChinese + ".json";
-                appText = new AppText { Language = "简体中文" };
+                appText = new AppText { LanguageLabel = "简体中文" };
                 Directory.CreateDirectory(localizer.TextDirectory);
                 var json = JsonSerializer.Serialize(appText, AppTextJsonContext.Unsafe.AppText);
                 File.WriteAllText(Path.Combine(localizer.TextDirectory, fileName), json);
@@ -107,7 +107,7 @@ public partial class Localizer : ObservableObject, ILocalizationService
                 if (appText is not null)
                 {
                     var fileName = Path.GetFileName(filePath);
-                    var language = string.IsNullOrEmpty(appText.Language) ? fileName : appText.Language;
+                    var language = string.IsNullOrEmpty(appText.LanguageLabel) ? fileName : appText.LanguageLabel;
                     result.TryAdd(fileName, language);
                 }
             }

@@ -43,10 +43,10 @@
             <NavigationView.MenuItems>
                 <NavigationViewItem
                     Icon="Home" Tag="{x:Bind HomePage}"
-                    Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.HomeMenuItem, Mode=OneWay}"/>
+                    Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.MenuHome, Mode=OneWay}"/>
                 <NavigationViewItem
                     Tag="{x:Bind DevicesPage}"
-                    Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesMenuItem, Mode=OneWay}">
+                    Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.MenuDevices, Mode=OneWay}">
                     <NavigationViewItem.Icon>
                         <PathIcon
                             Data="M0 20 20 0H84l20 20V146L84 166H20L0 146ZM10 26V52L22 64v38L10 114v26l16 16H78l16-16V
@@ -55,24 +55,24 @@
                 </NavigationViewItem>
                 <NavigationViewItem
                     Tag="{x:Bind WavesPage}"
-                    Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.WavesMenuItem, Mode=OneWay}">
+                    Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.MenuWaves, Mode=OneWay}">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE9D9;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
                 <NavigationViewItem
                     Tag="{x:Bind GamesPage}"
-                    Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesMenuItem, Mode=OneWay}">
+                    Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.MenuGames, Mode=OneWay}">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE7FC;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
                 <NavigationViewItem
                     Icon="ReportHacked" Tag="{x:Bind SafetyPage}"
-                    Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.SafetyMenuItem, Mode=OneWay}"/>
+                    Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.MenuSafety, Mode=OneWay}"/>
                 <NavigationViewItem
                     x:Name="_debugMenuItem" Icon="Repair" Tag="{x:Bind DebugPage}"
-                    Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DebugMenuItem, Mode=OneWay}"/>
+                    Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.MenuDebug, Mode=OneWay}"/>
             </NavigationView.MenuItems>
         </NavigationView>
         <VisualStateManager.VisualStateGroups>

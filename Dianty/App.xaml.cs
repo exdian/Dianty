@@ -43,8 +43,9 @@ public partial class App : Application
         var dialog = _window?.CreateContentDialog();
         if (dialog is null)
             return;
-        dialog.Title = "Unhandled exception";
-        dialog.CloseButtonText = "Shutdown";
+        var dialogText = Localizer.Instance?.AppText.MainWindowText.CrashDialogText;
+        dialog.Title = dialogText?.Title ?? "Something went wrong";
+        dialog.CloseButtonText = dialogText?.CloseButtonText ?? "Exit";
         dialog.IsPrimaryButtonEnabled = false;
         dialog.IsSecondaryButtonEnabled = false;
         dialog.DefaultButton = ContentDialogButton.Close;
@@ -62,11 +63,12 @@ public partial class App : Application
         var window = new MainWindow();
         window.AppWindow.Closing += OnAppWindowClosing;
         ToDoList.Plan += VersionHelper.Init;
+        ToDoList.Plan += Localizer.Init;
         ToDoList.Plan += RegisterService;
         ToDoList.UiPlan += MergeDictionaries;
         ToDoList.UiPlan += SetWindowIcon;
         TopPageLocator.Init(GetTopPage);
-        window.ViewModel = new MainViewModel(window, window);
+        window.ViewModel = new MainViewModel(window);
         _window = window;
         _window.Activate();
     }
@@ -92,7 +94,6 @@ public partial class App : Application
         ICoyoteBleDetector coyoteBleDetector = new CoyoteBleDetector();
         ServiceLocator.Register(coyoteBleDetector);
         ServiceLocator.Register<IMemoryService>(static () => new MemoryService());
-        Localizer.Init();
         ILocalizationService localizationService = Localizer.Instance;
         ServiceLocator.Register(localizationService);
 

@@ -1,24 +1,28 @@
 {
-  "Language": "简体中文",
+  "LanguageLabel": "简体中文",
   "MainWindowText": {
+    "CrashDialogText": {
+      "Title": "出错了",
+      "CloseButtonText": "结束运行"
+    },
     "MainViewText": {
-      "HomeMenuItem": "主页",
-      "DevicesMenuItem": "设备",
-      "WavesMenuItem": "波形",
-      "GamesMenuItem": "玩法",
-      "SafetyMenuItem": "安全",
-      "DebugMenuItem": "调试",
-      "SettingsMenuItem": "设置",
+      "MenuHome": "主页",
+      "MenuDevices": "设备",
+      "MenuWaves": "波形",
+      "MenuGames": "玩法",
+      "MenuSafety": "安全",
+      "MenuDebug": "调试",
+      "MenuSettings": "设置",
       "HomePageText": {
-        "DeviceManagement": "设备管理",
-        "ConnectedCount": "已连接 ",
-        "AddedCount": "已添加 ",
-        "NowPlaying": "正在播放",
-        "AChannel": "A通道 ",
-        "BChannel": "B通道 ",
-        "OutputStrength": "输出强度",
-        "CurrentStrength": "当前强度 ",
-        "None": "无"
+        "DeviceManagementCardHeader": "设备管理",
+        "ConnectedCountFormat": "已连接 {0}",
+        "AddedCountFormat": "已添加 {0}",
+        "NowPlayingCardHeader": "正在播放",
+        "ChannelAFormat": "A通道 {0}",
+        "ChannelBFormat": "B通道 {0}",
+        "OutputStrengthCardHeader": "输出强度",
+        "CurrentStrengthFormat": "当前强度 {0}",
+        "NoneLabel": "无"
       },
       "DevicesPageText": {},
       "WavesPageText": {},

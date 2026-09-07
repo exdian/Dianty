@@ -23,19 +23,19 @@
                     <toolkit:SettingsCard.Header>
                         <StackPanel Spacing="6">
                             <TextBlock
-                                Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.HomePageText.DeviceManagement, Mode=OneWay}"
+                                Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.HomePageText.DeviceManagementCardHeader, Mode=OneWay}"
                                 Style="{ThemeResource SubtitleTextBlockStyle}" Margin="0,0,0,6"/>
-                            <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}">
-                                <Run Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.HomePageText.ConnectedCount, Mode=OneWay}"/><Run Text="{x:Bind ViewModel.ConnectedCount, Mode=OneWay}"/>
-                            </TextBlock>
-                            <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}">
-                                <Run Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.HomePageText.AddedCount, Mode=OneWay}"/><Run Text="{x:Bind ViewModel.AddedCount, Mode=OneWay}"/>
-                            </TextBlock>
+                            <TextBlock
+                                Text="{x:Bind ViewModel.FormattedConnectedCount, Mode=OneWay}"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            <TextBlock
+                                Text="{x:Bind ViewModel.FormattedAddedCount, Mode=OneWay}"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                         </StackPanel>
                     </toolkit:SettingsCard.Header>
                 </toolkit:SettingsCard>
                 <toolkit:SettingsCard
-                    Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesMenuItem, Mode=OneWay}"
+                    Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.MenuDevices, Mode=OneWay}"
                     IsClickEnabled="True" CornerRadius="0,0,8,8" Click="OnDeviceCardClick">
                     <toolkit:SettingsCard.HeaderIcon>
                         <PathIcon
@@ -49,19 +49,19 @@
                     <toolkit:SettingsCard.Header>
                         <StackPanel Spacing="6">
                             <TextBlock
-                                Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.HomePageText.NowPlaying, Mode=OneWay}"
+                                Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.HomePageText.NowPlayingCardHeader, Mode=OneWay}"
                                 Style="{ThemeResource SubtitleTextBlockStyle}" Margin="0,0,0,6"/>
-                            <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}">
-                                <Run Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.HomePageText.AChannel, Mode=OneWay}"/><Run Text="{x:Bind ViewModel.WaveNameA, Mode=OneWay}"/>
-                            </TextBlock>
-                            <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}">
-                                <Run Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.HomePageText.BChannel, Mode=OneWay}"/><Run Text="{x:Bind ViewModel.WaveNameB, Mode=OneWay}"/>
-                            </TextBlock>
+                            <TextBlock
+                                Text="{x:Bind ViewModel.FormattedWaveNameA, Mode=OneWay}"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            <TextBlock
+                                Text="{x:Bind ViewModel.FormattedWaveNameB, Mode=OneWay}"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                         </StackPanel>
                     </toolkit:SettingsCard.Header>
                 </toolkit:SettingsCard>
                 <toolkit:SettingsCard
-                    Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.WavesMenuItem, Mode=OneWay}"
+                    Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.MenuWaves, Mode=OneWay}"
                     IsClickEnabled="True" CornerRadius="0,0,8,8" Click="OnWaveCardClick">
                     <toolkit:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE9D9;"/>
@@ -73,16 +73,16 @@
                     <toolkit:SettingsCard.Header>
                         <StackPanel Spacing="6">
                             <TextBlock
-                                Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.HomePageText.OutputStrength, Mode=OneWay}"
+                                Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.HomePageText.OutputStrengthCardHeader, Mode=OneWay}"
                                 Style="{ThemeResource SubtitleTextBlockStyle}" Margin="0,0,0,6"/>
-                            <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}">
-                                <Run Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.HomePageText.CurrentStrength, Mode=OneWay}"/><Run Text="{x:Bind ViewModel.CurrentStrength, Mode=OneWay}"/>
-                            </TextBlock>
+                            <TextBlock
+                                Text="{x:Bind ViewModel.FormattedCurrentStrength, Mode=OneWay}"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                         </StackPanel>
                     </toolkit:SettingsCard.Header>
                 </toolkit:SettingsCard>
                 <toolkit:SettingsCard
-                    Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesMenuItem, Mode=OneWay}"
+                    Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.MenuGames, Mode=OneWay}"
                     IsClickEnabled="True" CornerRadius="0,0,8,8" Click="OnGameCardClick">
                     <toolkit:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE7FC;"/>

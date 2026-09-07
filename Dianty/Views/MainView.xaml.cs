@@ -365,7 +365,7 @@ public sealed partial class MainView : UserControl
     {
         if (_navView.SettingsItem is ContentControl contentControl && contentControl.Content is string)
         {
-            contentControl.Content = _localizationService.AppText.MainWindowText.MainViewText.SettingsMenuItem;
+            contentControl.Content = _localizationService.AppText.MainWindowText.MainViewText.MenuSettings;
         }
     }
 }

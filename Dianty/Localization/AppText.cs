@@ -2,25 +2,32 @@
 
 public class AppText
 {
-    public string Language { get; set; } = string.Empty;
+    public string LanguageLabel { get; set; } = string.Empty;
 
     public MainWindowText MainWindowText { get; set; } = new();
 }
 
 public class MainWindowText
 {
+    public CrashDialogText CrashDialogText { get; set; } = new();
     public MainViewText MainViewText { get; set; } = new();
+}
+
+public class CrashDialogText
+{
+    public string Title { get; set; } = "出错了";
+    public string CloseButtonText { get; set; } = "结束运行";
 }
 
 public class MainViewText
 {
-    public string HomeMenuItem { get; set; } = "主页";
-    public string DevicesMenuItem { get; set; } = "设备";
-    public string WavesMenuItem { get; set; } = "波形";
-    public string GamesMenuItem { get; set; } = "玩法";
-    public string SafetyMenuItem { get; set; } = "安全";
-    public string DebugMenuItem { get; set; } = "调试";
-    public string SettingsMenuItem { get; set; } = "设置";
+    public string MenuHome { get; set; } = "主页";
+    public string MenuDevices { get; set; } = "设备";
+    public string MenuWaves { get; set; } = "波形";
+    public string MenuGames { get; set; } = "玩法";
+    public string MenuSafety { get; set; } = "安全";
+    public string MenuDebug { get; set; } = "调试";
+    public string MenuSettings { get; set; } = "设置";
 
     public HomePageText HomePageText { get; set; } = new();
     public DevicesPageText DevicesPageText { get; set; } = new();
@@ -33,15 +40,15 @@ public class MainViewText
 
 public class HomePageText
 {
-    public string DeviceManagement { get; set; } = "设备管理";
-    public string ConnectedCount { get; set; } = "已连接 ";
-    public string AddedCount { get; set; } = "已添加 ";
-    public string NowPlaying { get; set; } = "正在播放";
-    public string AChannel { get; set; } = "A通道 ";
-    public string BChannel { get; set; } = "B通道 ";
-    public string OutputStrength { get; set; } = "输出强度";
-    public string CurrentStrength { get; set; } = "当前强度 ";
-    public string None { get; set; } = "无";
+    public string DeviceManagementCardHeader { get; set; } = "设备管理";
+    public string ConnectedCountFormat { get; set; } = "已连接 {0}";
+    public string AddedCountFormat { get; set; } = "已添加 {0}";
+    public string NowPlayingCardHeader { get; set; } = "正在播放";
+    public string ChannelAFormat { get; set; } = "A通道 {0}";
+    public string ChannelBFormat { get; set; } = "B通道 {0}";
+    public string OutputStrengthCardHeader { get; set; } = "输出强度";
+    public string CurrentStrengthFormat { get; set; } = "当前强度 {0}";
+    public string NoneLabel { get; set; } = "无";
 }
 
 public class DevicesPageText

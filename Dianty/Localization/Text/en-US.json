@@ -1,24 +1,28 @@
 {
-  "Language": "English",
+  "LanguageLabel": "English",
   "MainWindowText": {
+    "CrashDialogText": {
+      "Title": "Something went wrong",
+      "CloseButtonText": "Exit"
+    },
     "MainViewText": {
-      "HomeMenuItem": "Home",
-      "DevicesMenuItem": "Device",
-      "WavesMenuItem": "Wave",
-      "GamesMenuItem": "Game",
-      "SafetyMenuItem": "Safety",
-      "DebugMenuItem": "Debug",
-      "SettingsMenuItem": "Settings",
+      "MenuHome": "Home",
+      "MenuDevices": "Devices",
+      "MenuWaves": "Waves",
+      "MenuGames": "Games",
+      "MenuSafety": "Safety",
+      "MenuDebug": "Debug",
+      "MenuSettings": "Settings",
       "HomePageText": {
-        "DeviceManagement": "Device Management",
-        "ConnectedCount": "Connected Count: ",
-        "AddedCount": "Added Count: ",
-        "NowPlaying": "Now Playing",
-        "AChannel": "A Channel: ",
-        "BChannel": "B Channel: ",
-        "OutputStrength": "Output Strength",
-        "CurrentStrength": "Current Strength: ",
-        "None": "None"
+        "DeviceManagementCardHeader": "Device Management",
+        "ConnectedCountFormat": "Connected {0}",
+        "AddedCountFormat": "Added {0}",
+        "NowPlayingCardHeader": "Now Playing",
+        "ChannelAFormat": "Channel A {0}",
+        "ChannelBFormat": "Channel B {0}",
+        "OutputStrengthCardHeader": "Output Strength",
+        "CurrentStrengthFormat": "Current Strength {0}",
+        "NoneLabel": "None"
       },
       "DevicesPageText": {},
       "WavesPageText": {},
