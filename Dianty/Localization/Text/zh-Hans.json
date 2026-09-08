@@ -90,7 +90,7 @@
           "PartiallyFailedTitle": "处理部分文件时发生错误",
           "CloseButtonText": "关闭",
           "ContentFirstLineText": "处理文件时出错：",
-          "FailureCountFormat": "({0}个) ："
+          "FailureCountFormat": "（{0}个）："
         },
         "ClassicWavesNameLabel": {
           "Breathing": "呼吸",

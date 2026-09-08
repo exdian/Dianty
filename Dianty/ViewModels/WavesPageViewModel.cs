@@ -71,12 +71,12 @@ public partial class WavesPageViewModel : ObservableObject
         WavePlayingItemsA.CollectionChanged += OnWavePlayingItemsACollectionChanged;
         WavePlayingItemsB.CollectionChanged += OnWavePlayingItemsBCollectionChanged;
 
-        WavePlayingModeItems =
-            [new WavePlayingModeSelectionItem(WavePlayMode.RepeatAll, "\uE8EE"),
-            new WavePlayingModeSelectionItem(WavePlayMode.Shuffle, "\uE8B1"),
-            new WavePlayingModeSelectionItem(WavePlayMode.RepeatOne, "\uE8ED"),];
-        WavePlayingModeA = WavePlayingModeItems[0];
-        WavePlayingModeB = WavePlayingModeItems[0];
+        WavePlaybackModeItems =
+            [new WavePlaybackModeSelectionItem(WavePlaybackMode.RepeatAll, "\uE8EE"),
+            new WavePlaybackModeSelectionItem(WavePlaybackMode.Shuffle, "\uE8B1"),
+            new WavePlaybackModeSelectionItem(WavePlaybackMode.RepeatOne, "\uE8ED"),];
+        WavePlaybackModeA = WavePlaybackModeItems[0];
+        WavePlaybackModeB = WavePlaybackModeItems[0];
 
         WaveIntervalItems = [5, 10, 20, 30, 50, 100, 200, 300, 600, 1200, 3000];
         WaveIntervalA = 50;
@@ -100,7 +100,7 @@ public partial class WavesPageViewModel : ObservableObject
     public ObservableCollection<WaveItem> WaveItems { get; } = [];
     public ObservableCollection<WavePlayingItem> WavePlayingItemsA { get; } = [];
     public ObservableCollection<WavePlayingItem> WavePlayingItemsB { get; } = [];
-    public WavePlayingModeSelectionItem[] WavePlayingModeItems { get; }
+    public WavePlaybackModeSelectionItem[] WavePlaybackModeItems { get; }
     public int[] WaveIntervalItems { get; }
 
     [ObservableProperty]
@@ -110,10 +110,10 @@ public partial class WavesPageViewModel : ObservableObject
     public partial bool IsChannelEnabledB { get; set; }
 
     [ObservableProperty]
-    public partial WavePlayingModeSelectionItem WavePlayingModeA { get; set; }
+    public partial WavePlaybackModeSelectionItem WavePlaybackModeA { get; set; }
 
     [ObservableProperty]
-    public partial WavePlayingModeSelectionItem WavePlayingModeB { get; set; }
+    public partial WavePlaybackModeSelectionItem WavePlaybackModeB { get; set; }
 
     [ObservableProperty]
     public partial int WaveIntervalA { get; set; }
@@ -323,14 +323,14 @@ public partial class WavesPageViewModel : ObservableObject
         _coyoteManager.ChannelB.IsEnabled = value;
     }
 
-    partial void OnWavePlayingModeAChanged(WavePlayingModeSelectionItem value)
+    partial void OnWavePlaybackModeAChanged(WavePlaybackModeSelectionItem value)
     {
-        _coyoteManager.ChannelA.PlayMode = value.Mode;
+        _coyoteManager.ChannelA.PlaybackMode = value.Mode;
     }
 
-    partial void OnWavePlayingModeBChanged(WavePlayingModeSelectionItem value)
+    partial void OnWavePlaybackModeBChanged(WavePlaybackModeSelectionItem value)
     {
-        _coyoteManager.ChannelB.PlayMode = value.Mode;
+        _coyoteManager.ChannelB.PlaybackMode = value.Mode;
     }
 
     partial void OnWaveIntervalAChanged(int value)
@@ -344,4 +344,4 @@ public partial class WavesPageViewModel : ObservableObject
     }
 }
 
-public readonly record struct WavePlayingModeSelectionItem(WavePlayMode Mode, string Description);
+public readonly record struct WavePlaybackModeSelectionItem(WavePlaybackMode Mode, string Description);

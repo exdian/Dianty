@@ -89,8 +89,8 @@
           "AllFailedTitle": "Error",
           "PartiallyFailedTitle": "Error processing some files",
           "CloseButtonText": "Close",
-          "ContentFirstLineText": "Error processing file: ",
-          "FailureCountFormat": "({0} items): "
+          "ContentFirstLineText": "Error processing file:",
+          "FailureCountFormat": " ({0} items) :"
         },
         "ClassicWavesNameLabel": {
           "Breathing": "Breathing",
@@ -107,8 +107,8 @@
           "Rainfall": "Rainfall",
           "TempoTap": "Tempo Tap",
           "Signal": "Signal",
-          "Tease1": "Tease1",
-          "Tease2": "Tease2"
+          "Tease1": "Tease 1",
+          "Tease2": "Tease 2"
         }
       },
       "GamesPageText": {},

@@ -5,19 +5,19 @@ using System.Windows.Input;
 
 namespace Dianty.Views.Controls;
 
-public sealed partial class WavePlayingQueueListView : UserControl
+public sealed partial class WavePlayQueueListView : UserControl
 {
-    public string Header
+    public object Header
     {
-        get => (string)GetValue(HeaderProperty);
+        get => GetValue(HeaderProperty);
         set => SetValue(HeaderProperty, value);
     }
 
     public static readonly DependencyProperty HeaderProperty
         = DependencyProperty.Register(
             nameof(Header),
-            typeof(string),
-            typeof(WavePlayingQueueListView),
+            typeof(object),
+            typeof(WavePlayQueueListView),
             new PropertyMetadata(null));
 
     public bool IsChannelEnabled
@@ -30,7 +30,7 @@ public sealed partial class WavePlayingQueueListView : UserControl
         = DependencyProperty.Register(
             nameof(IsChannelEnabled),
             typeof(bool),
-            typeof(WavePlayingQueueListView),
+            typeof(WavePlayQueueListView),
             new PropertyMetadata(false));
 
     public object WavePlayingItemsSource
@@ -43,33 +43,33 @@ public sealed partial class WavePlayingQueueListView : UserControl
         = DependencyProperty.Register(
             nameof(WavePlayingItemsSource),
             typeof(object),
-            typeof(WavePlayingQueueListView),
+            typeof(WavePlayQueueListView),
             new PropertyMetadata(null));
 
-    public object PlayingModeItemsSource
+    public object PlaybackModeItemsSource
     {
-        get => GetValue(PlayingModeItemsSourceProperty);
-        set => SetValue(PlayingModeItemsSourceProperty, value);
+        get => GetValue(PlaybackModeItemsSourceProperty);
+        set => SetValue(PlaybackModeItemsSourceProperty, value);
     }
 
-    public static readonly DependencyProperty PlayingModeItemsSourceProperty
+    public static readonly DependencyProperty PlaybackModeItemsSourceProperty
         = DependencyProperty.Register(
-            nameof(PlayingModeItemsSource),
+            nameof(PlaybackModeItemsSource),
             typeof(object),
-            typeof(WavePlayingQueueListView),
+            typeof(WavePlayQueueListView),
             new PropertyMetadata(null));
 
-    public object SelectedPlayingMode
+    public object SelectedPlaybackMode
     {
-        get => GetValue(SelectedPlayingModeProperty);
-        set => SetValue(SelectedPlayingModeProperty, value);
+        get => GetValue(SelectedPlaybackModeProperty);
+        set => SetValue(SelectedPlaybackModeProperty, value);
     }
 
-    public static readonly DependencyProperty SelectedPlayingModeProperty
+    public static readonly DependencyProperty SelectedPlaybackModeProperty
         = DependencyProperty.Register(
-            nameof(SelectedPlayingMode),
+            nameof(SelectedPlaybackMode),
             typeof(object),
-            typeof(WavePlayingQueueListView),
+            typeof(WavePlayQueueListView),
             new PropertyMetadata(null));
 
     public object WaveIntervalItemsSource
@@ -82,7 +82,7 @@ public sealed partial class WavePlayingQueueListView : UserControl
         = DependencyProperty.Register(
             nameof(WaveIntervalItemsSource),
             typeof(object),
-            typeof(WavePlayingQueueListView),
+            typeof(WavePlayQueueListView),
             new PropertyMetadata(null));
 
     public object SelectedWaveInterval
@@ -95,7 +95,7 @@ public sealed partial class WavePlayingQueueListView : UserControl
         = DependencyProperty.Register(
             nameof(SelectedWaveInterval),
             typeof(object),
-            typeof(WavePlayingQueueListView),
+            typeof(WavePlayQueueListView),
             new PropertyMetadata(null));
 
     public ICommand PlayWaveCommand
@@ -108,7 +108,7 @@ public sealed partial class WavePlayingQueueListView : UserControl
         = DependencyProperty.Register(
             nameof(PlayWaveCommand),
             typeof(ICommand),
-            typeof(WavePlayingQueueListView),
+            typeof(WavePlayQueueListView),
             new PropertyMetadata(null));
 
     public ICommand RemoveWaveCommand
@@ -121,7 +121,7 @@ public sealed partial class WavePlayingQueueListView : UserControl
         = DependencyProperty.Register(
             nameof(RemoveWaveCommand),
             typeof(ICommand),
-            typeof(WavePlayingQueueListView),
+            typeof(WavePlayQueueListView),
             new PropertyMetadata(null));
 
     public ICommand ClearPlayingItemsCommand
@@ -134,10 +134,10 @@ public sealed partial class WavePlayingQueueListView : UserControl
         = DependencyProperty.Register(
             nameof(ClearPlayingItemsCommand),
             typeof(ICommand),
-            typeof(WavePlayingQueueListView),
+            typeof(WavePlayQueueListView),
             new PropertyMetadata(null));
 
-    public WavePlayingQueueListView()
+    public WavePlayQueueListView()
     {
         InitializeComponent();
     }

@@ -12,12 +12,12 @@ using static Dianty.Services.ILocalizationService;
 
 namespace Dianty.Views.Pages;
 
-public sealed partial class WavePlayingQueuePage : Page
+public sealed partial class WavePlayQueuePage : Page
 {
-    public WavePlayingQueuePage()
+    public WavePlayQueuePage()
     {
         InitializeComponent();
-        Unloaded += OnWavePlayingQueuePageUnloaded;
+        Unloaded += OnWavePlayQueuePageUnloaded;
     }
 
     private IQueueService? _queueService;
@@ -43,7 +43,7 @@ public sealed partial class WavePlayingQueuePage : Page
         }
     }
 
-    private void OnWavePlayingQueuePageUnloaded(object sender, RoutedEventArgs e)
+    private void OnWavePlayQueuePageUnloaded(object sender, RoutedEventArgs e)
     {
         _localizationService?.CurrentLanguageFileNameChanged -= OnCurrentLanguageFileNameChanged;
     }

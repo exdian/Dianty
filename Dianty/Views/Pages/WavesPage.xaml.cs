@@ -46,9 +46,9 @@ public sealed partial class WavesPage : Page
                 Effect = SlideNavigationTransitionEffect.FromRight
             }
         };
-        var requiredParameter = new WavePlayingQueuePage.RequiredParameter(ViewModel,
+        var requiredParameter = new WavePlayQueuePage.RequiredParameter(ViewModel,
             () => [_localizationService.AppText.MainWindowText.MainViewText.MenuWaves], _queueService, _localizationService);
-        WeakReferenceMessenger.Default.Send(new NavigationRequest(typeof(WavePlayingQueuePage), requiredParameter, options));
+        WeakReferenceMessenger.Default.Send(new NavigationRequest(typeof(WavePlayQueuePage), requiredParameter, options));
     }
 
     private void OnWaveItemCardClick(object sender, RoutedEventArgs e)

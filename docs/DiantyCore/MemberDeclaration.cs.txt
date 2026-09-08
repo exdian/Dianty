@@ -11,7 +11,13 @@ public enum Channel
     A,
     B,
 }
-public enum WavePlayMode 
+public enum SocketStrengthMode 
+{
+    Sub,
+    Add,
+    Abs,
+}
+public enum WavePlaybackMode 
 {
     RepeatAll,
     Shuffle,

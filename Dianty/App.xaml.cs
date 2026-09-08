@@ -170,7 +170,7 @@ public partial class App : Application
         {
             nameof(HomePage) => typeof(HomePage),
             nameof(DevicesPage) or nameof(CoyoteDetailPage) => typeof(DevicesPage),
-            nameof(WavesPage) or nameof(WavePlayingQueuePage) or nameof(WaveSettingsPage) => typeof(WavesPage),
+            nameof(WavesPage) or nameof(WavePlayQueuePage) or nameof(WaveSettingsPage) => typeof(WavesPage),
             nameof(GamesPage) => typeof(GamesPage),
             nameof(SafetyPage) => typeof(SafetyPage),
             nameof(DebugPage) => typeof(DebugPage),
