@@ -47,7 +47,7 @@ public sealed partial class WavesPage : Page
             }
         };
         var requiredParameter = new WavePlayQueuePage.RequiredParameter(ViewModel,
-            () => [_localizationService.AppText.MainWindowText.MainViewText.MenuWaves], _queueService, _localizationService);
+            [s => s.AppText.MainWindowText.MainViewText.MenuWaves], _queueService, _localizationService);
         WeakReferenceMessenger.Default.Send(new NavigationRequest(typeof(WavePlayQueuePage), requiredParameter, options));
     }
 
@@ -67,7 +67,7 @@ public sealed partial class WavesPage : Page
         if (element.DataContext is WaveItem waveItem)
         {
             var requiredParameter = new WaveSettingsPage.RequiredParameter(waveItem,
-                () => [_localizationService.AppText.MainWindowText.MainViewText.MenuWaves], _queueService, _localizationService);
+                [s => s.AppText.MainWindowText.MainViewText.MenuWaves], _queueService, _localizationService);
             WeakReferenceMessenger.Default.Send(new NavigationRequest(typeof(WaveSettingsPage), requiredParameter, options));
         }
     }

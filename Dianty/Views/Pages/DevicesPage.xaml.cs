@@ -1,5 +1,4 @@
 using CommunityToolkit.Mvvm.Messaging;
-using Dianty.Localization;
 using Dianty.Services;
 using Dianty.Utils.Messages;
 using Dianty.ViewModels;
@@ -49,7 +48,7 @@ public sealed partial class DevicesPage : Page
         if (element.DataContext is CoyoteItem coyoteItem)
         {
             var requiredParameter = new CoyoteDetailPage.RequiredParameter(coyoteItem,
-                () => [_localizationService.AppText.MainWindowText.MainViewText.MenuDevices], _queueService, _localizationService);
+                [s => s.AppText.MainWindowText.MainViewText.MenuDevices], _queueService, _localizationService);
             WeakReferenceMessenger.Default.Send(new NavigationRequest(typeof(CoyoteDetailPage), requiredParameter, options));
         }
     }

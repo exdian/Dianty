@@ -9,7 +9,9 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using static Dianty.Services.ILocalizationService;
 
 namespace Dianty.Views.Pages;
@@ -24,7 +26,7 @@ public sealed partial class CoyoteDetailPage : Page
 
     private IQueueService? _queueService;
     private ILocalizationService? _localizationService;
-    private Func<string[]>? _pathsGetter;
+    private IEnumerable<Func<ILocalizationService, string>>? _pathGetters;
 
     private CoyoteItem? ViewModel { get; set; }
 
@@ -37,10 +39,10 @@ public sealed partial class CoyoteDetailPage : Page
         {
             _queueService = parameter.QueueService;
             _localizationService = parameter.LocalizationService;
+            _pathGetters = parameter.PathGetters;
             ViewModel = parameter.ViewModel;
-            _pathsGetter = parameter.PathsGetter;
 
-            Paths = [.. _pathsGetter.Invoke(),
+            Paths = [.. _pathGetters.Select(f => f.Invoke(_localizationService)),
                 _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.DetailsMenuPath];
             _localizationService.CurrentLanguageFileNameChanged += OnCurrentLanguageFileNameChanged;
         }
@@ -53,9 +55,9 @@ public sealed partial class CoyoteDetailPage : Page
 
     private void OnCurrentLanguageFileNameChanged(object? sender, CurrentLanguageFileNameChangedEventArgs e)
     {
-        if (Paths is null || _queueService is null || _localizationService is null || _pathsGetter is null)
+        if (Paths is null || _queueService is null || _localizationService is null || _pathGetters is null)
             return;
-        string[] paths = [.. _pathsGetter.Invoke(),
+        string[] paths = [.. _pathGetters.Select(f => f.Invoke(_localizationService)),
             _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.DetailsMenuPath];
         _queueService.TryEnqueue(() =>
         {
@@ -104,6 +106,6 @@ public sealed partial class CoyoteDetailPage : Page
     }
 
     public record class RequiredParameter(
-        CoyoteItem ViewModel, Func<string[]> PathsGetter, IQueueService QueueService,
+        CoyoteItem ViewModel, IEnumerable<Func<ILocalizationService, string>> PathGetters, IQueueService QueueService,
         ILocalizationService LocalizationService);
 }
