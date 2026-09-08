@@ -4,6 +4,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:Dianty.Views.Controls"
+    xmlns:txt="using:Dianty.Localization"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -27,7 +28,8 @@
             </BreadcrumbBar.ItemTemplate>
         </BreadcrumbBar>
         <controls:WavePlayingQueueListView
-            x:Name="ListViewA" Grid.Row="1" Padding="12,0,12,20" Header="A通道队列"
+            x:Name="ListViewA" Grid.Row="1" Padding="12,0,12,20"
+            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.WavesPageText.ChannelAQueueSwitchHeader, Mode=OneWay}"
             IsChannelEnabled="{x:Bind ViewModel.IsChannelEnabledA, Mode=TwoWay}"
             WavePlayingItemsSource="{x:Bind ViewModel.WavePlayingItemsA}"
             PlayingModeItemsSource="{x:Bind ViewModel.WavePlayingModeItems}"
@@ -38,7 +40,8 @@
             RemoveWaveCommand="{x:Bind ViewModel.RemovePlayingItemACommand}"
             ClearPlayingItemsCommand="{x:Bind ViewModel.ClearPlayingItemsACommand}"/>
         <controls:WavePlayingQueueListView
-            x:Name="ListViewB" Grid.Row="1" Grid.Column="1" Padding="12,0,12,20" Header="B通道队列"
+            x:Name="ListViewB" Grid.Row="1" Grid.Column="1" Padding="12,0,12,20"
+            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.WavesPageText.ChannelBQueueSwitchHeader, Mode=OneWay}"
             IsChannelEnabled="{x:Bind ViewModel.IsChannelEnabledB, Mode=TwoWay}"
             WavePlayingItemsSource="{x:Bind ViewModel.WavePlayingItemsB}"
             PlayingModeItemsSource="{x:Bind ViewModel.WavePlayingModeItems}"

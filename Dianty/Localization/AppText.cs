@@ -95,7 +95,61 @@ public class DevicesPageText
 
 public class WavesPageText
 {
+    public string ChannelAQueueSwitchHeader { get; set; } = "A通道队列";
+    public string ChannelBQueueSwitchHeader { get; set; } = "B通道队列";
+    public string ImportWaveButtonText { get; set; } = "导入波形";
+    public string DeleteButtonText { get; set; } = "删除";
+    public string SortButtonText { get; set; } = "排序";
+    public string QueueButtonText { get; set; } = "播放队列";
+    public string WaveFilePickerTitle { get; set; } = "打开";
+    public string WaveFilesLabel { get; set; } = "波形文件";
+    public string AllFilesLabel { get; set; } = "所有文件";
+    public string DefaultWaveNameLabel { get; set; } = "新波形";
+    public string ChannelALabel { get; set; } = "A通道";
+    public string ChannelBLabel { get; set; } = "B通道";
+    public string QueueMenuPath { get; set; } = "播放队列";
+    public string ClearButtonText { get; set; } = "清空";
+    public string QueueModePlaceholderText { get; set; } = "播放模式";
+    public string QueueIntervalPlaceholderText { get; set; } = "切换间隔";
+    public string QueueIntervalUnitText { get; set; } = "秒";
+    public string DetailsMenuPath { get; set; } = "详细信息";
+    public string WaveNameCardHeader { get; set; } = "名称";
+    public string WaveDescriptionCardHeader { get; set; } = "备注";
+    public string WaveQueueSwitchCardHeader { get; set; } = "将波形加入到播放队列";
+    public string ChannelAQueueCardHeader { get; set; } = "A通道播放队列";
+    public string ChannelBQueueCardHeader { get; set; } = "B通道播放队列";
 
+    public ErrorProcessingFileDialogText ErrorProcessingFileDialogText { get; set; } = new();
+    public ClassicWavesNameLabel ClassicWavesNameLabel { get; set; } = new();
+}
+
+public class ErrorProcessingFileDialogText
+{
+    public string AllFailedTitle { get; set; } = "发生错误";
+    public string PartiallyFailedTitle { get; set; } = "处理部分文件时发生错误";
+    public string CloseButtonText { get; set; } = "关闭";
+    public string ContentFirstLineText { get; set; } = "处理文件时出错：";
+    public string FailureCountFormat { get; set; } = "({0}个) ：";
+}
+
+public class ClassicWavesNameLabel
+{
+    public string Breathing { get; set; } = "呼吸";
+    public string Tide { get; set; } = "潮汐";
+    public string Pulsating { get; set; } = "连击";
+    public string QuickRub { get; set; } = "快速按捏";
+    public string GradualRub { get; set; } = "按捏渐强";
+    public string Heartbeat { get; set; } = "心跳节奏";
+    public string Compress { get; set; } = "压缩";
+    public string Rhythmic { get; set; } = "节奏步伐";
+    public string Grainy { get; set; } = "颗粒摩擦";
+    public string Bouncy { get; set; } = "渐变弹跳";
+    public string Ripple { get; set; } = "波浪涟漪";
+    public string Rainfall { get; set; } = "雨水冲刷";
+    public string TempoTap { get; set; } = "变速敲击";
+    public string Signal { get; set; } = "信号灯";
+    public string Tease1 { get; set; } = "挑逗1";
+    public string Tease2 { get; set; } = "挑逗2";
 }
 
 public class GamesPageText
