@@ -105,8 +105,8 @@ public partial class App : Application
         {
             GtaVcGameRule = gtaVcGameRule
         };
-        var gtaVcRuleCardViewModel = new GtaVcRuleCardViewModel(gtaVcGameRule, queueService);
-        var gamesPageViewModel = new GamesPageViewModel(gameManager, queueService)
+        var gtaVcRuleCardViewModel = new GtaVcRuleCardViewModel(gtaVcGameRule, queueService, localizationService);
+        var gamesPageViewModel = new GamesPageViewModel(gameManager, queueService, localizationService)
         {
             GtaVcRuleCardViewModel = gtaVcRuleCardViewModel
         };

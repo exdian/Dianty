@@ -129,7 +129,7 @@ public class ErrorProcessingFileDialogText
     public string PartiallyFailedTitle { get; set; } = "处理部分文件时发生错误";
     public string CloseButtonText { get; set; } = "关闭";
     public string ContentFirstLineText { get; set; } = "处理文件时出错：";
-    public string FailureCountFormat { get; set; } = "({0}个) ：";
+    public string FailureCountFormat { get; set; } = "（{0}个）：";
 }
 
 public class ClassicWavesNameLabel
@@ -154,7 +154,38 @@ public class ClassicWavesNameLabel
 
 public class GamesPageText
 {
-
+    public string OverviewItemsHeader { get; set; } = "概况";
+    public string EnabledGameCountLabel { get; set; } = "生效玩法";
+    public string OutputStrengthLabel { get; set; } = "输出强度";
+    public string OutputModeCardHeader { get; set; } = "输出模式";
+    public string OutputModeCardDescription { get; set; } = "自动模式下强度为0时自动暂停输出";
+    public string OutputModePlaceholderText { get; set; } = "默认自动";
+    public string AutoModeItemText { get; set; } = "自动";
+    public string ManualModeItemText { get; set; } = "手动";
+    public string ManualSwitchCardHeader { get; set; } = "手动开关";
+    public string StrengthModeCardHeader { get; set; } = "强度模式";
+    public string StrengthModeCardDescription { get; set; } = "多个玩法同时生效时";
+    public string StrengthModePlaceholderText { get; set; } = "选择处理模式";
+    public string MaximumModeItemText { get; set; } = "取最大值";
+    public string SumModeItemText { get; set; } = "叠加强度";
+    public string RuleItemsHeader { get; set; } = "规则";
+    public string EmptyRuleCardHeader { get; set; } = "敬请期待";
+    public string RepositoryLinkCardHeader { get; set; } = "查看更新";
+    public string GameDisabledStateText { get; set; } = "未接入游戏";
+    public string FindTargetProcessStateText { get; set; } = "查找游戏进程";
+    public string GameEnabledStateText { get; set; } = "已接入";
+    public string GameStrengthModeCardHeader { get; set; } = "此玩法的规则强度模式";
+    public string GameStrengthModeCardDescription { get; set; } = "多条规则同时生效时";
+    public string RuleStrengthHeader { get; set; } = "惩罚强度";
+    public string RuleDurationHeader { get; set; } = "持续时间（秒）";
+    public string GtaVcRuleCardHeader { get; set; } = "侠盗飞车 罪恶都市";
+    public string GtaVcRuleCardDescription { get; set; } = "包含6条规则";
+    public string GtaVcDamageRuleCardHeader { get; set; } = "每累计受到伤害";
+    public string GtaVcBustedRuleCardHeader { get; set; } = "被捕时，每拥有1枚好市民勋章";
+    public string GtaVcWastedRuleCardHeader { get; set; } = "血量为0时";
+    public string GtaVcDrownedRuleCardHeader { get; set; } = "变成米汤时";
+    public string GtaVcWantedLevelRuleCardHeader { get; set; } = "每获得1枚好市民勋章";
+    public string GtaVcFellOffBikeRuleCardHeader { get; set; } = "从摩托车上摔下来时";
 }
 
 public class SafetyPageText

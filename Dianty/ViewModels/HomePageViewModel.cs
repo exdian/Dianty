@@ -2,12 +2,13 @@
 using Dianty.Models;
 using Dianty.Services;
 using DungeonToolkit.Coyote;
+using System;
 using System.Collections;
 using System.Collections.Specialized;
 
 namespace Dianty.ViewModels;
 
-public partial class HomePageViewModel : ObservableObject
+public partial class HomePageViewModel : ObservableObject, IDisposable
 {
     public HomePageViewModel(
         CoyoteCollection coyoteItems, GameManager gameManager, IQueueService queueService,
@@ -36,6 +37,7 @@ public partial class HomePageViewModel : ObservableObject
     private readonly GameManager _gameManager;
     private readonly IQueueService _queueService;
     private readonly ILocalizationService _localizationService;
+    private bool _isDisposed;
 
     private string ConnectedCountFormat => _localizationService.AppText.MainWindowText.MainViewText.HomePageText.ConnectedCountFormat;
     private string AddedCountFormat => _localizationService.AppText.MainWindowText.MainViewText.HomePageText.AddedCountFormat;
@@ -84,6 +86,29 @@ public partial class HomePageViewModel : ObservableObject
 
     [ObservableProperty]
     public partial string FormattedCurrentStrength { get; private set; }
+
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_isDisposed)
+            return;
+        _isDisposed = true;
+
+        if (disposing)
+        {
+            _coyoteItems.CollectionChanged -= OnCoyoteCollectionChanged;
+            _gameManager.CoyoteManager.ChannelA.PlayingWaveChanged -= OnChannelAPlayingWaveChanged;
+            _gameManager.CoyoteManager.ChannelB.PlayingWaveChanged -= OnChannelBPlayingWaveChanged;
+            _gameManager.CoyoteManager.OutputStatusChanged -= OnCoyoteManagerOutputStatusChanged;
+            _gameManager.OutputStrengthChanged -= OnGameManagerOutputStrengthChanged;
+            _localizationService.CurrentLanguageFileNameChanged -= OnCurrentLanguageFileNameChanged;
+        }
+    }
 
     private void OnCoyoteCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {

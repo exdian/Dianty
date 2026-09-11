@@ -5,11 +5,14 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="using:Dianty.ViewModels"
     xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
+    xmlns:txt="using:Dianty.Localization"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <toolkit:SettingsExpander Header="侠盗飞车 罪恶都市" Description="包含6条规则">
+    <toolkit:SettingsExpander
+        Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.GtaVcRuleCardHeader, Mode=OneWay}"
+        Description="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.GtaVcRuleCardDescription, Mode=OneWay}">
         <toolkit:SettingsExpander.HeaderIcon>
             <FontIcon Glyph="&#xE804;"/>
         </toolkit:SettingsExpander.HeaderIcon>
@@ -25,13 +28,15 @@
                 OnContent="{x:Null}" OffContent="{x:Null}" Margin="-8,0,0,0"/>
         </StackPanel>
         <toolkit:SettingsExpander.Items>
-            <toolkit:SettingsCard Header="此玩法的规则强度模式" Description="多条规则同时生效时">
+            <toolkit:SettingsCard
+                Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.GameStrengthModeCardHeader, Mode=OneWay}"
+                Description="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.GameStrengthModeCardDescription, Mode=OneWay}">
                 <toolkit:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE9E9;"/>
                 </toolkit:SettingsCard.HeaderIcon>
                 <ComboBox
-                    PlaceholderText="选择处理模式"
-                    ItemsSource="{x:Bind ViewModel.StrengthModeSelectionItems}"
+                    PlaceholderText="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.StrengthModePlaceholderText, Mode=OneWay}"
+                    ItemsSource="{x:Bind ViewModel.StrengthModeSelectionItems, Mode=OneWay}"
                     SelectedItem="{x:Bind ViewModel.StrengthMode, Mode=TwoWay}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate x:DataType="vm:StrengthModeSelectionItem">
@@ -44,21 +49,27 @@
                 <toolkit:SettingsCard.Header>
                     <StackPanel Spacing="{StaticResource CommonCardSpacing}">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="每累计受到伤害" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
+                            <TextBlock
+                                Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"
+                                Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.GtaVcDamageRuleCardHeader, Mode=OneWay}"/>
                             <NumberBox
                                 SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
                                 Value="{x:Bind ViewModel.DamageRuleThreshold, Mode=TwoWay}"
                                 SmallChange="1" LargeChange="20" Minimum="-200" Maximum="200"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="惩罚强度" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
+                            <TextBlock
+                                Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"
+                                Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.RuleStrengthHeader, Mode=OneWay}"/>
                             <NumberBox
                                 SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
                                 Value="{x:Bind ViewModel.DamageRuleStrength, Mode=TwoWay}"
                                 SmallChange="1" LargeChange="20" Minimum="-200" Maximum="200"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="持续时间（秒）" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
+                            <TextBlock
+                                Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"
+                                Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.RuleDurationHeader, Mode=OneWay}"/>
                             <NumberBox
                                 SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
                                 Value="{x:Bind ViewModel.DamageRuleDuration, Mode=TwoWay}"
@@ -66,21 +77,30 @@
                         </StackPanel>
                     </StackPanel>
                 </toolkit:SettingsCard.Header>
-                <ToggleSwitch IsOn="{x:Bind ViewModel.DamageRuleEnabled, Mode=TwoWay}"/>
+                <ToggleSwitch
+                    IsOn="{x:Bind ViewModel.DamageRuleEnabled, Mode=TwoWay}"
+                    OffContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OffText, Mode=OneWay}"
+                    OnContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OnText, Mode=OneWay}"/>
             </toolkit:SettingsCard>
             <toolkit:SettingsCard>
                 <toolkit:SettingsCard.Header>
                     <StackPanel Spacing="{StaticResource CommonCardSpacing}">
-                        <TextBlock Text="被捕时，每拥有1枚好市民勋章" Style="{StaticResource BodyTextBlockStyle}" Margin="0,7"/>
+                        <TextBlock
+                            Style="{StaticResource BodyTextBlockStyle}" Margin="0,7"
+                            Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.GtaVcBustedRuleCardHeader, Mode=OneWay}"/>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="惩罚强度" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
+                            <TextBlock
+                                Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"
+                                Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.RuleStrengthHeader, Mode=OneWay}"/>
                             <NumberBox
                                 SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
                                 Value="{x:Bind ViewModel.BustedRuleStrength, Mode=TwoWay}"
                                 SmallChange="1" LargeChange="20" Minimum="-200" Maximum="200"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="持续时间（秒）" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
+                            <TextBlock
+                                Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"
+                                Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.RuleDurationHeader, Mode=OneWay}"/>
                             <NumberBox
                                 SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
                                 Value="{x:Bind ViewModel.BustedRuleDuration, Mode=TwoWay}"
@@ -88,21 +108,30 @@
                         </StackPanel>
                     </StackPanel>
                 </toolkit:SettingsCard.Header>
-                <ToggleSwitch IsOn="{x:Bind ViewModel.BustedRuleEnabled, Mode=TwoWay}"/>
+                <ToggleSwitch
+                    IsOn="{x:Bind ViewModel.BustedRuleEnabled, Mode=TwoWay}"
+                    OffContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OffText, Mode=OneWay}"
+                    OnContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OnText, Mode=OneWay}"/>
             </toolkit:SettingsCard>
             <toolkit:SettingsCard>
                 <toolkit:SettingsCard.Header>
                     <StackPanel Spacing="{StaticResource CommonCardSpacing}">
-                        <TextBlock Text="血量为0时" Style="{StaticResource BodyTextBlockStyle}" Margin="0,7"/>
+                        <TextBlock
+                            Style="{StaticResource BodyTextBlockStyle}" Margin="0,7"
+                            Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.GtaVcWastedRuleCardHeader, Mode=OneWay}"/>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="惩罚强度" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
+                            <TextBlock
+                                Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"
+                                Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.RuleStrengthHeader, Mode=OneWay}"/>
                             <NumberBox
                                 SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
                                 Value="{x:Bind ViewModel.WastedRuleStrength, Mode=TwoWay}"
                                 SmallChange="1" LargeChange="20" Minimum="-200" Maximum="200"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="持续时间（秒）" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
+                            <TextBlock
+                                Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"
+                                Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.RuleDurationHeader, Mode=OneWay}"/>
                             <NumberBox
                                 SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
                                 Value="{x:Bind ViewModel.WastedRuleDuration, Mode=TwoWay}"
@@ -110,21 +139,30 @@
                         </StackPanel>
                     </StackPanel>
                 </toolkit:SettingsCard.Header>
-                <ToggleSwitch IsOn="{x:Bind ViewModel.WastedRuleEnabled, Mode=TwoWay}"/>
+                <ToggleSwitch
+                    IsOn="{x:Bind ViewModel.WastedRuleEnabled, Mode=TwoWay}"
+                    OffContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OffText, Mode=OneWay}"
+                    OnContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OnText, Mode=OneWay}"/>
             </toolkit:SettingsCard>
             <toolkit:SettingsCard>
                 <toolkit:SettingsCard.Header>
                     <StackPanel Spacing="{StaticResource CommonCardSpacing}">
-                        <TextBlock Text="变成米汤时" Style="{StaticResource BodyTextBlockStyle}" Margin="0,7"/>
+                        <TextBlock
+                            Style="{StaticResource BodyTextBlockStyle}" Margin="0,7"
+                            Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.GtaVcDrownedRuleCardHeader, Mode=OneWay}"/>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="惩罚强度" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
+                            <TextBlock
+                                Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"
+                                Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.RuleStrengthHeader, Mode=OneWay}"/>
                             <NumberBox
                                 SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
                                 Value="{x:Bind ViewModel.MiTangRuleStrength, Mode=TwoWay}"
                                 SmallChange="1" LargeChange="20" Minimum="-200" Maximum="200"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="持续时间（秒）" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
+                            <TextBlock
+                                Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"
+                                Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.RuleDurationHeader, Mode=OneWay}"/>
                             <NumberBox
                                 SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
                                 Value="{x:Bind ViewModel.MiTangRuleDuration, Mode=TwoWay}"
@@ -132,21 +170,30 @@
                         </StackPanel>
                     </StackPanel>
                 </toolkit:SettingsCard.Header>
-                <ToggleSwitch IsOn="{x:Bind ViewModel.MiTangRuleEnabled, Mode=TwoWay}"/>
+                <ToggleSwitch
+                    IsOn="{x:Bind ViewModel.MiTangRuleEnabled, Mode=TwoWay}"
+                    OffContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OffText, Mode=OneWay}"
+                    OnContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OnText, Mode=OneWay}"/>
             </toolkit:SettingsCard>
             <toolkit:SettingsCard>
                 <toolkit:SettingsCard.Header>
                     <StackPanel Spacing="{StaticResource CommonCardSpacing}">
-                        <TextBlock Text="每获得1枚好市民勋章" Style="{StaticResource BodyTextBlockStyle}" Margin="0,7"/>
+                        <TextBlock
+                            Style="{StaticResource BodyTextBlockStyle}" Margin="0,7"
+                            Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.GtaVcWantedLevelRuleCardHeader, Mode=OneWay}"/>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="惩罚强度" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
+                            <TextBlock
+                                Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"
+                                Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.RuleStrengthHeader, Mode=OneWay}"/>
                             <NumberBox
                                 SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
                                 Value="{x:Bind ViewModel.WantedLevelRuleStrength, Mode=TwoWay}"
                                 SmallChange="1" LargeChange="20" Minimum="-200" Maximum="200"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="持续时间（秒）" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
+                            <TextBlock
+                                Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"
+                                Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.RuleDurationHeader, Mode=OneWay}"/>
                             <NumberBox
                                 SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
                                 Value="{x:Bind ViewModel.WantedLevelRuleDuration, Mode=TwoWay}"
@@ -154,21 +201,30 @@
                         </StackPanel>
                     </StackPanel>
                 </toolkit:SettingsCard.Header>
-                <ToggleSwitch IsOn="{x:Bind ViewModel.WantedLevelRuleEnabled, Mode=TwoWay}"/>
+                <ToggleSwitch
+                    IsOn="{x:Bind ViewModel.WantedLevelRuleEnabled, Mode=TwoWay}"
+                    OffContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OffText, Mode=OneWay}"
+                    OnContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OnText, Mode=OneWay}"/>
             </toolkit:SettingsCard>
             <toolkit:SettingsCard>
                 <toolkit:SettingsCard.Header>
                     <StackPanel Spacing="{StaticResource CommonCardSpacing}">
-                        <TextBlock Text="从摩托车上摔下来时" Style="{StaticResource BodyTextBlockStyle}" Margin="0,7"/>
+                        <TextBlock
+                            Style="{StaticResource BodyTextBlockStyle}" Margin="0,7"
+                            Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.GtaVcFellOffBikeRuleCardHeader, Mode=OneWay}"/>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="惩罚强度" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
+                            <TextBlock
+                                Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"
+                                Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.RuleStrengthHeader, Mode=OneWay}"/>
                             <NumberBox
                                 SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
                                 Value="{x:Bind ViewModel.FellOffBikeRuleStrength, Mode=TwoWay}"
                                 SmallChange="1" LargeChange="20" Minimum="-200" Maximum="200"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="持续时间（秒）" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
+                            <TextBlock
+                                Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"
+                                Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.RuleDurationHeader, Mode=OneWay}"/>
                             <NumberBox
                                 SpinButtonPlacementMode="Inline" NumberFormatter="{StaticResource DecimalIntegerFormatter}"
                                 Value="{x:Bind ViewModel.FellOffBikeRuleDuration, Mode=TwoWay}"
@@ -176,7 +232,10 @@
                         </StackPanel>
                     </StackPanel>
                 </toolkit:SettingsCard.Header>
-                <ToggleSwitch IsOn="{x:Bind ViewModel.FellOffBikeRuleEnabled, Mode=TwoWay}"/>
+                <ToggleSwitch
+                    IsOn="{x:Bind ViewModel.FellOffBikeRuleEnabled, Mode=TwoWay}"
+                    OffContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OffText, Mode=OneWay}"
+                    OnContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OnText, Mode=OneWay}"/>
             </toolkit:SettingsCard>
         </toolkit:SettingsExpander.Items>
     </toolkit:SettingsExpander>
