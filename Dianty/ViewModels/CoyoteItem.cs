@@ -24,8 +24,8 @@ public partial class CoyoteItem : ObservableObject, IDisposable
         Name = coyote.DeviceName;
         IsEnabled = coyote.IsEnabled;
         ConnectionTypeDescription = _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionStatusCardBluetoothDescription;
-        _localizationService.CurrentLanguageFileNameChanged += OnCurrentLanguageFileNameChanged;
         UpdateConnectionMessage(coyote.IsConnected);
+        _localizationService.CurrentLanguageFileNameChanged += OnCurrentLanguageFileNameChanged;
     }
 
     public CoyoteItem(CoyoteWS coyote, IQueueService queueService, ICoyoteListService coyoteListService, ILocalizationService localizationService)
@@ -37,8 +37,8 @@ public partial class CoyoteItem : ObservableObject, IDisposable
         Name = coyote.DeviceName;
         IsEnabled = coyote.IsEnabled;
         ConnectionTypeDescription = _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionStatusCardSocketDescription;
-        _localizationService.CurrentLanguageFileNameChanged += OnCurrentLanguageFileNameChanged;
         UpdateConnectionMessage(coyote.IsBound);
+        _localizationService.CurrentLanguageFileNameChanged += OnCurrentLanguageFileNameChanged;
     }
 
     protected readonly CoyoteBLE? _coyoteBLE;
@@ -333,9 +333,13 @@ public partial class CoyoteBleItem : CoyoteItem
 
     protected override void Dispose(bool disposing)
     {
+        Debug.Assert(_coyoteBLE is not null);
         base.Dispose(disposing);
         if (disposing)
         {
+            _coyoteBLE.ConnectionStatusChanged -= OnConnectionStatusChanged;
+            _coyoteBLE.StrengthChanged -= OnStrengthChanged;
+            _coyoteBLE.BatteryLevelChanged -= OnBatteryLevelChanged;
             _bfCommandTimer.Dispose();
         }
     }
@@ -533,6 +537,19 @@ public partial class CoyoteWsItem : CoyoteItem
             StrengthCapA = e.StrengthCapA;
             StrengthCapB = e.StrengthCapB;
         });
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        Debug.Assert(_coyoteWS is not null);
+        base.Dispose(disposing);
+        if (disposing)
+        {
+            _coyoteWS.ConnectionStatusChanged -= OnConnectionStatusChanged;
+            _coyoteWS.ClientIdChanged -= OnClientIdChanged;
+            _coyoteWS.BindingStatusChanged -= OnBindingStatusChanged;
+            _coyoteWS.StrengthChanged -= OnStrengthChanged;
+        }
     }
 
     protected override void OnCurrentLanguageFileNameChanged(object? sender, CurrentLanguageFileNameChangedEventArgs e)

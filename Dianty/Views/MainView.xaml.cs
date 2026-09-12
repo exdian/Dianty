@@ -1,5 +1,4 @@
 using CommunityToolkit.Mvvm.Messaging;
-using Dianty.Localization;
 using Dianty.Services;
 using Dianty.Utils;
 using Dianty.Utils.Messages;

@@ -19,16 +19,16 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
         _queueService = queueService;
         _localizationService = localizationService;
 
-        _gameManager.EnabledGameCountChanged += OnGameManagerEnabledGameCountChanged;
-        _gameManager.OutputStrengthChanged += GameManager_OutputStrengthChanged;
-        _gameManager.CoyoteManager.OutputStatusChanged += OnCoyoteManagerOutputStatusChanged;
-        _localizationService.CurrentLanguageFileNameChanged += OnCurrentLanguageFileNameChanged;
-
         AutoStartStopModeSelectionItems = AutoStartStopModeSelectionItem.GetSelectionItems(_localizationService);
         IsAutoStartStopMode = AutoStartStopModeSelectionItems[0];
 
         StrengthModeSelectionItems = StrengthModeSelectionItem.GetSelectionItems(_localizationService);
         GamesStrengthMode = StrengthModeSelectionItems[0];
+
+        _gameManager.EnabledGameCountChanged += OnGameManagerEnabledGameCountChanged;
+        _gameManager.OutputStrengthChanged += GameManager_OutputStrengthChanged;
+        _gameManager.CoyoteManager.OutputStatusChanged += OnCoyoteManagerOutputStatusChanged;
+        _localizationService.CurrentLanguageFileNameChanged += OnCurrentLanguageFileNameChanged;
     }
 
     private readonly GameManager _gameManager;

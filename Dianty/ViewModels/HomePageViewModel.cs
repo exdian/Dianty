@@ -18,12 +18,6 @@ public partial class HomePageViewModel : ObservableObject, IDisposable
         _gameManager = gameManager;
         _queueService = queueService;
         _localizationService = localizationService;
-        _coyoteItems.CollectionChanged += OnCoyoteCollectionChanged;
-        _gameManager.CoyoteManager.ChannelA.PlayingWaveChanged += OnChannelAPlayingWaveChanged;
-        _gameManager.CoyoteManager.ChannelB.PlayingWaveChanged += OnChannelBPlayingWaveChanged;
-        _gameManager.CoyoteManager.OutputStatusChanged += OnCoyoteManagerOutputStatusChanged;
-        _gameManager.OutputStrengthChanged += OnGameManagerOutputStrengthChanged;
-        _localizationService.CurrentLanguageFileNameChanged += OnCurrentLanguageFileNameChanged;
 
         FormattedConnectedCount = string.Format(ConnectedCountFormat, 0);
         FormattedAddedCount = string.Format(AddedCountFormat, _coyoteItems.Count);
@@ -31,6 +25,13 @@ public partial class HomePageViewModel : ObservableObject, IDisposable
         FormattedWaveNameB = string.Format(BChannelFormat, _gameManager.CoyoteManager.ChannelB.PlayingWave?.Wave.Name ?? NoneLabel);
         FormattedCurrentStrength = string.Format(CurrentStrengthFormat, _gameManager.CoyoteManager.IsOutputting
             ? _gameManager.OutputStrength : NoneLabel);
+
+        _coyoteItems.CollectionChanged += OnCoyoteCollectionChanged;
+        _gameManager.CoyoteManager.ChannelA.PlayingWaveChanged += OnChannelAPlayingWaveChanged;
+        _gameManager.CoyoteManager.ChannelB.PlayingWaveChanged += OnChannelBPlayingWaveChanged;
+        _gameManager.CoyoteManager.OutputStatusChanged += OnCoyoteManagerOutputStatusChanged;
+        _gameManager.OutputStrengthChanged += OnGameManagerOutputStrengthChanged;
+        _localizationService.CurrentLanguageFileNameChanged += OnCurrentLanguageFileNameChanged;
     }
 
     private readonly CoyoteCollection _coyoteItems;

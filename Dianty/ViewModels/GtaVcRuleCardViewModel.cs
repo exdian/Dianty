@@ -16,12 +16,12 @@ public partial class GtaVcRuleCardViewModel : ObservableObject, IDisposable
         _queueService = queueService;
         _localizationService = localizationService;
 
-        _gameRule.Monitor.StateChanged += OnMonitorStateChanged;
-        _localizationService.CurrentLanguageFileNameChanged += OnCurrentLanguageFileNameChanged;
-
         StrengthModeSelectionItems = StrengthModeSelectionItem.GetSelectionItems(_localizationService);
         StrengthMode = StrengthModeSelectionItems[0];
         UpdateStateMessage(_gameRule.Monitor.State);
+
+        _gameRule.Monitor.StateChanged += OnMonitorStateChanged;
+        _localizationService.CurrentLanguageFileNameChanged += OnCurrentLanguageFileNameChanged;
     }
 
     private bool _isDisposed;
