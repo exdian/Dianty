@@ -68,10 +68,10 @@
                     </toolkit:SettingsExpander.HeaderIcon>
                     <ComboBox
                         PlaceholderText="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.OutputModePlaceholderText, Mode=OneWay}"
-                        ItemsSource="{x:Bind ViewModel.AutoStartStopModeSelectionItems, Mode=OneWay}"
-                        SelectedItem="{x:Bind ViewModel.IsAutoStartStopMode, Mode=TwoWay}">
+                        ItemsSource="{x:Bind ViewModel.OutputModeSelectionItems, Mode=OneWay}"
+                        SelectedItem="{x:Bind ViewModel.SelectedOutputMode, Mode=TwoWay}">
                         <ComboBox.ItemTemplate>
-                            <DataTemplate x:DataType="vm:AutoStartStopModeSelectionItem">
+                            <DataTemplate x:DataType="vm:OutputModeSelectionItem">
                                 <TextBlock Text="{x:Bind Description}" VerticalAlignment="Center"/>
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
@@ -98,7 +98,7 @@
                     <ComboBox
                         PlaceholderText="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.StrengthModePlaceholderText, Mode=OneWay}"
                         ItemsSource="{x:Bind ViewModel.StrengthModeSelectionItems, Mode=OneWay}"
-                        SelectedItem="{x:Bind ViewModel.GamesStrengthMode, Mode=TwoWay}">
+                        SelectedItem="{x:Bind ViewModel.SelectedStrengthMode, Mode=TwoWay}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate x:DataType="vm:StrengthModeSelectionItem">
                                 <TextBlock Text="{x:Bind Description}" VerticalAlignment="Center"/>

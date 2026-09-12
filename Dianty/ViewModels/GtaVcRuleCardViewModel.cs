@@ -1,8 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Dianty.Models;
 using Dianty.Services;
-using Dianty.Utils;
 using System;
+using System.Linq;
 using static Dianty.Services.ILocalizationService;
 using static GameMonitor.GtaVcMonitor;
 
@@ -17,7 +17,7 @@ public partial class GtaVcRuleCardViewModel : ObservableObject, IDisposable
         _localizationService = localizationService;
 
         StrengthModeSelectionItems = StrengthModeSelectionItem.GetSelectionItems(_localizationService);
-        StrengthMode = StrengthModeSelectionItems[0];
+        SelectedStrengthMode = StrengthModeSelectionItems[0];
         UpdateStateMessage(_gameRule.Monitor.State);
 
         _gameRule.Monitor.StateChanged += OnMonitorStateChanged;
@@ -42,7 +42,7 @@ public partial class GtaVcRuleCardViewModel : ObservableObject, IDisposable
     public partial bool IsEnabled { get; set; }
 
     [ObservableProperty]
-    public partial StrengthModeSelectionItem StrengthMode { get; set; }
+    public partial StrengthModeSelectionItem? SelectedStrengthMode { get; set; }
 
     [ObservableProperty]
     public partial bool DamageRuleEnabled { get; set; }
@@ -129,12 +129,16 @@ public partial class GtaVcRuleCardViewModel : ObservableObject, IDisposable
     private void OnCurrentLanguageFileNameChanged(object? sender, CurrentLanguageFileNameChangedEventArgs e)
     {
         var strengthModeSelectionItems = StrengthModeSelectionItem.GetSelectionItems(_localizationService);
-        var gamesStrengthMode = StrengthMode.Mode;
-        var index = strengthModeSelectionItems.FirstIndex(i => i.Mode == gamesStrengthMode);
+        var selectedStrengthMode = SelectedStrengthMode;
+        if (selectedStrengthMode is not null)
+        {
+            var mode = selectedStrengthMode.Mode;
+            selectedStrengthMode = strengthModeSelectionItems.FirstOrDefault(i => i.Mode == mode);
+        }
         _queueService.TryEnqueue(() =>
         {
             StrengthModeSelectionItems = strengthModeSelectionItems;
-            StrengthMode = StrengthModeSelectionItems[index];
+            SelectedStrengthMode = selectedStrengthMode;
         });
         UpdateStateMessage(_gameRule.Monitor.State);
     }
@@ -168,7 +172,7 @@ public partial class GtaVcRuleCardViewModel : ObservableObject, IDisposable
         _gameRule.IsEnabled = value;
     }
 
-    partial void OnStrengthModeChanged(StrengthModeSelectionItem value)
+    partial void OnSelectedStrengthModeChanged(StrengthModeSelectionItem? value)
     {
         if (value is null)
             return;

@@ -37,7 +37,7 @@
                 <ComboBox
                     PlaceholderText="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.StrengthModePlaceholderText, Mode=OneWay}"
                     ItemsSource="{x:Bind ViewModel.StrengthModeSelectionItems, Mode=OneWay}"
-                    SelectedItem="{x:Bind ViewModel.StrengthMode, Mode=TwoWay}">
+                    SelectedItem="{x:Bind ViewModel.SelectedStrengthMode, Mode=TwoWay}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate x:DataType="vm:StrengthModeSelectionItem">
                             <TextBlock Text="{x:Bind Description}" VerticalAlignment="Center"/>
