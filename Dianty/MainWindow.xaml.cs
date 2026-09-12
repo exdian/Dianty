@@ -53,21 +53,21 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
 
     public InputNonClientPointerSource? GetInputNonClientPointerSource()
     {
-        if (AppWindow is null)
+        if (AppWindow == null)
             return null;
         return InputNonClientPointerSource.GetForWindowId(AppWindow.Id);
     }
 
     public InputActivationListener? GetInputActivationListener()
     {
-        if (AppWindow is null)
+        if (AppWindow == null)
             return null;
         return InputActivationListener.GetForWindowId(AppWindow.Id);
     }
 
     public ContentDialog? CreateContentDialog()
     {
-        if (Content is null || Content.XamlRoot is null)
+        if (Content == null || Content.XamlRoot == null)
             return null;
         var dialog = new ContentDialog
         {

@@ -41,7 +41,7 @@ public partial class App : Application
         _isUnhandledExceptionOccurred = true;
 
         var dialog = _window?.CreateContentDialog();
-        if (dialog is null)
+        if (dialog == null)
             return;
         var dialogText = Localizer.Instance?.AppText.MainWindowText.CrashDialogText;
         dialog.Title = dialogText?.Title ?? "Something went wrong";
@@ -80,7 +80,7 @@ public partial class App : Application
 
     private void RegisterService()
     {
-        if (_window is null)
+        if (_window == null)
             return;
 
         ITitleBarService titleBarService = _window;
@@ -138,7 +138,7 @@ public partial class App : Application
 
     private void SetWindowIcon()
     {
-        if (_window is null)
+        if (_window == null)
             return;
 
         var file = "Assets/AppIcon.ico";

@@ -118,7 +118,7 @@ public partial class SettingsPageViewModel : ObservableObject, IDisposable
             if (isExceptionOccurred)
             {
                 var dialog = _windowService.CreateContentDialog();
-                if (dialog is null)
+                if (dialog == null)
                     return;
                 var dialogText = _localizationService.AppText.MainWindowText.MainViewText.SettingsPageText.LanguageSwitchFailedDialogText;
                 dialog.Title = dialogText.Title;
