@@ -6,6 +6,7 @@
     xmlns:vm="using:Dianty.ViewModels"
     xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
     xmlns:ui="using:CommunityToolkit.WinUI"
+    xmlns:txt="using:Dianty.Localization"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -25,8 +26,12 @@
                         .826-1.073l4.36-11.601 7.136 24.961c.117.399.358.768.721 1.107.363.34.768.51 1.213.51.469 0 .897-.093 1.283-.281Z"/>
                 </toolkit:SettingsCard.HeaderIcon>
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource CommonControlSpacing}">
-                    <ToggleButton Content="A通道" IsChecked="{x:Bind IsEnabledA, Mode=TwoWay}"/>
-                    <ToggleButton Content="B通道" IsChecked="{x:Bind IsEnabledB, Mode=TwoWay}"/>
+                    <ToggleButton
+                        Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.WavesPageText.ChannelALabel, Mode=OneWay}"
+                        IsChecked="{x:Bind IsEnabledA, Mode=TwoWay}"/>
+                    <ToggleButton
+                        Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.WavesPageText.ChannelBLabel, Mode=OneWay}"
+                        IsChecked="{x:Bind IsEnabledB, Mode=TwoWay}"/>
                 </StackPanel>
             </toolkit:SettingsCard>
         </DataTemplate>
@@ -42,8 +47,12 @@
                         .826-1.073l4.36-11.601 7.136 24.961c.117.399.358.768.721 1.107.363.34.768.51 1.213.51.469 0 .897-.093 1.283-.281Z"/>
                 </toolkit:SettingsCard.HeaderIcon>
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource CommonControlSpacing}">
-                    <ToggleButton Content="A通道" IsChecked="{x:Bind IsEnabledA, Mode=TwoWay}"/>
-                    <ToggleButton Content="B通道" IsChecked="{x:Bind IsEnabledB, Mode=TwoWay}"/>
+                    <ToggleButton
+                        Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.WavesPageText.ChannelALabel, Mode=OneWay}"
+                        IsChecked="{x:Bind IsEnabledA, Mode=TwoWay}"/>
+                    <ToggleButton
+                        Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.WavesPageText.ChannelBLabel, Mode=OneWay}"
+                        IsChecked="{x:Bind IsEnabledB, Mode=TwoWay}"/>
                 </StackPanel>
             </toolkit:SettingsCard>
         </DataTemplate>
@@ -70,38 +79,54 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <TextBlock x:Name="_pageHeader" Text="波形" Style="{StaticResource TitleTextBlockStyle}" Margin="12,6,12,12"/>
+        <TextBlock
+            x:Name="_pageHeader" Style="{StaticResource TitleTextBlockStyle}" Margin="12,6,12,12"
+            Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.MenuWaves, Mode=OneWay}"/>
         <ListView
             x:Name="_pageContent" Grid.Row="1" Padding="12,0,12,20" SelectionMode="None" CanReorderItems="True" AllowDrop="True"
             ItemsSource="{x:Bind ViewModel.WaveItems}" ItemContainerStyle="{StaticResource StretchListViewItemStyle}"
             ItemTemplate="{StaticResource NormalWaveItemTemplate}">
             <ListView.Header>
                 <Grid x:Name="ListViewHeader" Margin="0,0,0,8">
+                    <Grid.Resources>
+                        <Thickness x:Key="ToggleSwitchTopHeaderMargin">0</Thickness>
+                    </Grid.Resources>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="*" MaxWidth="200"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="A通道队列"/>
-                    <TextBlock Grid.Column="1" Text="B通道队列"/>
-                    <ToggleSwitch Grid.Row="1" IsOn="{x:Bind ViewModel.IsChannelEnabledA, Mode=TwoWay}"/>
-                    <ToggleSwitch Grid.Row="1" Grid.Column="1" IsOn="{x:Bind ViewModel.IsChannelEnabledB, Mode=TwoWay}"/>
-                    <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="{StaticResource CommonControlSpacing}">
+                    <ToggleSwitch
+                        IsOn="{x:Bind ViewModel.IsChannelEnabledA, Mode=TwoWay}" MinWidth="0"
+                        Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.WavesPageText.ChannelAQueueSwitchHeader, Mode=OneWay}"
+                        OffContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OffText, Mode=OneWay}"
+                        OnContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OnText, Mode=OneWay}"/>
+                    <ToggleSwitch
+                        Grid.Column="1" IsOn="{x:Bind ViewModel.IsChannelEnabledB, Mode=TwoWay}"
+                        Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.WavesPageText.ChannelBQueueSwitchHeader, Mode=OneWay}"
+                        OffContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OffText, Mode=OneWay}"
+                        OnContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OnText, Mode=OneWay}"/>
+                    <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="{StaticResource CommonControlSpacing}">
                         <Button
-                            Content="导入波形" Command="{x:Bind ViewModel.ImportWaveCommand}"
-                            CommandParameter="{x:Bind XamlRoot.ContentIslandEnvironment.AppWindowId}"/>
-                        <ToggleButton x:Name="_deletionButton" Content="删除" Click="OnDeletionButtonClick"/>
+                            Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.WavesPageText.ImportWaveButtonText, Mode=OneWay}"
+                            Command="{x:Bind ViewModel.ImportWaveCommand}" CommandParameter="{x:Bind XamlRoot.ContentIslandEnvironment.AppWindowId}"/>
+                        <ToggleButton
+                            x:Name="_deletionButton" Click="OnDeletionButtonClick"
+                            Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.WavesPageText.DeleteButtonText, Mode=OneWay}"/>
                     </StackPanel>
                     <StackPanel
-                        x:Name="SortAndQueueButton" Grid.Row="2" Grid.ColumnSpan="2"
+                        x:Name="SortAndQueueButton" Grid.Row="1" Grid.ColumnSpan="2"
                         Orientation="Horizontal" Spacing="{StaticResource CommonControlSpacing}" HorizontalAlignment="Right">
-                        <ToggleButton x:Name="_sortButton" Content="排序" Click="OnSortButtonClick"/>
-                        <Button Content="播放队列" Click="OnQueueButtonClick"/>
+                        <ToggleButton
+                            x:Name="_sortButton" Click="OnSortButtonClick"
+                            Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.WavesPageText.SortButtonText, Mode=OneWay}"/>
+                        <Button
+                            Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.WavesPageText.QueueButtonText, Mode=OneWay}"
+                            Click="OnQueueButtonClick"/>
                     </StackPanel>
                 </Grid>
             </ListView.Header>
@@ -130,7 +155,7 @@
                         <ui:ControlSizeTrigger MaxWidth="290" TargetElement="{x:Bind ListViewHeader}" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="SortAndQueueButton.(Grid.Row)" Value="3"/>
+                        <Setter Target="SortAndQueueButton.(Grid.Row)" Value="2"/>
                         <Setter Target="SortAndQueueButton.HorizontalAlignment" Value="Left"/>
                         <Setter Target="SortAndQueueButton.Margin" Value="0,8,0,0"/>
                     </VisualState.Setters>

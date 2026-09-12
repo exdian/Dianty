@@ -3,6 +3,7 @@
     x:Class="Dianty.Views.Pages.SafetyPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:txt="using:Dianty.Localization"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -12,7 +13,7 @@
             <Button Command="{x:Bind ViewModel.DisableCommand}">
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <FontIcon Glyph="&#xF140;"/>
-                    <TextBlock Text="立即停止所有设备输出"/>
+                    <TextBlock Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.SafetyPageText.DisableAllDevicesButtonText, Mode=OneWay}"/>
                 </StackPanel>
             </Button>
             <Button Command="{x:Bind ViewModel.DisconnectCommand}">
@@ -37,7 +38,7 @@
                             C67.59 16.776 68 18.82 68 21q0 1-.12 2C69 24 70 25 71.6 27ZM42 18.75H20.504c-.61 0-1.096.235-1.459.703-.364.469-.545.984-.545 1.547s.181 1.078
                             .545 1.547c.363.469.849.703 1.459.703H36c1.54-1.416 4-3.25 6-4.5Z" Fill="{ThemeResource SystemControlForegroundBaseHighBrush}"/>
                     </Viewbox>
-                    <TextBlock Text="立即断开所有设备连接"/>
+                    <TextBlock Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.SafetyPageText.DisconnectAllDevicesButtonText, Mode=OneWay}"/>
                 </StackPanel>
             </Button>
         </StackPanel>

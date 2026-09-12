@@ -13,26 +13,48 @@ namespace Dianty.ViewModels;
 
 public partial class DevicesPageViewModel : ObservableObject
 {
-    public DevicesPageViewModel(CoyoteCollection coyoteCollection, IQueueService queueService, ICoyoteBleDetector coyoteBleDetector)
+    public DevicesPageViewModel(
+        CoyoteCollection coyoteCollection, IQueueService queueService, ICoyoteBleDetector coyoteBleDetector,
+        ILocalizationService localizationService)
     {
         _coyoteCollection = coyoteCollection;
         _queueService = queueService;
         _coyoteBleDetector = coyoteBleDetector;
+        _localizationService = localizationService;
 
 #if DEBUG
-        CoyoteItems.Add(new CoyoteBleItem(new CoyoteBLE { DeviceName = "调试" }, _queueService, _coyoteCollection, _coyoteBleDetector));
-        CoyoteItems.Add(new CoyoteWsItem(new CoyoteWS { DeviceName = "调试0" }, _queueService, _coyoteCollection));
-        CoyoteItems.Add(new CoyoteWsItem(new CoyoteWS { DeviceName = "调试1" }, _queueService, _coyoteCollection));
+        CoyoteItems.Add(new CoyoteBleItem(new CoyoteBLE { DeviceName = "debug" },
+            _queueService, _coyoteCollection, _coyoteBleDetector, _localizationService));
+        CoyoteItems.Add(new CoyoteWsItem(new CoyoteWS { DeviceName = "debug0" },
+            _queueService, _coyoteCollection, _localizationService));
+        CoyoteItems.Add(new CoyoteWsItem(new CoyoteWS { DeviceName = "debug1" },
+            _queueService, _coyoteCollection, _localizationService));
 #endif
     }
 
     private readonly CoyoteCollection _coyoteCollection;
     private readonly IQueueService _queueService;
     private readonly ICoyoteBleDetector _coyoteBleDetector;
+    private readonly ILocalizationService _localizationService;
     private TaskCompletionSource? _getClientIdTcs;
     private TaskCompletionSource? _bindingTcs;
     private CancellationTokenSource? _cts;
     private int _reconnectingCount;
+
+    private string WaitingBluetoothConnectionStateText =>
+        _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.WaitingBluetoothConnectionStateText;
+    private string WaitingSocketServerStateText =>
+        _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.WaitingSocketServerStateText;
+    private string WaitingScanQrCodeStateText =>
+        _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.WaitingScanQrCodeStateText;
+    private string ConnectionFailedStateText =>
+        _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionFailedStateText;
+    private string ConnectionSuccessfulStateText =>
+        _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionSuccessfulStateText;
+    private string ConnectionCanceledStateText =>
+        _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionCanceledStateText;
+    private string DefaultDeviceNameLabel =>
+        _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.DefaultDeviceNameLabel;
 
     public ObservableCollection<CoyoteItem> CoyoteItems => _coyoteCollection;
 
@@ -60,22 +82,23 @@ public partial class DevicesPageViewModel : ObservableObject
 
         _reconnectingCount++;
         var count = _reconnectingCount;
-        ConnectionMessage = "正在搜索并连接";
-        string connectionMessage = "连接失败";
-        var coyote = new CoyoteBLE();
+        ConnectionMessage = WaitingBluetoothConnectionStateText;
+        string? connectionMessage = null;
+        var coyote = new CoyoteBLE { DeviceName = DefaultDeviceNameLabel };
         _cts = new CancellationTokenSource();
         try
         {
             if (await coyote.ConnectNewAsync(_coyoteBleDetector, _cts.Token))
             {
-                connectionMessage = "连接成功";
-                var coyoteBleItem = new CoyoteBleItem(coyote, _queueService, _coyoteCollection, _coyoteBleDetector);
+                connectionMessage = ConnectionSuccessfulStateText;
+                var coyoteBleItem = new CoyoteBleItem(
+                    coyote, _queueService, _coyoteCollection, _coyoteBleDetector, _localizationService);
                 _queueService.TryEnqueue(() => CoyoteItems.Add(coyoteBleItem));
             }
         }
         catch (OperationCanceledException)
         {
-            connectionMessage = "已取消连接";
+            connectionMessage = ConnectionCanceledStateText;
             coyote.Dispose();
         }
         catch
@@ -89,7 +112,7 @@ public partial class DevicesPageViewModel : ObservableObject
             _cts = null;
             _queueService.TryEnqueue(() =>
             {
-                ConnectionMessage = connectionMessage;
+                ConnectionMessage = connectionMessage ?? ConnectionFailedStateText;
                 IsConnecting = false;
             });
 
@@ -108,9 +131,9 @@ public partial class DevicesPageViewModel : ObservableObject
 
         _reconnectingCount++;
         var count = _reconnectingCount;
-        ConnectionMessage = "正在连接服务器获取二维码";
-        string connectionMessage = "连接失败";
-        var coyote = new CoyoteWS();
+        ConnectionMessage = WaitingSocketServerStateText;
+        string? connectionMessage = null;
+        var coyote = new CoyoteWS { DeviceName = DefaultDeviceNameLabel };
         coyote.ConnectionStatusChanged += OnConnectionStatusChanged;
         coyote.ClientIdChanged += OnClientIdChanged;
         coyote.BindingStatusChanged += OnBindingStatusChanged;
@@ -125,19 +148,19 @@ public partial class DevicesPageViewModel : ObservableObject
             var qrCodeSvgPath = await Task.Run(() => CoyoteHelper.CreateQrCodeSvgPathString(coyote)).WaitAsync(_cts.Token);
             _queueService.TryEnqueue(() =>
             {
-                ConnectionMessage = "已获取二维码";
+                ConnectionMessage = WaitingScanQrCodeStateText;
                 QrCodeSvgPath = qrCodeSvgPath;
                 CanShowQrCode = true;
                 IsQrCodeDisplayed = true;
             });
             await _bindingTcs.Task.WaitAsync(_cts.Token);
-            connectionMessage = "连接成功";
-            var coyoteWsItem = new CoyoteWsItem(coyote, _queueService, _coyoteCollection);
+            connectionMessage = ConnectionSuccessfulStateText;
+            var coyoteWsItem = new CoyoteWsItem(coyote, _queueService, _coyoteCollection, _localizationService);
             _queueService.TryEnqueue(() => CoyoteItems.Add(coyoteWsItem));
         }
         catch (OperationCanceledException)
         {
-            connectionMessage = "已取消连接";
+            connectionMessage = ConnectionCanceledStateText;
             coyote.Dispose();
         }
         catch
@@ -160,7 +183,7 @@ public partial class DevicesPageViewModel : ObservableObject
             {
                 IsQrCodeDisplayed = false;
                 CanShowQrCode = false;
-                ConnectionMessage = connectionMessage;
+                ConnectionMessage = connectionMessage ?? ConnectionFailedStateText;
                 IsConnecting = false;
             });
 

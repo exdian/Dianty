@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.Messaging;
+using Dianty.Services;
 using Dianty.Utils.Messages;
 using Dianty.ViewModels;
 using Microsoft.UI.Xaml;
@@ -16,23 +17,27 @@ public sealed partial class WavesPage : Page
         InitializeComponent();
     }
 
+    private IQueueService? _queueService;
+    private ILocalizationService? _localizationService;
+
     private WavesPageViewModel? ViewModel { get; set; }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
-        if (e.Parameter is WavesPageViewModel viewModel)
+        if (e.Parameter is RequiredParameter parameter)
         {
-            ViewModel = viewModel;
+            ViewModel = parameter.ViewModel;
+            _queueService = parameter.QueueService;
+            _localizationService = parameter.LocalizationService;
         }
     }
 
     private void OnQueueButtonClick(object sender, RoutedEventArgs e)
     {
-        if (ViewModel is null)
+        if (ViewModel is null || _queueService is null || _localizationService is null)
             return;
 
-        string[] traces = [_pageHeader.Text];
         var options = new FrameNavigationOptions
         {
             IsNavigationStackEnabled = true,
@@ -41,16 +46,16 @@ public sealed partial class WavesPage : Page
                 Effect = SlideNavigationTransitionEffect.FromRight
             }
         };
-        var requiredParameter = new WavePlayingQueuePage.RequiredParameter(ViewModel, traces);
-        WeakReferenceMessenger.Default.Send(new NavigationRequest(typeof(WavePlayingQueuePage), requiredParameter, options));
+        var requiredParameter = new WavePlayQueuePage.RequiredParameter(ViewModel,
+            [s => s.AppText.MainWindowText.MainViewText.MenuWaves], _queueService, _localizationService);
+        WeakReferenceMessenger.Default.Send(new NavigationRequest(typeof(WavePlayQueuePage), requiredParameter, options));
     }
 
     private void OnWaveItemCardClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not FrameworkElement element)
+        if (sender is not FrameworkElement element || _queueService is null || _localizationService is null)
             return;
 
-        string[] traces = [_pageHeader.Text];
         var options = new FrameNavigationOptions
         {
             IsNavigationStackEnabled = true,
@@ -61,7 +66,8 @@ public sealed partial class WavesPage : Page
         };
         if (element.DataContext is WaveItem waveItem)
         {
-            var requiredParameter = new WaveSettingsPage.RequiredParameter(waveItem, traces);
+            var requiredParameter = new WaveSettingsPage.RequiredParameter(waveItem,
+                [s => s.AppText.MainWindowText.MainViewText.MenuWaves], _queueService, _localizationService);
             WeakReferenceMessenger.Default.Send(new NavigationRequest(typeof(WaveSettingsPage), requiredParameter, options));
         }
     }
@@ -94,4 +100,7 @@ public sealed partial class WavesPage : Page
                 command.Execute(commandParameter);
         }
     }
+
+    public record class RequiredParameter(WavesPageViewModel ViewModel, IQueueService QueueService,
+        ILocalizationService LocalizationService);
 }

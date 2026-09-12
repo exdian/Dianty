@@ -2,40 +2,48 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Dianty.Models;
 using Dianty.Services;
+using Dianty.Utils;
 using Dianty.Utils.Messages;
 using System;
 using static Dianty.Models.AutomaticStrength;
+using static Dianty.Services.ILocalizationService;
 using static DungeonToolkit.Coyote.CoyoteManager;
 
 namespace Dianty.ViewModels;
 
 public partial class GamesPageViewModel : ObservableObject, IDisposable
 {
-    public GamesPageViewModel(GameManager gameManager, IQueueService queueService)
+    public GamesPageViewModel(GameManager gameManager, IQueueService queueService, ILocalizationService localizationService)
     {
         _gameManager = gameManager;
         _queueService = queueService;
+        _localizationService = localizationService;
+
+        AutoStartStopModeSelectionItems = AutoStartStopModeSelectionItem.GetSelectionItems(_localizationService);
+        IsAutoStartStopMode = AutoStartStopModeSelectionItems[0];
+
+        StrengthModeSelectionItems = StrengthModeSelectionItem.GetSelectionItems(_localizationService);
+        GamesStrengthMode = StrengthModeSelectionItems[0];
 
         _gameManager.EnabledGameCountChanged += OnGameManagerEnabledGameCountChanged;
         _gameManager.OutputStrengthChanged += GameManager_OutputStrengthChanged;
         _gameManager.CoyoteManager.OutputStatusChanged += OnCoyoteManagerOutputStatusChanged;
-
-        AutoStartStopModeSelectionItems = AutoStartStopModeSelectionItem.AutoStartStopModeSelectionItems;
-        IsAutoStartStopMode = AutoStartStopModeSelectionItems[0];
-
-        StrengthModeSelectionItems = StrengthModeSelectionItem.StrengthModeSelectionItems;
-        GamesStrengthMode = StrengthModeSelectionItems[0];
+        _localizationService.CurrentLanguageFileNameChanged += OnCurrentLanguageFileNameChanged;
     }
 
     private readonly GameManager _gameManager;
     private readonly IQueueService _queueService;
+    private readonly ILocalizationService _localizationService;
     private bool _isDisposed;
 
-    public AutoStartStopModeSelectionItem[] AutoStartStopModeSelectionItems { get; }
-    public StrengthModeSelectionItem[] StrengthModeSelectionItems { get; }
     public required GtaVcRuleCardViewModel GtaVcRuleCardViewModel { get; init; }
 
-    // 概况
+    [ObservableProperty]
+    public partial AutoStartStopModeSelectionItem[] AutoStartStopModeSelectionItems { get; private set; }
+
+    [ObservableProperty]
+    public partial StrengthModeSelectionItem[] StrengthModeSelectionItems { get; private set; }
+
     [ObservableProperty]
     public partial int EnabledGameCount { get; private set; }
 
@@ -71,6 +79,7 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
             _gameManager.EnabledGameCountChanged -= OnGameManagerEnabledGameCountChanged;
             _gameManager.OutputStrengthChanged -= GameManager_OutputStrengthChanged;
             _gameManager.CoyoteManager.OutputStatusChanged -= OnCoyoteManagerOutputStatusChanged;
+            _localizationService.CurrentLanguageFileNameChanged -= OnCurrentLanguageFileNameChanged;
             _gameManager.Dispose();
         }
     }
@@ -93,8 +102,31 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
             _queueService.TryEnqueue(() => IsOutputting = e.IsOutputting);
     }
 
+    private void OnCurrentLanguageFileNameChanged(object? sender, CurrentLanguageFileNameChangedEventArgs e)
+    {
+        var autoStartStopModeSelectionItems = AutoStartStopModeSelectionItem.GetSelectionItems(_localizationService);
+        var isAutoStartStop = IsAutoStartStopMode.IsAutoStartStop;
+        var index = autoStartStopModeSelectionItems.FirstIndex(i => i.IsAutoStartStop == isAutoStartStop);
+        _queueService.TryEnqueue(() =>
+        {
+            AutoStartStopModeSelectionItems = autoStartStopModeSelectionItems;
+            IsAutoStartStopMode = AutoStartStopModeSelectionItems[index];
+        });
+
+        var strengthModeSelectionItems = StrengthModeSelectionItem.GetSelectionItems(_localizationService);
+        var gamesStrengthMode = GamesStrengthMode.Mode;
+        index = strengthModeSelectionItems.FirstIndex(i => i.Mode == gamesStrengthMode);
+        _queueService.TryEnqueue(() =>
+        {
+            StrengthModeSelectionItems = strengthModeSelectionItems;
+            GamesStrengthMode = StrengthModeSelectionItems[index];
+        });
+    }
+
     partial void OnIsAutoStartStopModeChanged(AutoStartStopModeSelectionItem value)
     {
+        if (value is null)
+            return;
         var isAutoStartStop = value.IsAutoStartStop;
         IsAutoStartStop = isAutoStartStop;
         _gameManager.CoyoteManager.IsAutoStartStop = isAutoStartStop;
@@ -114,36 +146,48 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
 
     partial void OnGamesStrengthModeChanged(StrengthModeSelectionItem value)
     {
+        if (value is null)
+            return;
         _gameManager.StrengthMode = value.Mode;
     }
 }
 
-public readonly record struct AutoStartStopModeSelectionItem(bool IsAutoStartStop, string Description)
+public record class AutoStartStopModeSelectionItem(bool IsAutoStartStop, string Description)
 {
-    public static AutoStartStopModeSelectionItem[] AutoStartStopModeSelectionItems
+    private static AutoStartStopModeSelectionItem[]? s_SelectionItems;
+
+    public static AutoStartStopModeSelectionItem[] GetSelectionItems(ILocalizationService service)
     {
-        get
+        var text = service.AppText.MainWindowText.MainViewText.GamesPageText;
+        if (s_SelectionItems is null
+            || s_SelectionItems.Length != 2
+            || !ReferenceEquals(s_SelectionItems[0].Description, text.AutoModeItemText)
+            || !ReferenceEquals(s_SelectionItems[1].Description, text.ManualModeItemText))
         {
-            field ??=
-                [new AutoStartStopModeSelectionItem(true, "自动"),
-                new AutoStartStopModeSelectionItem(false, "手动")];
-            return field;
+            s_SelectionItems =
+                [new AutoStartStopModeSelectionItem(true, text.AutoModeItemText),
+                new AutoStartStopModeSelectionItem(false, text.ManualModeItemText)];
         }
-        set;
+        return s_SelectionItems;
     }
 }
 
-public readonly record struct StrengthModeSelectionItem(Mode Mode, string Description)
+public record class StrengthModeSelectionItem(Mode Mode, string Description)
 {
-    public static StrengthModeSelectionItem[] StrengthModeSelectionItems
+    private static StrengthModeSelectionItem[]? s_SelectionItems;
+
+    public static StrengthModeSelectionItem[] GetSelectionItems(ILocalizationService service)
     {
-        get
+        var text = service.AppText.MainWindowText.MainViewText.GamesPageText;
+        if (s_SelectionItems is null
+            || s_SelectionItems.Length != 2
+            || !ReferenceEquals(s_SelectionItems[0].Description, text.MaximumModeItemText)
+            || !ReferenceEquals(s_SelectionItems[1].Description, text.SumModeItemText))
         {
-            field ??=
-                [new StrengthModeSelectionItem(Mode.Max, "取最大值"),
-                new StrengthModeSelectionItem(Mode.Sum, "叠加强度")];
-            return field;
+            s_SelectionItems =
+                [new StrengthModeSelectionItem(Mode.Max, text.MaximumModeItemText),
+                new StrengthModeSelectionItem(Mode.Sum, text.SumModeItemText)];
         }
-        set;
+        return s_SelectionItems;
     }
 }

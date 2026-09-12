@@ -1,4 +1,5 @@
-﻿using Dianty.Models;
+﻿using Dianty.Localization;
+using Dianty.Models;
 using Dianty.Services;
 using Dianty.Utils;
 using Dianty.ViewModels;
@@ -8,6 +9,7 @@ using DungeonToolkit.Coyote;
 using GameMonitor;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.IO;
 using System.Security.Cryptography;
@@ -19,6 +21,7 @@ namespace Dianty;
 public partial class App : Application
 {
     private MainWindow? _window;
+    private bool _isUnhandledExceptionOccurred;
 
     /// <summary>
     /// Initializes the singleton application object.  This is the first line of authored code
@@ -27,6 +30,28 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
+        UnhandledException += Shutdown;
+    }
+
+    private async void Shutdown(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
+    {
+        e.Handled = true;
+        if (_isUnhandledExceptionOccurred)
+            return;
+        _isUnhandledExceptionOccurred = true;
+
+        var dialog = _window?.CreateContentDialog();
+        if (dialog is null)
+            return;
+        var dialogText = Localizer.Instance?.AppText.MainWindowText.CrashDialogText;
+        dialog.Title = dialogText?.Title ?? "Something went wrong";
+        dialog.CloseButtonText = dialogText?.CloseButtonText ?? "Exit";
+        dialog.IsPrimaryButtonEnabled = false;
+        dialog.IsSecondaryButtonEnabled = false;
+        dialog.DefaultButton = ContentDialogButton.Close;
+        dialog.Content = e.Message;
+        await dialog.ShowAsync();
+        _window?.Close();
     }
 
     /// <summary>
@@ -38,6 +63,7 @@ public partial class App : Application
         var window = new MainWindow();
         window.AppWindow.Closing += OnAppWindowClosing;
         ToDoList.Plan += VersionHelper.Init;
+        ToDoList.Plan += Localizer.Init;
         ToDoList.Plan += RegisterService;
         ToDoList.UiPlan += MergeDictionaries;
         ToDoList.UiPlan += SetWindowIcon;
@@ -68,6 +94,8 @@ public partial class App : Application
         ICoyoteBleDetector coyoteBleDetector = new CoyoteBleDetector();
         ServiceLocator.Register(coyoteBleDetector);
         ServiceLocator.Register<IMemoryService>(static () => new MemoryService());
+        ILocalizationService localizationService = Localizer.Instance;
+        ServiceLocator.Register(localizationService);
 
         var coyoteManager = new CoyoteManager();
         var coyoteItems = new CoyoteCollection(coyoteManager);
@@ -77,23 +105,28 @@ public partial class App : Application
         {
             GtaVcGameRule = gtaVcGameRule
         };
-        var gtaVcRuleCardViewModel = new GtaVcRuleCardViewModel(gtaVcGameRule, queueService);
-        var gamesPageViewModel = new GamesPageViewModel(gameManager, queueService)
+        var gtaVcRuleCardViewModel = new GtaVcRuleCardViewModel(gtaVcGameRule, queueService, localizationService);
+        var gamesPageViewModel = new GamesPageViewModel(gameManager, queueService, localizationService)
         {
             GtaVcRuleCardViewModel = gtaVcRuleCardViewModel
         };
         ServiceLocator.Register(gamesPageViewModel);
         ServiceLocator.Register(gtaVcRuleCardViewModel);
 
-        ServiceLocator.RegisterViewModel(typeof(HomePage), new HomePageViewModel(coyoteItems, gameManager, queueService));
+        ServiceLocator.RegisterViewModel(typeof(HomePage),
+            new HomePageViewModel(coyoteItems, gameManager, queueService, localizationService));
         ServiceLocator.RegisterViewModel(typeof(DevicesPage), new DevicesPage.RequiredParameter(
-            new DevicesPageViewModel(coyoteItems, queueService, coyoteBleDetector), queueService));
-        ServiceLocator.RegisterViewModel(typeof(WavesPage), new WavesPageViewModel(coyoteManager, queueService, windowService));
+            new DevicesPageViewModel(coyoteItems, queueService, coyoteBleDetector, localizationService),
+            queueService, localizationService));
+        ServiceLocator.RegisterViewModel(typeof(WavesPage), new WavesPage.RequiredParameter(
+            new WavesPageViewModel(coyoteManager, queueService, windowService, localizationService),
+            queueService, localizationService));
         ServiceLocator.RegisterViewModel(typeof(GamesPage), new GamesPage.RequiredParameter(
             gamesPageViewModel, queueService));
         ServiceLocator.RegisterViewModel(typeof(SafetyPage), new SafetyPageViewModel(coyoteItems));
         ServiceLocator.RegisterViewModel(typeof(DebugPage), new DebugPageViewModel(queueService));
-        ServiceLocator.RegisterViewModel(typeof(SettingsPage), new SettingsPageViewModel(queueService, windowService));
+        ServiceLocator.RegisterViewModel(typeof(SettingsPage),
+            new SettingsPageViewModel(queueService, windowService, localizationService));
     }
 
     private void MergeDictionaries()
@@ -137,7 +170,7 @@ public partial class App : Application
         {
             nameof(HomePage) => typeof(HomePage),
             nameof(DevicesPage) or nameof(CoyoteDetailPage) => typeof(DevicesPage),
-            nameof(WavesPage) or nameof(WavePlayingQueuePage) or nameof(WaveSettingsPage) => typeof(WavesPage),
+            nameof(WavesPage) or nameof(WavePlayQueuePage) or nameof(WaveSettingsPage) => typeof(WavesPage),
             nameof(GamesPage) => typeof(GamesPage),
             nameof(SafetyPage) => typeof(SafetyPage),
             nameof(DebugPage) => typeof(DebugPage),

@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="using:Dianty.ViewModels"
     xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
+    xmlns:txt="using:Dianty.Localization"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -14,20 +15,25 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <TextBlock x:Name="PageHeader" Text="设置" Style="{StaticResource TitleTextBlockStyle}" Margin="12,6,12,12"/>
+        <TextBlock
+            x:Name="PageHeader" Style="{StaticResource TitleTextBlockStyle}" Margin="12,6,12,12"
+            Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.MenuSettings, Mode=OneWay}"/>
         <ScrollViewer x:Name="PageContent" Grid.Row="1" Padding="12,0" VerticalScrollBarVisibility="Auto" VerticalScrollMode="Auto">
             <StackPanel Spacing="{StaticResource CommonCardSpacing}" Margin="0,0,0,24">
                 <StackPanel.ChildrenTransitions>
                     <RepositionThemeTransition />
                 </StackPanel.ChildrenTransitions>
-                <TextBlock Text="外观" Style="{StaticResource BodyStrongTextBlockStyle}" Margin="1,2,0,4"/>
-                <toolkit:SettingsCard Header="应用主题">
+                <TextBlock
+                    Style="{StaticResource BodyStrongTextBlockStyle}" Margin="1,2,0,4"
+                    Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.SettingsPageText.AppearanceItemsHeader, Mode=OneWay}"/>
+                <toolkit:SettingsCard
+                    Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.SettingsPageText.AppThemeCardHeader, Mode=OneWay}">
                     <toolkit:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE790;"/>
                     </toolkit:SettingsCard.HeaderIcon>
                     <ComboBox
-                        PlaceholderText="选择应用主题" ItemsSource="{x:Bind ViewModel.AppThemeSelectionItems}"
-                        SelectedItem="{x:Bind ViewModel.SelectedAppTheme, Mode=TwoWay}">
+                        PlaceholderText="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.SettingsPageText.AppThemePlaceholderText, Mode=OneWay}"
+                        ItemsSource="{x:Bind ViewModel.AppThemeSelectionItems, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedAppTheme, Mode=TwoWay}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate x:DataType="vm:AppThemeSelectionItem">
                                 <TextBlock Text="{x:Bind Description}" VerticalAlignment="Center"/>
@@ -35,28 +41,55 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
                 </toolkit:SettingsCard>
-                <TextBlock Text="其他" Style="{StaticResource BodyStrongTextBlockStyle}" Margin="1,14,0,4"/>
-                <toolkit:SettingsExpander Header="其他设置" HeaderIcon="Setting">
+                <toolkit:SettingsCard
+                    Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.SettingsPageText.LanguageCardHeader, Mode=OneWay}">
+                    <toolkit:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xF2B7;"/>
+                    </toolkit:SettingsCard.HeaderIcon>
+                    <ComboBox
+                        PlaceholderText="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.SettingsPageText.LanguagePlaceholderText, Mode=OneWay}"
+                        ItemsSource="{x:Bind ViewModel.LanguageSelectionItems, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedLanguage, Mode=TwoWay}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="vm:LanguageSelectionItem">
+                                <TextBlock Text="{x:Bind Description}" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </toolkit:SettingsCard>
+                <TextBlock
+                    Style="{StaticResource BodyStrongTextBlockStyle}" Margin="1,14,0,4"
+                    Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.SettingsPageText.OtherItemsHeader, Mode=OneWay}"/>
+                <toolkit:SettingsExpander
+                    HeaderIcon="Setting"
+                    Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.SettingsPageText.OtherSettingsCardHeader, Mode=OneWay}">
                     <toolkit:SettingsExpander.Items>
                         <toolkit:SettingsCard Loaded="OnSettingsCardLoaded">
-                            <TextBlock Text="不给设" HorizontalAlignment="Center" Margin="0,8.67"/>
+                            <TextBlock
+                                HorizontalAlignment="Center" Margin="0,8.67"
+                                Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.SettingsPageText.MemeCardContent, Mode=OneWay}"/>
                         </toolkit:SettingsCard>
                     </toolkit:SettingsExpander.Items>
                 </toolkit:SettingsExpander>
-                <TextBlock Text="关于" Style="{StaticResource BodyStrongTextBlockStyle}" Margin="1,14,0,4"/>
+                <TextBlock
+                    Style="{StaticResource BodyStrongTextBlockStyle}" Margin="1,14,0,4"
+                    Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.SettingsPageText.AboutItemsHeader, Mode=OneWay}"/>
                 <toolkit:SettingsExpander Header="Dianty">
                     <toolkit:SettingsExpander.HeaderIcon>
                         <BitmapIcon ShowAsMonochrome="False" UriSource="Assets/AppIcon-48.png"/>
                     </toolkit:SettingsExpander.HeaderIcon>
                     <TextBlock Text="{x:Bind ViewModel.Version}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                     <toolkit:SettingsExpander.Items>
-                        <toolkit:SettingsCard Header="查看源代码" IsClickEnabled="True">
+                        <toolkit:SettingsCard
+                            IsClickEnabled="True"
+                            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.SettingsPageText.RepositoryLinkCardHeader, Mode=OneWay}">
                             <HyperlinkButton Content="https://github.com/exdian/Dianty" NavigateUri="https://github.com/exdian/Dianty" />
                             <toolkit:SettingsCard.ActionIcon>
                                 <FontIcon Glyph="&#xE8A7;" />
                             </toolkit:SettingsCard.ActionIcon>
                         </toolkit:SettingsCard>
-                        <toolkit:SettingsCard Header="依赖和引用" ContentAlignment="Vertical" HorizontalContentAlignment="Left">
+                        <toolkit:SettingsCard
+                            ContentAlignment="Vertical" HorizontalContentAlignment="Left"
+                            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.SettingsPageText.DependenciesAndReferencesCardHeader, Mode=OneWay}">
                             <StackPanel Margin="-12,0,0,0">
                                 <HyperlinkButton Content="Windows App SDK, Windows App Runtime" NavigateUri="https://aka.ms/windowsappsdk" />
                                 <HyperlinkButton Content="WinUI 3" NavigateUri="https://aka.ms/winui" />
@@ -66,10 +99,14 @@
                                 <HyperlinkButton Content="QRCoder" NavigateUri="https://github.com/Shane32/QRCoder" />
                             </StackPanel>
                         </toolkit:SettingsCard>
-                        <toolkit:SettingsCard Header="部分代码参考了 WinUI 3 Gallery" ContentAlignment="Vertical" HorizontalContentAlignment="Left">
+                        <toolkit:SettingsCard
+                            ContentAlignment="Vertical" HorizontalContentAlignment="Left"
+                            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.SettingsPageText.WinUIGalleryCardHeader, Mode=OneWay}">
                             <HyperlinkButton Content="WinUI-Gallery" NavigateUri="https://github.com/microsoft/WinUI-Gallery" Margin="-12,0,0,0"/>
                         </toolkit:SettingsCard>
-                        <toolkit:SettingsCard Header="引用的其他项目" ContentAlignment="Vertical" HorizontalContentAlignment="Stretch">
+                        <toolkit:SettingsCard
+                            ContentAlignment="Vertical" HorizontalContentAlignment="Stretch"
+                            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.SettingsPageText.OtherDependenciesCardHeader, Mode=OneWay}">
                             <TreeView SelectionMode="None" CanDragItems="False" CanReorderItems="False" ItemInvoked="OnTreeViewItemInvoked">
                                 <TreeView.ItemContainerTransitions>
                                     <TransitionCollection>
@@ -82,7 +119,8 @@
                                         <TreeViewNode.Children>
                                             <TreeViewNode Content="DungeonToolkit">
                                                 <TreeViewNode.Children>
-                                                    <TreeViewNode Content="依赖项">
+                                                    <TreeViewNode
+                                                        Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.SettingsPageText.DependenciesLabel, Mode=OneWay}">
                                                         <TreeViewNode.Children>
                                                             <TreeViewNode Content=".NET 10.0"/>
                                                         </TreeViewNode.Children>
@@ -91,7 +129,8 @@
                                             </TreeViewNode>
                                             <TreeViewNode Content="GameMonitor">
                                                 <TreeViewNode.Children>
-                                                    <TreeViewNode Content="依赖项">
+                                                    <TreeViewNode
+                                                        Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.SettingsPageText.DependenciesLabel, Mode=OneWay}">
                                                         <TreeViewNode.Children>
                                                             <TreeViewNode Content=".NET 10.0"/>
                                                         </TreeViewNode.Children>
@@ -100,7 +139,8 @@
                                             </TreeViewNode>
                                         </TreeViewNode.Children>
                                     </TreeViewNode>
-                                    <TreeViewNode Content="备注：DiantyCore 仓库暂未公开"/>
+                                    <TreeViewNode
+                                        Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.SettingsPageText.DiantyCoreRepositoryDescription, Mode=OneWay}"/>
                                 </TreeView.RootNodes>
                             </TreeView>
                         </toolkit:SettingsCard>

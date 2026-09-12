@@ -22,7 +22,7 @@ public class CoyoteWS : IDisposable
     public event EventHandler<FeedbackReceivedEventArgs>? FeedbackReceived;
     public async Task<bool> ConnectAsync(CancellationToken token);
     public async Task DisconnectAsync();
-    public async Task<bool> SetStrengthAsync(int strength, Channel channel);
+    public async Task<bool> SetStrengthAsync(Channel channel, SocketStrengthMode mode, int strength);
     public bool AddPulseList(PulseData pulse, Channel channel);
     public async Task<bool> SendPulseDataAsync(Channel channel);
     public async Task<bool> ClearPulseListAsync(Channel channel);

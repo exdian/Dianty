@@ -12,7 +12,7 @@ public partial class MainViewModel : ObservableObject
     public MainViewModel(IQueueService queueService)
     {
         _queueService = queueService;
-        _queueService.TryEnqueue(DispatcherQueuePriority.Low, LoadData);
+        InitializeData();
     }
 
     private readonly IQueueService _queueService;
@@ -20,28 +20,29 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     public partial bool IsLoaded { get; private set; }
 
-    private async void LoadData()
+    private void InitializeData()
     {
-        var stopwatch = Stopwatch.StartNew();
-        var task = Task.Delay(300);
-
-        if (ToDoList.Plan is not null)
+        _queueService.TryEnqueue(DispatcherQueuePriority.Low, async () =>
         {
-            await Task.Run(ToDoList.Plan);
+            var stopwatch = Stopwatch.StartNew();
+            var minLoadTask = Task.Delay(300); // 最短加载时间
+            var planTask = Task.CompletedTask;
+
+            var plan = ToDoList.Plan;
             ToDoList.Plan = null;
-        }
+            if (plan is not null)
+                planTask = Task.Run(plan);
 
-        if (ToDoList.UiPlan is not null)
-        {
-            _queueService.TryEnqueue(ToDoList.UiPlan.Invoke);
+            var uiPlan = ToDoList.UiPlan;
             ToDoList.UiPlan = null;
-        }
-        Debug.WriteLine($"后台加载耗时: {stopwatch.ElapsedMilliseconds} ms");
+            uiPlan?.Invoke();
 
-        // 至少加载 300 毫秒
-        await task;
-        _queueService.TryEnqueue(DispatcherQueuePriority.Low, () =>
-        {
+            await planTask;
+            Debug.WriteLine($"后台加载耗时: {stopwatch.ElapsedMilliseconds} ms");
+
+            // 确保总耗时不少于 300ms
+            await minLoadTask;
+
             IsLoaded = true;
             Debug.WriteLine($"总加载耗时: {stopwatch.ElapsedMilliseconds} ms");
         });

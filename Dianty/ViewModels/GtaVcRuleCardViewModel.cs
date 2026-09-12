@@ -1,30 +1,36 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Dianty.Models;
 using Dianty.Services;
+using Dianty.Utils;
 using System;
+using static Dianty.Services.ILocalizationService;
 using static GameMonitor.GtaVcMonitor;
 
 namespace Dianty.ViewModels;
 
 public partial class GtaVcRuleCardViewModel : ObservableObject, IDisposable
 {
-    public GtaVcRuleCardViewModel(GtaVcGameRule gameRule, IQueueService queueService)
+    public GtaVcRuleCardViewModel(GtaVcGameRule gameRule, IQueueService queueService, ILocalizationService localizationService)
     {
         _gameRule = gameRule;
         _queueService = queueService;
+        _localizationService = localizationService;
 
-        _gameRule.Monitor.StateChanged += OnMonitorStateChanged;
-
-        StrengthModeSelectionItems = StrengthModeSelectionItem.StrengthModeSelectionItems;
+        StrengthModeSelectionItems = StrengthModeSelectionItem.GetSelectionItems(_localizationService);
         StrengthMode = StrengthModeSelectionItems[0];
         UpdateStateMessage(_gameRule.Monitor.State);
+
+        _gameRule.Monitor.StateChanged += OnMonitorStateChanged;
+        _localizationService.CurrentLanguageFileNameChanged += OnCurrentLanguageFileNameChanged;
     }
 
     private bool _isDisposed;
     private readonly GtaVcGameRule _gameRule;
     private readonly IQueueService _queueService;
+    private readonly ILocalizationService _localizationService;
 
-    public StrengthModeSelectionItem[] StrengthModeSelectionItems { get; }
+    [ObservableProperty]
+    public partial StrengthModeSelectionItem[] StrengthModeSelectionItems { get; private set; }
 
     [ObservableProperty]
     public partial bool IsAccessing { get; private set; }
@@ -110,6 +116,7 @@ public partial class GtaVcRuleCardViewModel : ObservableObject, IDisposable
         if (disposing)
         {
             _gameRule.Monitor.StateChanged -= OnMonitorStateChanged;
+            _localizationService.CurrentLanguageFileNameChanged -= OnCurrentLanguageFileNameChanged;
             _gameRule.Dispose();
         }
     }
@@ -119,24 +126,38 @@ public partial class GtaVcRuleCardViewModel : ObservableObject, IDisposable
         UpdateStateMessage(e.State);
     }
 
+    private void OnCurrentLanguageFileNameChanged(object? sender, CurrentLanguageFileNameChangedEventArgs e)
+    {
+        var strengthModeSelectionItems = StrengthModeSelectionItem.GetSelectionItems(_localizationService);
+        var gamesStrengthMode = StrengthMode.Mode;
+        var index = strengthModeSelectionItems.FirstIndex(i => i.Mode == gamesStrengthMode);
+        _queueService.TryEnqueue(() =>
+        {
+            StrengthModeSelectionItems = strengthModeSelectionItems;
+            StrengthMode = StrengthModeSelectionItems[index];
+        });
+        UpdateStateMessage(_gameRule.Monitor.State);
+    }
+
     private void UpdateStateMessage(MonitoringState state)
     {
         _queueService.TryEnqueue(() =>
         {
+            var text = _localizationService.AppText.MainWindowText.MainViewText.GamesPageText;
             switch (state)
             {
                 default:
                 case MonitoringState.Stopped:
                     IsAccessing = false;
-                    StateMessage = "未接入游戏";
+                    StateMessage = text.GameDisabledStateText;
                     break;
                 case MonitoringState.FindTargetProcess:
                     IsAccessing = true;
-                    StateMessage = "查找游戏进程";
+                    StateMessage = text.FindTargetProcessStateText;
                     break;
                 case MonitoringState.AccessedTargetProcess:
                     IsAccessing = false;
-                    StateMessage = "已接入";
+                    StateMessage = text.GameEnabledStateText;
                     break;
             }
         });
@@ -149,6 +170,8 @@ public partial class GtaVcRuleCardViewModel : ObservableObject, IDisposable
 
     partial void OnStrengthModeChanged(StrengthModeSelectionItem value)
     {
+        if (value is null)
+            return;
         _gameRule.StrengthMode = value.Mode;
     }
 

@@ -91,7 +91,7 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
     {
         if (item is bool value && value)
         {
-            return new MainView(this, this, this);
+            return new MainView(this, this, this, ServiceLocator.GetService<ILocalizationService>());
         }
         else
         {
@@ -119,7 +119,17 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
         WindowHelper.SetWindowMinSize(this, 285, 56);
         WindowHelper.SetWindowSize(this, 800, 520);
         TitleBarHelper.ApplySystemThemeToCaptionButtons(this, _rootElement.ActualTheme);
-        _rootElement.ActualThemeChanged += (_, _) => TitleBarHelper.ApplySystemThemeToCaptionButtons(this, _rootElement.ActualTheme);
+        _rootElement.ActualThemeChanged += OnRootElementActualThemeChanged;
+    }
+
+    private void RootElement_Unloaded(object sender, RoutedEventArgs e)
+    {
+        _rootElement.ActualThemeChanged -= OnRootElementActualThemeChanged;
+    }
+
+    private void OnRootElementActualThemeChanged(FrameworkElement sender, object args)
+    {
+        TitleBarHelper.ApplySystemThemeToCaptionButtons(this, _rootElement.ActualTheme);
     }
 
     [LibraryImport("user32.dll", EntryPoint = "PostMessageA")]

@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
     xmlns:local="using:Dianty.Views.Controls"
+    xmlns:txt="using:Dianty.Localization"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -13,12 +14,14 @@
         <StackPanel.ChildrenTransitions>
             <RepositionThemeTransition />
         </StackPanel.ChildrenTransitions>
-        <toolkit:SettingsCard Header="设备名称" HeaderIcon="Tag">
+        <toolkit:SettingsCard
+            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.DeviceNameCardHeader, Mode=OneWay}"
+            HeaderIcon="Tag">
             <TextBox Text="{x:Bind ViewModel.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         </toolkit:SettingsCard>
         <toolkit:SettingsCard
-            Header="连接状态" HeaderIcon="Link"
-            Description="{x:Bind ViewModel.IsBleConnection, Converter={StaticResource CoyoteConnectionTypeConverter}}">
+            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionStatusCardHeader, Mode=OneWay}"
+            HeaderIcon="Link" Description="{x:Bind ViewModel.ConnectionTypeDescription, Mode=OneWay}">
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource CommonControlSpacing}">
                 <ProgressRing IsActive="{x:Bind ViewModel.IsConnecting, Mode=OneWay}"/>
                 <ContentControl Content="{x:Bind ViewModel.ConnectionMessage, Mode=OneWay}" VerticalAlignment="Center">
@@ -34,13 +37,20 @@
         <!-- 在 ScrollViewer 的空白区域（或其内部非交互元素上）点击鼠标时，ScrollViewer 在 PointerReleased 事件的处理逻辑中，
         会尝试将焦点自动设置到其内部第一个可获取焦点的子元素上。
         这里获得焦点的是设备名称的 TextBox，并且会强制滚动到 TextBox，此处设置 TabIndex 可解决此问题 -->
-        <toolkit:SettingsCard Header="是否允许输出" TabIndex="1">
+        <toolkit:SettingsCard
+            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.OutputSwitchCardHeader, Mode=OneWay}"
+            TabIndex="1">
             <toolkit:SettingsCard.HeaderIcon>
                 <FontIcon Glyph="&#xE7E8;"/>
             </toolkit:SettingsCard.HeaderIcon>
-            <ToggleSwitch IsOn="{x:Bind ViewModel.IsEnabled, Mode=TwoWay}"/>
+            <ToggleSwitch
+                IsOn="{x:Bind ViewModel.IsEnabled, Mode=TwoWay}"
+                OffContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OffText, Mode=OneWay}"
+                OnContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OnText, Mode=OneWay}"/>
         </toolkit:SettingsCard>
-        <toolkit:SettingsExpander Header="强度上限" HeaderIcon="Upload">
+        <toolkit:SettingsExpander
+            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.StrengthLimitCardHeader, Mode=OneWay}"
+            HeaderIcon="Upload">
             <toolkit:SettingsExpander.Items>
                 <toolkit:SettingsCard Header="A" Loaded="OnSettingsCardLoaded">
                     <Slider
@@ -54,57 +64,72 @@
                 </toolkit:SettingsCard>
             </toolkit:SettingsExpander.Items>
         </toolkit:SettingsExpander>
-        <toolkit:SettingsExpander Header="输出参数" Description="轻柔模式、频率与强度平衡参数">
+        <toolkit:SettingsExpander
+            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.OutputParametersCardHeader, Mode=OneWay}"
+            Description="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.OutputParametersCardDescription, Mode=OneWay}">
             <toolkit:SettingsExpander.HeaderIcon>
                 <FontIcon Glyph="&#xE9E9;"/>
             </toolkit:SettingsExpander.HeaderIcon>
             <toolkit:SettingsExpander.Items>
-                <toolkit:SettingsCard Header="轻柔模式">
+                <toolkit:SettingsCard
+                    Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.GentleModeCardHeader, Mode=OneWay}">
                     <toolkit:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xEC0A;"/>
                     </toolkit:SettingsCard.HeaderIcon>
-                    <ToggleSwitch IsOn="{x:Bind ViewModel.IsGentle, Mode=TwoWay}"/>
+                    <ToggleSwitch
+                        IsOn="{x:Bind ViewModel.IsGentle, Mode=TwoWay}"
+                        OffContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OffText, Mode=OneWay}"
+                        OnContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OnText, Mode=OneWay}"/>
                 </toolkit:SettingsCard>
                 <toolkit:SettingsCard Loaded="OnSettingsCardLoaded">
                     <StackPanel Spacing="{StaticResource CommonControlSpacing}">
                         <Slider
-                            Header="A通道频率平衡参数" Value="{x:Bind ViewModel.BfFrequencyParamA, Mode=TwoWay}"
+                            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.ChannelAFrequencyBalanceSliderHeader, Mode=OneWay}"
+                            Value="{x:Bind ViewModel.BfFrequencyParamA, Mode=TwoWay}"
                             Minimum="0" Maximum="255" StepFrequency="1" SmallChange="1" LargeChange="10"/>
                         <Slider
-                            Header="A通道强度平衡参数" Value="{x:Bind ViewModel.BfStrengthParamA, Mode=TwoWay}"
+                            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.ChannelAStrengthBalanceSliderHeader, Mode=OneWay}"
+                            Value="{x:Bind ViewModel.BfStrengthParamA, Mode=TwoWay}"
                             Minimum="0" Maximum="255" StepFrequency="1" SmallChange="1" LargeChange="10"/>
                     </StackPanel>
                 </toolkit:SettingsCard>
                 <toolkit:SettingsCard Loaded="OnSettingsCardLoaded">
                     <StackPanel Spacing="{StaticResource CommonControlSpacing}">
                         <Slider
-                            Header="B通道频率平衡参数" Value="{x:Bind ViewModel.BfFrequencyParamB, Mode=TwoWay}"
+                            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.ChannelBFrequencyBalanceSliderHeader, Mode=OneWay}"
+                            Value="{x:Bind ViewModel.BfFrequencyParamB, Mode=TwoWay}"
                             Minimum="0" Maximum="255" StepFrequency="1" SmallChange="1" LargeChange="10"/>
                         <Slider
-                            Header="B通道强度平衡参数" Value="{x:Bind ViewModel.BfStrengthParamB, Mode=TwoWay}"
+                            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.ChannelBStrengthBalanceSliderHeader, Mode=OneWay}"
+                            Value="{x:Bind ViewModel.BfStrengthParamB, Mode=TwoWay}"
                             Minimum="0" Maximum="255" StepFrequency="1" SmallChange="1" LargeChange="10"/>
                     </StackPanel>
                 </toolkit:SettingsCard>
             </toolkit:SettingsExpander.Items>
         </toolkit:SettingsExpander>
-        <toolkit:SettingsExpander Header="更多" IsExpanded="True">
+        <toolkit:SettingsExpander
+            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.MoreInfoCardHeader, Mode=OneWay}"
+            IsExpanded="True">
             <toolkit:SettingsExpander.HeaderIcon>
                 <FontIcon Glyph="&#xF0E3;"/>
             </toolkit:SettingsExpander.HeaderIcon>
             <toolkit:SettingsExpander.Items>
-                <toolkit:SettingsCard Header="当前A通道强度">
+                <toolkit:SettingsCard
+                    Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.CurrentChannelAStrengthCardHeader, Mode=OneWay}">
                     <toolkit:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xF093;"/>
                     </toolkit:SettingsCard.HeaderIcon>
                     <TextBlock Text="{x:Bind ViewModel.CurrentStrengthA, Mode=OneWay}"/>
                 </toolkit:SettingsCard>
-                <toolkit:SettingsCard Header="当前B通道强度">
+                <toolkit:SettingsCard
+                    Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.CurrentChannelBStrengthCardHeader, Mode=OneWay}">
                     <toolkit:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xF094;"/>
                     </toolkit:SettingsCard.HeaderIcon>
                     <TextBlock Text="{x:Bind ViewModel.CurrentStrengthB, Mode=OneWay}"/>
                 </toolkit:SettingsCard>
-                <toolkit:SettingsCard Header="电池电量">
+                <toolkit:SettingsCard
+                    Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.BatteryLevelCardHeader, Mode=OneWay}">
                     <toolkit:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="{x:Bind ViewModel.BatteryLevel, Mode=OneWay, Converter={StaticResource IntToBatteryIconConverter}}"/>
                     </toolkit:SettingsCard.HeaderIcon>

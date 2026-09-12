@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.Messaging;
+using Dianty.Localization;
 using Dianty.Utils.Messages;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -69,15 +70,16 @@ public sealed partial class CoyoteDeletionCard : UserControl
         {
             _deletionSlider.Value = 100;
 
+            var dialogText = Localizer.Instance.AppText.MainWindowText.DeviceDeletionCardText.ConfirmationDialogText;
             var dialog = new ContentDialog
             {
                 XamlRoot = XamlRoot,
-                Title = "是否删除？",
-                PrimaryButtonText = "确认删除",
-                CloseButtonText = "取消",
+                Title = dialogText.Title,
+                PrimaryButtonText = dialogText.PrimaryButtonText,
+                CloseButtonText = dialogText.CloseButtonText,
                 IsSecondaryButtonEnabled = false,
                 DefaultButton = ContentDialogButton.None,
-                Content = $"从列表中移除“{TargetName}”",
+                Content = string.Format(dialogText.ContentFormat, TargetName),
                 RequestedTheme = ActualTheme
             };
 

@@ -14,20 +14,19 @@ using static Dianty.Services.ILocalizationService;
 
 namespace Dianty.Views.Pages;
 
-public sealed partial class WaveSettingsPage : Page
+public sealed partial class WavePlayQueuePage : Page
 {
-    public WaveSettingsPage()
+    public WavePlayQueuePage()
     {
         InitializeComponent();
-        Unloaded += OnWaveSettingsPageUnloaded;
+        Unloaded += OnWavePlayQueuePageUnloaded;
     }
 
     private IQueueService? _queueService;
     private ILocalizationService? _localizationService;
     private IEnumerable<Func<ILocalizationService, string>>? _pathGetters;
 
-    private WaveItem? ViewModel { get; set; }
-
+    private WavesPageViewModel? ViewModel { get; set; }
     private ObservableCollection<string>? Paths { get; set; }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -41,12 +40,12 @@ public sealed partial class WaveSettingsPage : Page
             ViewModel = parameter.ViewModel;
 
             Paths = [.. _pathGetters.Select(f => f.Invoke(_localizationService)),
-                _localizationService.AppText.MainWindowText.MainViewText.WavesPageText.DetailsMenuPath];
+                _localizationService.AppText.MainWindowText.MainViewText.WavesPageText.QueueMenuPath];
             _localizationService.CurrentLanguageFileNameChanged += OnCurrentLanguageFileNameChanged;
         }
     }
 
-    private void OnWaveSettingsPageUnloaded(object sender, RoutedEventArgs e)
+    private void OnWavePlayQueuePageUnloaded(object sender, RoutedEventArgs e)
     {
         _localizationService?.CurrentLanguageFileNameChanged -= OnCurrentLanguageFileNameChanged;
     }
@@ -56,7 +55,7 @@ public sealed partial class WaveSettingsPage : Page
         if (Paths is null || _queueService is null || _localizationService is null || _pathGetters is null)
             return;
         string[] paths = [.. _pathGetters.Select(f => f.Invoke(_localizationService)),
-            _localizationService.AppText.MainWindowText.MainViewText.WavesPageText.DetailsMenuPath];
+            _localizationService.AppText.MainWindowText.MainViewText.WavesPageText.QueueMenuPath];
         _queueService.TryEnqueue(() =>
         {
             Paths.Clear();
@@ -89,6 +88,6 @@ public sealed partial class WaveSettingsPage : Page
         WeakReferenceMessenger.Default.Send(navigationRequest);
     }
 
-    public record class RequiredParameter(WaveItem ViewModel, IEnumerable<Func<ILocalizationService, string>> PathGetters,
+    public record class RequiredParameter(WavesPageViewModel ViewModel, IEnumerable<Func<ILocalizationService, string>> PathGetters,
         IQueueService QueueService, ILocalizationService LocalizationService);
 }

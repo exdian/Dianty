@@ -17,23 +17,28 @@ using System.Collections.Generic;
 using System.Linq;
 using Windows.Foundation;
 using Windows.Graphics;
+using static Dianty.Services.ILocalizationService;
 
 namespace Dianty.Views;
 
 public sealed partial class MainView : UserControl
 {
-    public MainView(ITitleBarService titleBarService, IWindowService windowService, IQueueService queueService)
+    public MainView(ITitleBarService titleBarService, IWindowService windowService, IQueueService queueService, ILocalizationService localizationService)
     {
         InitializeComponent();
         _titleBarService = titleBarService;
         _windowService = windowService;
         _queueService = queueService;
+        _localizationService = localizationService;
 
         // 导航按钮不居中，需要手动刷新一下
         _navView.IsPaneOpen = false;
         _navView.IsPaneOpen = true;
 
-        _debugMenuItem = DebugPage.GetNavigationViewItem();
+#if !DEBUG
+        _debugMenuItem.Visibility = Visibility.Collapsed;
+#endif
+
         _keySequenceTrigger.AddKeySequence("debug", ToggleDebugMenuItem);
         Loaded += MainView_Loaded;
         Unloaded += MainView_Unloaded;
@@ -42,31 +47,36 @@ public sealed partial class MainView : UserControl
     private readonly ITitleBarService _titleBarService;
     private readonly IWindowService _windowService;
     private readonly IQueueService _queueService;
+    private readonly ILocalizationService _localizationService;
     private readonly List<FrameworkElement> _interactableElements = [];
     private readonly KeySequenceTrigger _keySequenceTrigger = new();
-    private readonly NavigationViewItem _debugMenuItem;
     private RectInt32[] _previousPassthroughRects = [];
     private Button? _backButton;
     private Button? _closePaneButton;
     private Button? _togglePaneButton;
 
+#pragma warning disable CA1822 // 将成员标记为 static
     private Type HomePage => typeof(HomePage);
     private Type DevicesPage => typeof(DevicesPage);
     private Type WavesPage => typeof(WavesPage);
     private Type GamesPage => typeof(GamesPage);
     private Type SafetyPage => typeof(SafetyPage);
-    private static Type SettingsPage => typeof(SettingsPage);
+    private Type DebugPage => typeof(DebugPage);
+    private Type SettingsPage => typeof(SettingsPage);
+#pragma warning restore CA1822 // 将成员标记为 static
 
     private void MainView_Loaded(object sender, RoutedEventArgs e)
     {
         WeakReferenceMessenger.Default.Register<KeyDownMessage>(this, ProcessKey);
         WeakReferenceMessenger.Default.Register<NavigationRequest>(this, ProcessNavigationRequest);
+        _localizationService.CurrentLanguageFileNameChanged += OnLocalizationServiceCurrentLanguageFileNameChanged;
     }
 
     private void MainView_Unloaded(object sender, RoutedEventArgs e)
     {
         WeakReferenceMessenger.Default.Unregister<KeyDownMessage>(this);
         WeakReferenceMessenger.Default.Unregister<NavigationRequest>(this);
+        _localizationService.CurrentLanguageFileNameChanged -= OnLocalizationServiceCurrentLanguageFileNameChanged;
     }
 
     private void ProcessKey(object recipient, KeyDownMessage message)
@@ -78,10 +88,10 @@ public sealed partial class MainView : UserControl
     {
         _queueService.TryEnqueue(DispatcherQueuePriority.Low, () =>
         {
-            if (_navView.MenuItems.Contains(_debugMenuItem))
-                _navView.MenuItems.Remove(_debugMenuItem);
+            if (_debugMenuItem.Visibility == Visibility.Visible)
+                _debugMenuItem.Visibility = Visibility.Collapsed;
             else
-                _navView.MenuItems.Add(_debugMenuItem);
+                _debugMenuItem.Visibility = Visibility.Visible;
         });
     }
 
@@ -140,18 +150,10 @@ public sealed partial class MainView : UserControl
 
             // 图标区域在窗口发生交互时很可能会被重置，因此需要重新设置
             var nonClientPointerSource = _windowService.GetInputNonClientPointerSource();
-            if (nonClientPointerSource is not null)
-            {
-                nonClientPointerSource.ExitedMoveSize += MainView_ExitedMoveSize;
-                _appIcon.Unloaded += (_, _) => nonClientPointerSource.ExitedMoveSize -= MainView_ExitedMoveSize;
-            }
+            nonClientPointerSource?.ExitedMoveSize += MainView_ExitedMoveSize;
 
             var activationListener = _windowService.GetInputActivationListener();
-            if (activationListener is not null)
-            {
-                activationListener.InputActivationChanged += ActivationListener_InputActivationChanged;
-                _appIcon.Unloaded += (_, _) => activationListener.InputActivationChanged -= ActivationListener_InputActivationChanged;
-            }
+            activationListener?.InputActivationChanged += ActivationListener_InputActivationChanged;
 
             // 获取所有可能位于标题栏区域的元素
             _backButton = VisualTreeHelperExtension.FindChildByName(_navView, "NavigationViewBackButton") as Button;
@@ -169,6 +171,15 @@ public sealed partial class MainView : UserControl
                 rectangle.Clip = clip;
             }
         }
+    }
+
+    private void NavView_Unloaded(object sender, RoutedEventArgs e)
+    {
+        var nonClientPointerSource = _windowService.GetInputNonClientPointerSource();
+        nonClientPointerSource?.ExitedMoveSize -= MainView_ExitedMoveSize;
+
+        var activationListener = _windowService.GetInputActivationListener();
+        activationListener?.InputActivationChanged -= ActivationListener_InputActivationChanged;
     }
 
     private void UpdateDragRegion()
@@ -347,5 +358,16 @@ public sealed partial class MainView : UserControl
         {
             _navView.IsPaneOpen = false;
         }
+    }
+
+    private void OnLocalizationServiceCurrentLanguageFileNameChanged(object? sender, CurrentLanguageFileNameChangedEventArgs e)
+    {
+        _queueService.TryEnqueue(() =>
+        {
+            if (_navView.SettingsItem is ContentControl contentControl && contentControl.Content is string)
+            {
+                contentControl.Content = _localizationService.AppText.MainWindowText.MainViewText.MenuSettings;
+            }
+        });
     }
 }

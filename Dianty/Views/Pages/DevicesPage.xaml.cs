@@ -17,6 +17,7 @@ public sealed partial class DevicesPage : Page
     }
 
     private IQueueService? _queueService;
+    private ILocalizationService? _localizationService;
 
     private DevicesPageViewModel? ViewModel { get; set; }
 
@@ -27,15 +28,15 @@ public sealed partial class DevicesPage : Page
         {
             ViewModel = parameter.ViewModel;
             _queueService = parameter.QueueService;
+            _localizationService = parameter.LocalizationService;
         }
     }
 
     private void OnSettingsCardClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not FrameworkElement element || _queueService is null)
+        if (sender is not FrameworkElement element || _queueService is null || _localizationService is null)
             return;
 
-        string[] traces = [_pageHeader.Text];
         var options = new FrameNavigationOptions
         {
             IsNavigationStackEnabled = true,
@@ -46,7 +47,8 @@ public sealed partial class DevicesPage : Page
         };
         if (element.DataContext is CoyoteItem coyoteItem)
         {
-            var requiredParameter = new CoyoteDetailPage.RequiredParameter(coyoteItem, traces, _queueService);
+            var requiredParameter = new CoyoteDetailPage.RequiredParameter(coyoteItem,
+                [s => s.AppText.MainWindowText.MainViewText.MenuDevices], _queueService, _localizationService);
             WeakReferenceMessenger.Default.Send(new NavigationRequest(typeof(CoyoteDetailPage), requiredParameter, options));
         }
     }
@@ -59,5 +61,5 @@ public sealed partial class DevicesPage : Page
             _pageContent.ItemTemplate = (DataTemplate)Resources["NormalCoyoteItemTemplate"];
     }
 
-    public record class RequiredParameter(DevicesPageViewModel ViewModel, IQueueService QueueService);
+    public record class RequiredParameter(DevicesPageViewModel ViewModel, IQueueService QueueService, ILocalizationService LocalizationService);
 }

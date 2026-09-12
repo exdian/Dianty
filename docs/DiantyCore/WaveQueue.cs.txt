@@ -3,7 +3,7 @@
 public class WaveQueue  
 {
     public bool IsEnabled { get; set; }
-    public WavePlayMode PlayMode { get; set; }
+    public WavePlaybackMode PlaybackMode { get; set; }
     public WavePlayer? PlayingWave { get; }
     public PulseData CurrentPulseData { get; }
     public int NextWaveInterval { get; set; }

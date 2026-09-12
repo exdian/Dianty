@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="using:Dianty.ViewModels"
     xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
+    xmlns:txt="using:Dianty.Localization"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -14,7 +15,9 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <TextBlock x:Name="PageHeader" Text="玩法" Style="{StaticResource TitleTextBlockStyle}" Margin="12,6,12,12"/>
+        <TextBlock
+            x:Name="PageHeader" Style="{StaticResource TitleTextBlockStyle}" Margin="12,6,12,12"
+            Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.MenuGames, Mode=OneWay}"/>
         <ScrollViewer
             x:Name="PageContent" Grid.Row="1" Padding="12,0"
             VerticalScrollBarVisibility="Auto" VerticalScrollMode="Auto">
@@ -22,7 +25,9 @@
                 <StackPanel.ChildrenTransitions>
                     <RepositionThemeTransition />
                 </StackPanel.ChildrenTransitions>
-                <TextBlock Text="概况" Style="{StaticResource BodyStrongTextBlockStyle}" Margin="1,2,0,4"/>
+                <TextBlock
+                    Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.OverviewItemsHeader, Mode=OneWay}"
+                    Style="{StaticResource BodyStrongTextBlockStyle}" Margin="1,2,0,4"/>
                 <Grid
                     Padding="16,12"
                     Background="{ThemeResource CardBackgroundFillColorDefault}"
@@ -41,29 +46,29 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <TextBlock
-                        Grid.Row="0" Grid.Column="0"
-                        Text="生效玩法" FontWeight="SemiBold"
-                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        Grid.Row="0" Grid.Column="0" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.EnabledGameCountLabel, Mode=OneWay}" />
                     <TextBlock
                         Grid.Row="1" Grid.Column="0"
                         Text="{x:Bind ViewModel.EnabledGameCount, Mode=OneWay}"
                         FontSize="20" FontWeight="Bold" />
                     <TextBlock
-                        Grid.Row="0" Grid.Column="1"
-                        Text="输出强度" FontWeight="SemiBold"
-                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        Grid.Row="0" Grid.Column="1" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.OutputStrengthLabel, Mode=OneWay}" />
                     <TextBlock
                         Grid.Row="1" Grid.Column="1"
                         Text="{x:Bind ViewModel.OutputStrength, Mode=OneWay}"
                         FontSize="20" FontWeight="Bold" />
                 </Grid>
-                <toolkit:SettingsExpander Header="输出模式" Description="自动模式下强度为0时自动暂停输出">
+                <toolkit:SettingsExpander
+                    Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.OutputModeCardHeader, Mode=OneWay}"
+                    Description="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.OutputModeCardDescription, Mode=OneWay}">
                     <toolkit:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE9F5;"/>
                     </toolkit:SettingsExpander.HeaderIcon>
                     <ComboBox
-                        PlaceholderText="默认自动"
-                        ItemsSource="{x:Bind ViewModel.AutoStartStopModeSelectionItems}"
+                        PlaceholderText="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.OutputModePlaceholderText, Mode=OneWay}"
+                        ItemsSource="{x:Bind ViewModel.AutoStartStopModeSelectionItems, Mode=OneWay}"
                         SelectedItem="{x:Bind ViewModel.IsAutoStartStopMode, Mode=TwoWay}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate x:DataType="vm:AutoStartStopModeSelectionItem">
@@ -73,7 +78,7 @@
                     </ComboBox>
                     <toolkit:SettingsExpander.Items>
                         <toolkit:SettingsCard
-                            Header="手动开关"
+                            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.ManualSwitchCardHeader, Mode=OneWay}"
                             IsEnabled="{x:Bind ViewModel.IsAutoStartStop, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}">
                             <toolkit:SettingsCard.HeaderIcon>
                                 <FontIcon Glyph="&#xE815;"/>
@@ -84,13 +89,15 @@
                         </toolkit:SettingsCard>
                     </toolkit:SettingsExpander.Items>
                 </toolkit:SettingsExpander>
-                <toolkit:SettingsCard Header="强度模式" Description="多个玩法同时生效时">
+                <toolkit:SettingsCard
+                    Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.StrengthModeCardHeader, Mode=OneWay}"
+                    Description="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.StrengthModeCardDescription, Mode=OneWay}">
                     <toolkit:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE9E9;"/>
                     </toolkit:SettingsCard.HeaderIcon>
                     <ComboBox
-                        PlaceholderText="选择处理模式"
-                        ItemsSource="{x:Bind ViewModel.StrengthModeSelectionItems}"
+                        PlaceholderText="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.StrengthModePlaceholderText, Mode=OneWay}"
+                        ItemsSource="{x:Bind ViewModel.StrengthModeSelectionItems, Mode=OneWay}"
                         SelectedItem="{x:Bind ViewModel.GamesStrengthMode, Mode=TwoWay}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate x:DataType="vm:StrengthModeSelectionItem">
@@ -99,13 +106,18 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
                 </toolkit:SettingsCard>
-                <TextBlock Text="规则" Style="{StaticResource BodyStrongTextBlockStyle}" Margin="1,14,0,4"/>
-                <toolkit:SettingsExpander Header="敬请期待">
+                <TextBlock
+                    Style="{StaticResource BodyStrongTextBlockStyle}" Margin="1,14,0,4"
+                    Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.RuleItemsHeader, Mode=OneWay}"/>
+                <toolkit:SettingsExpander
+                    Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.EmptyRuleCardHeader, Mode=OneWay}">
                     <toolkit:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE897;"/>
                     </toolkit:SettingsExpander.HeaderIcon>
                     <toolkit:SettingsExpander.Items>
-                        <toolkit:SettingsCard Header="查看更新" IsClickEnabled="True">
+                        <toolkit:SettingsCard
+                            IsClickEnabled="True"
+                            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.RepositoryLinkCardHeader, Mode=OneWay}">
                             <HyperlinkButton Content="https://github.com/exdian/Dianty/releases" NavigateUri="https://github.com/exdian/Dianty/releases" />
                             <toolkit:SettingsCard.ActionIcon>
                                 <FontIcon Glyph="&#xE8A7;" />

@@ -2,44 +2,114 @@
 using Dianty.Models;
 using Dianty.Services;
 using DungeonToolkit.Coyote;
+using System;
 using System.Collections;
 using System.Collections.Specialized;
 
 namespace Dianty.ViewModels;
 
-public partial class HomePageViewModel : ObservableObject
+public partial class HomePageViewModel : ObservableObject, IDisposable
 {
-    public HomePageViewModel(CoyoteCollection coyoteItems, GameManager gameManager, IQueueService queueService)
+    public HomePageViewModel(
+        CoyoteCollection coyoteItems, GameManager gameManager, IQueueService queueService,
+        ILocalizationService localizationService)
     {
         _coyoteItems = coyoteItems;
         _gameManager = gameManager;
         _queueService = queueService;
+        _localizationService = localizationService;
+
+        FormattedConnectedCount = string.Format(ConnectedCountFormat, 0);
+        FormattedAddedCount = string.Format(AddedCountFormat, _coyoteItems.Count);
+        FormattedWaveNameA = string.Format(AChannelFormat, _gameManager.CoyoteManager.ChannelA.PlayingWave?.Wave.Name ?? NoneLabel);
+        FormattedWaveNameB = string.Format(BChannelFormat, _gameManager.CoyoteManager.ChannelB.PlayingWave?.Wave.Name ?? NoneLabel);
+        FormattedCurrentStrength = string.Format(CurrentStrengthFormat, _gameManager.CoyoteManager.IsOutputting
+            ? _gameManager.OutputStrength : NoneLabel);
 
         _coyoteItems.CollectionChanged += OnCoyoteCollectionChanged;
         _gameManager.CoyoteManager.ChannelA.PlayingWaveChanged += OnChannelAPlayingWaveChanged;
         _gameManager.CoyoteManager.ChannelB.PlayingWaveChanged += OnChannelBPlayingWaveChanged;
         _gameManager.CoyoteManager.OutputStatusChanged += OnCoyoteManagerOutputStatusChanged;
         _gameManager.OutputStrengthChanged += OnGameManagerOutputStrengthChanged;
+        _localizationService.CurrentLanguageFileNameChanged += OnCurrentLanguageFileNameChanged;
     }
 
     private readonly CoyoteCollection _coyoteItems;
     private readonly GameManager _gameManager;
     private readonly IQueueService _queueService;
+    private readonly ILocalizationService _localizationService;
+    private bool _isDisposed;
+
+    private string ConnectedCountFormat => _localizationService.AppText.MainWindowText.MainViewText.HomePageText.ConnectedCountFormat;
+    private string AddedCountFormat => _localizationService.AppText.MainWindowText.MainViewText.HomePageText.AddedCountFormat;
+    private string AChannelFormat => _localizationService.AppText.MainWindowText.MainViewText.HomePageText.ChannelAFormat;
+    private string BChannelFormat => _localizationService.AppText.MainWindowText.MainViewText.HomePageText.ChannelBFormat;
+    private string CurrentStrengthFormat => _localizationService.AppText.MainWindowText.MainViewText.HomePageText.CurrentStrengthFormat;
+    private string NoneLabel => _localizationService.AppText.MainWindowText.MainViewText.HomePageText.NoneLabel;
+
+    public int ConnectedCount
+    {
+        get;
+        private set
+        {
+            if (field != value)
+            {
+                field = value;
+                FormattedConnectedCount = string.Format(ConnectedCountFormat, value);
+            }
+        }
+    }
+
+    public int AddedCount
+    {
+        get;
+        private set
+        {
+            if (field != value)
+            {
+                field = value;
+                FormattedAddedCount = string.Format(AddedCountFormat, value);
+            }
+        }
+    }
 
     [ObservableProperty]
-    public partial int ConnectedCount { get; private set; }
+    public partial string FormattedConnectedCount { get; private set; }
 
     [ObservableProperty]
-    public partial int AddedCount { get; private set; }
+    public partial string FormattedAddedCount { get; private set; }
 
     [ObservableProperty]
-    public partial string WaveNameA { get; private set; } = "无";
+    public partial string FormattedWaveNameA { get; private set; }
 
     [ObservableProperty]
-    public partial string WaveNameB { get; private set; } = "无";
+    public partial string FormattedWaveNameB { get; private set; }
 
     [ObservableProperty]
-    public partial string CurrentStrength { get; private set; } = "无";
+    public partial string FormattedCurrentStrength { get; private set; }
+
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_isDisposed)
+            return;
+        _isDisposed = true;
+
+        if (disposing)
+        {
+            _coyoteItems.CollectionChanged -= OnCoyoteCollectionChanged;
+            _gameManager.CoyoteManager.ChannelA.PlayingWaveChanged -= OnChannelAPlayingWaveChanged;
+            _gameManager.CoyoteManager.ChannelB.PlayingWaveChanged -= OnChannelBPlayingWaveChanged;
+            _gameManager.CoyoteManager.OutputStatusChanged -= OnCoyoteManagerOutputStatusChanged;
+            _gameManager.OutputStrengthChanged -= OnGameManagerOutputStrengthChanged;
+            _localizationService.CurrentLanguageFileNameChanged -= OnCurrentLanguageFileNameChanged;
+        }
+    }
 
     private void OnCoyoteCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
@@ -65,12 +135,12 @@ public partial class HomePageViewModel : ObservableObject
                 break;
             case NotifyCollectionChangedAction.Reset:
                 ConnectedCount = 0;
-                AddedCount = 0;
                 // 此处未能取消事件订阅，如果在移除条目后继续对已移除的条目进行操作，会导致计数错误
                 break;
             default:
                 break;
         }
+        AddedCount = _coyoteItems.Count;
     }
 
     private void OnAddItems(IList list)
@@ -80,14 +150,12 @@ public partial class HomePageViewModel : ObservableObject
             var item = list[i];
             if (item is CoyoteBleItem coyoteBleItem)
             {
-                AddedCount++;
                 if (coyoteBleItem.Coyote.IsConnected)
                     ConnectedCount++;
                 coyoteBleItem.Coyote.ConnectionStatusChanged += OnCoyoteConnectionStatusChanged;
             }
             else if (item is CoyoteWsItem coyoteWsItem)
             {
-                AddedCount++;
                 if (coyoteWsItem.Coyote.IsBound)
                     ConnectedCount++;
                 coyoteWsItem.Coyote.BindingStatusChanged += OnCoyoteBindingStatusChanged;
@@ -105,14 +173,12 @@ public partial class HomePageViewModel : ObservableObject
                 coyoteBleItem.Coyote.ConnectionStatusChanged -= OnCoyoteConnectionStatusChanged;
                 if (coyoteBleItem.Coyote.IsConnected)
                     ConnectedCount--;
-                AddedCount--;
             }
             else if (item is CoyoteWsItem coyoteWsItem)
             {
                 coyoteWsItem.Coyote.BindingStatusChanged -= OnCoyoteBindingStatusChanged;
                 if (coyoteWsItem.Coyote.IsBound)
                     ConnectedCount--;
-                AddedCount--;
             }
         }
     }
@@ -135,25 +201,38 @@ public partial class HomePageViewModel : ObservableObject
 
     private void OnChannelAPlayingWaveChanged(object? sender, WaveQueue.PlayingWaveChangedEventArgs e)
     {
-        _queueService.TryEnqueue(() => WaveNameA = e.WavePlayer?.Wave.Name ?? "无");
+        _queueService.TryEnqueue(() => FormattedWaveNameA = string.Format(AChannelFormat, e.WavePlayer?.Wave.Name ?? NoneLabel));
     }
 
     private void OnChannelBPlayingWaveChanged(object? sender, WaveQueue.PlayingWaveChangedEventArgs e)
     {
-        _queueService.TryEnqueue(() => WaveNameB = e.WavePlayer?.Wave.Name ?? "无");
+        _queueService.TryEnqueue(() => FormattedWaveNameB = string.Format(BChannelFormat, e.WavePlayer?.Wave.Name ?? NoneLabel));
     }
 
     private void OnCoyoteManagerOutputStatusChanged(object? sender, CoyoteManager.OutputStatusChangedEventArgs e)
     {
-        if (e.IsOutputting)
-            _queueService.TryEnqueue(() => CurrentStrength = _gameManager.OutputStrength.ToString());
-        else
-            _queueService.TryEnqueue(() => CurrentStrength = "无");
+        _queueService.TryEnqueue(() =>
+        {
+            FormattedCurrentStrength = string.Format(CurrentStrengthFormat, e.IsOutputting ? _gameManager.OutputStrength : NoneLabel);
+        });
     }
 
     private void OnGameManagerOutputStrengthChanged(object? sender, AutomaticStrength.OutputStrengthChangedEventArgs e)
     {
         if (_gameManager.CoyoteManager.IsOutputting)
-            _queueService.TryEnqueue(() => CurrentStrength = e.Strength.ToString());
+            _queueService.TryEnqueue(() => FormattedCurrentStrength = string.Format(CurrentStrengthFormat, e.Strength));
+    }
+
+    private void OnCurrentLanguageFileNameChanged(object? sender, ILocalizationService.CurrentLanguageFileNameChangedEventArgs e)
+    {
+        _queueService.TryEnqueue(() =>
+        {
+            FormattedConnectedCount = string.Format(ConnectedCountFormat, ConnectedCount);
+            FormattedAddedCount = string.Format(AddedCountFormat, AddedCount);
+            FormattedWaveNameA = string.Format(AChannelFormat, _gameManager.CoyoteManager.ChannelA.PlayingWave?.Wave.Name ?? NoneLabel);
+            FormattedWaveNameB = string.Format(BChannelFormat, _gameManager.CoyoteManager.ChannelB.PlayingWave?.Wave.Name ?? NoneLabel);
+            FormattedCurrentStrength = string.Format(CurrentStrengthFormat, _gameManager.CoyoteManager.IsOutputting
+                ? _gameManager.OutputStrength : NoneLabel);
+        });
     }
 }

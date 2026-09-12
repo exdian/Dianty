@@ -6,6 +6,7 @@
     xmlns:vm="using:Dianty.ViewModels"
     xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
     xmlns:controls="using:Dianty.Views.Controls"
+    xmlns:txt="using:Dianty.Localization"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -18,7 +19,10 @@
                 <toolkit:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="{x:Bind IsBleConnection, Converter={StaticResource CoyoteTypeIconConverter}}"/>
                 </toolkit:SettingsCard.HeaderIcon>
-                <ToggleSwitch IsOn="{x:Bind IsEnabled, Mode=TwoWay}"/>
+                <ToggleSwitch
+                    IsOn="{x:Bind IsEnabled, Mode=TwoWay}"
+                    OffContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OffText, Mode=OneWay}"
+                    OnContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OnText, Mode=OneWay}"/>
             </toolkit:SettingsCard>
         </DataTemplate>
         <DataTemplate x:Key="SortCoyoteItemTemplate" x:DataType="vm:CoyoteItem">
@@ -26,7 +30,10 @@
                 <toolkit:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="{x:Bind IsBleConnection, Converter={StaticResource CoyoteTypeIconConverter}}"/>
                 </toolkit:SettingsCard.HeaderIcon>
-                <ToggleSwitch IsOn="{x:Bind IsEnabled, Mode=TwoWay}"/>
+                <ToggleSwitch
+                    IsOn="{x:Bind IsEnabled, Mode=TwoWay}"
+                    OffContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OffText, Mode=OneWay}"
+                    OnContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OnText, Mode=OneWay}"/>
             </toolkit:SettingsCard>
         </DataTemplate>
     </Page.Resources>
@@ -36,7 +43,9 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <TextBlock x:Name="_pageHeader" Text="设备" Style="{StaticResource TitleTextBlockStyle}" Margin="12,6,12,12"/>
+        <TextBlock
+            x:Name="_pageHeader" Style="{StaticResource TitleTextBlockStyle}" Margin="12,6,12,12"
+            Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.MenuDevices, Mode=OneWay}"/>
         <ListView
             x:Name="_pageContent" Grid.Row="1" Padding="12,0,12,20" SelectionMode="None" CanReorderItems="True" AllowDrop="True"
             ItemsSource="{x:Bind ViewModel.CoyoteItems}" ItemContainerStyle="{StaticResource StretchListViewItemStyle}"
@@ -52,16 +61,20 @@
                             <RepositionThemeTransition/>
                         </StackPanel.ChildrenTransitions>
                         <DropDownButton
-                            Content="添加设备"
+                            Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.AddDeviceButtonText, Mode=OneWay}"
                             Visibility="{x:Bind ViewModel.IsConnecting, Mode=OneWay, Converter={StaticResource VisibleIfFalseConverter}}">
                             <DropDownButton.Flyout>
                                 <MenuFlyout Placement="Bottom">
-                                    <MenuFlyoutItem Text="蓝牙" Command="{x:Bind ViewModel.ConnectBleCommand}">
+                                    <MenuFlyoutItem
+                                        Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.BluetoothLabel, Mode=OneWay}"
+                                        Command="{x:Bind ViewModel.ConnectBleCommand}">
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xE702;"/>
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
-                                    <MenuFlyoutItem Text="Socket" Command="{x:Bind ViewModel.ConnectWsCommand}">
+                                    <MenuFlyoutItem
+                                        Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.SocketLabel, Mode=OneWay}"
+                                        Command="{x:Bind ViewModel.ConnectWsCommand}">
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xE753;"/>
                                         </MenuFlyoutItem.Icon>
@@ -70,7 +83,8 @@
                             </DropDownButton.Flyout>
                         </DropDownButton>
                         <Button
-                            Content="取消" Command="{x:Bind ViewModel.CancelConnectCommand}"
+                            Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.CancelButtonText, Mode=OneWay}"
+                            Command="{x:Bind ViewModel.CancelConnectCommand}"
                             Visibility="{x:Bind ViewModel.IsConnecting, Mode=OneWay, Converter={StaticResource VisibleIfTrueConverter}}"/>
                         <controls:QrCodeButton
                             IsDisplayed="{x:Bind ViewModel.IsQrCodeDisplayed, Mode=OneWay}"
@@ -86,8 +100,8 @@
                         </ContentControl>
                     </StackPanel>
                     <ToggleButton
-                        x:Name="_sortButton" Grid.Row="1" Content="排序" Click="OnSortButtonClick"
-                        HorizontalAlignment="Left" Margin="0,5,0,0"/>
+                        x:Name="_sortButton" Grid.Row="1" Click="OnSortButtonClick" HorizontalAlignment="Left" Margin="0,5,0,0"
+                        Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.SortButtonText, Mode=OneWay}"/>
                 </Grid>
             </ListView.Header>
         </ListView>
