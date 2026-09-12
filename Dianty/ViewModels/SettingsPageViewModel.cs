@@ -78,11 +78,13 @@ public partial class SettingsPageViewModel : ObservableObject, IDisposable
 
     private void OnCurrentLanguageFileNameChanged(object? sender, CurrentLanguageFileNameChangedEventArgs e)
     {
-        if (SelectedAppTheme is null)
-            return;
         var appThemeSelectionItems = AppThemeSelectionItem.GetSelectionItems(_localizationService);
-        var theme = SelectedAppTheme.Theme;
-        var selectedAppTheme = appThemeSelectionItems.FirstOrDefault(i => i.Theme == theme);
+        var selectedAppTheme = SelectedAppTheme;
+        if (selectedAppTheme is not null)
+        {
+            var theme = selectedAppTheme.Theme;
+            selectedAppTheme = appThemeSelectionItems.FirstOrDefault(i => i.Theme == theme);
+        }
         _queueService.TryEnqueue(() =>
         {
             AppThemeSelectionItems = appThemeSelectionItems;
@@ -118,7 +120,7 @@ public partial class SettingsPageViewModel : ObservableObject, IDisposable
             if (isExceptionOccurred)
             {
                 var dialog = _windowService.CreateContentDialog();
-                if (dialog is null)
+                if (dialog == null)
                     return;
                 var dialogText = _localizationService.AppText.MainWindowText.MainViewText.SettingsPageText.LanguageSwitchFailedDialogText;
                 dialog.Title = dialogText.Title;

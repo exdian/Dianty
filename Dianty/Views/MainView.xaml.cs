@@ -231,7 +231,7 @@ public sealed partial class MainView : UserControl
     private void UpdateIconRegion()
     {
         var nonClientPointerSource = _windowService.GetInputNonClientPointerSource();
-        if (nonClientPointerSource is null)
+        if (nonClientPointerSource == null)
             return;
 
         var rect = FrameworkElementHelper.GetBounds(_appIcon);

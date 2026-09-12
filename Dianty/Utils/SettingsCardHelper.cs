@@ -35,7 +35,7 @@ internal class SettingsCardHelper
                     }
                 }
                 var currentState = visualStateGroup.CurrentState;
-                if (currentState is null)
+                if (currentState == null)
                 {
                     VisualStateManager.GoToState(settingsCard, "Right", false);
                 }

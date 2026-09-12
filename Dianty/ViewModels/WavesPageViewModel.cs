@@ -185,7 +185,7 @@ public partial class WavesPageViewModel : ObservableObject
                 _queueService.TryEnqueue(async () =>
                 {
                     var dialog = _windowService.CreateContentDialog();
-                    if (dialog is null)
+                    if (dialog == null)
                         return;
                     dialog.Title = result.Count > 0 ? dialogText.PartiallyFailedTitle : dialogText.AllFailedTitle;
                     dialog.CloseButtonText = dialogText.CloseButtonText;

@@ -2,9 +2,9 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Dianty.Models;
 using Dianty.Services;
-using Dianty.Utils;
 using Dianty.Utils.Messages;
 using System;
+using System.Linq;
 using static Dianty.Models.AutomaticStrength;
 using static Dianty.Services.ILocalizationService;
 using static DungeonToolkit.Coyote.CoyoteManager;
@@ -19,11 +19,11 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
         _queueService = queueService;
         _localizationService = localizationService;
 
-        AutoStartStopModeSelectionItems = AutoStartStopModeSelectionItem.GetSelectionItems(_localizationService);
-        IsAutoStartStopMode = AutoStartStopModeSelectionItems[0];
+        OutputModeSelectionItems = OutputModeSelectionItem.GetSelectionItems(_localizationService);
+        SelectedOutputMode = OutputModeSelectionItems[0];
 
         StrengthModeSelectionItems = StrengthModeSelectionItem.GetSelectionItems(_localizationService);
-        GamesStrengthMode = StrengthModeSelectionItems[0];
+        SelectedStrengthMode = StrengthModeSelectionItems[0];
 
         _gameManager.EnabledGameCountChanged += OnGameManagerEnabledGameCountChanged;
         _gameManager.OutputStrengthChanged += GameManager_OutputStrengthChanged;
@@ -39,7 +39,7 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
     public required GtaVcRuleCardViewModel GtaVcRuleCardViewModel { get; init; }
 
     [ObservableProperty]
-    public partial AutoStartStopModeSelectionItem[] AutoStartStopModeSelectionItems { get; private set; }
+    public partial OutputModeSelectionItem[] OutputModeSelectionItems { get; private set; }
 
     [ObservableProperty]
     public partial StrengthModeSelectionItem[] StrengthModeSelectionItems { get; private set; }
@@ -51,7 +51,7 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
     public partial int OutputStrength { get; private set; }
 
     [ObservableProperty]
-    public partial AutoStartStopModeSelectionItem IsAutoStartStopMode { get; set; }
+    public partial OutputModeSelectionItem? SelectedOutputMode { get; set; }
 
     [ObservableProperty]
     public partial bool IsAutoStartStop { get; private set; }
@@ -60,7 +60,7 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
     public partial bool IsOutputting { get; set; }
 
     [ObservableProperty]
-    public partial StrengthModeSelectionItem GamesStrengthMode { get; set; }
+    public partial StrengthModeSelectionItem? SelectedStrengthMode { get; set; }
 
     public void Dispose()
     {
@@ -104,26 +104,34 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
 
     private void OnCurrentLanguageFileNameChanged(object? sender, CurrentLanguageFileNameChangedEventArgs e)
     {
-        var autoStartStopModeSelectionItems = AutoStartStopModeSelectionItem.GetSelectionItems(_localizationService);
-        var isAutoStartStop = IsAutoStartStopMode.IsAutoStartStop;
-        var index = autoStartStopModeSelectionItems.FirstIndex(i => i.IsAutoStartStop == isAutoStartStop);
+        var outputModeSelectionItems = OutputModeSelectionItem.GetSelectionItems(_localizationService);
+        var selectedOutputMode = SelectedOutputMode;
+        if (selectedOutputMode is not null)
+        {
+            var isAutoStartStop = selectedOutputMode.IsAutoStartStop;
+            selectedOutputMode = outputModeSelectionItems.FirstOrDefault(i => i.IsAutoStartStop == isAutoStartStop);
+        }
         _queueService.TryEnqueue(() =>
         {
-            AutoStartStopModeSelectionItems = autoStartStopModeSelectionItems;
-            IsAutoStartStopMode = AutoStartStopModeSelectionItems[index];
+            OutputModeSelectionItems = outputModeSelectionItems;
+            SelectedOutputMode = selectedOutputMode;
         });
 
         var strengthModeSelectionItems = StrengthModeSelectionItem.GetSelectionItems(_localizationService);
-        var gamesStrengthMode = GamesStrengthMode.Mode;
-        index = strengthModeSelectionItems.FirstIndex(i => i.Mode == gamesStrengthMode);
+        var selectedStrengthMode = SelectedStrengthMode;
+        if (selectedStrengthMode is not null)
+        {
+            var mode = selectedStrengthMode.Mode;
+            selectedStrengthMode = strengthModeSelectionItems.FirstOrDefault(i => i.Mode == mode);
+        }
         _queueService.TryEnqueue(() =>
         {
             StrengthModeSelectionItems = strengthModeSelectionItems;
-            GamesStrengthMode = StrengthModeSelectionItems[index];
+            SelectedStrengthMode = selectedStrengthMode;
         });
     }
 
-    partial void OnIsAutoStartStopModeChanged(AutoStartStopModeSelectionItem value)
+    partial void OnSelectedOutputModeChanged(OutputModeSelectionItem? value)
     {
         if (value is null)
             return;
@@ -144,7 +152,7 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
             _gameManager.CoyoteManager.StopOutput();
     }
 
-    partial void OnGamesStrengthModeChanged(StrengthModeSelectionItem value)
+    partial void OnSelectedStrengthModeChanged(StrengthModeSelectionItem? value)
     {
         if (value is null)
             return;
@@ -152,11 +160,11 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
     }
 }
 
-public record class AutoStartStopModeSelectionItem(bool IsAutoStartStop, string Description)
+public record class OutputModeSelectionItem(bool IsAutoStartStop, string Description)
 {
-    private static AutoStartStopModeSelectionItem[]? s_SelectionItems;
+    private static OutputModeSelectionItem[]? s_SelectionItems;
 
-    public static AutoStartStopModeSelectionItem[] GetSelectionItems(ILocalizationService service)
+    public static OutputModeSelectionItem[] GetSelectionItems(ILocalizationService service)
     {
         var text = service.AppText.MainWindowText.MainViewText.GamesPageText;
         if (s_SelectionItems is null
@@ -165,8 +173,8 @@ public record class AutoStartStopModeSelectionItem(bool IsAutoStartStop, string 
             || !ReferenceEquals(s_SelectionItems[1].Description, text.ManualModeItemText))
         {
             s_SelectionItems =
-                [new AutoStartStopModeSelectionItem(true, text.AutoModeItemText),
-                new AutoStartStopModeSelectionItem(false, text.ManualModeItemText)];
+                [new OutputModeSelectionItem(true, text.AutoModeItemText),
+                new OutputModeSelectionItem(false, text.ManualModeItemText)];
         }
         return s_SelectionItems;
     }

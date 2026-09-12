@@ -43,7 +43,7 @@ public class KeySequenceTrigger
             if (_cachedKeys is null || _cachedKeys.Length != sequenceLength)
             {
                 var newCache = new VirtualKey[sequenceLength];
-                if (_cachedKeys != null && _keyCount > 0)
+                if (_cachedKeys is not null && _keyCount > 0)
                 {
                     int copyCount = Math.Min(_keyCount, sequenceLength);
                     int start = (_cachedKeyIndex - copyCount + _cachedKeys.Length) % _cachedKeys.Length;
@@ -96,7 +96,7 @@ public class KeySequenceTrigger
         {
             TrieNode trieNode = path[i];
             // 如果当前节点不可删除（有 Action 或有子节点），则祖先节点也不能删除，直接终止
-            if (trieNode.Action != null || trieNode.Children.Count > 0)
+            if (trieNode.Action is not null || trieNode.Children.Count > 0)
                 break;
 
             // 从父节点中移除当前节点

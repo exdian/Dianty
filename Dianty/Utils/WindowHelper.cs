@@ -9,7 +9,7 @@ public partial class WindowHelper
 {
     public static void SetWindowSize(Window window, double width, double height)
     {
-        if (window.Content is null || window.Content.XamlRoot is null)
+        if (window.Content == null || window.Content.XamlRoot == null)
         {
             Debug.WriteLine("窗口 XamlRoot 不存在");
             return;
@@ -30,7 +30,7 @@ public partial class WindowHelper
             return;
         }
 
-        if (windowContent.XamlRoot is null)
+        if (windowContent.XamlRoot == null)
         {
             Debug.WriteLine("Window content's XamlRoot is null.");
             return;

@@ -154,7 +154,7 @@ internal partial class CoyoteBleService : ICoyoteBleService
 
     public async Task<byte?> ReadBatteryLevelAsync()
     {
-        if (_isDisposed || _batteryCharacteristic is null)
+        if (_isDisposed || _batteryCharacteristic == null)
             return null;
 
         var operationResult = await _batteryCharacteristic.ReadValueAsync().AsTask().ConfigureAwait(false);
