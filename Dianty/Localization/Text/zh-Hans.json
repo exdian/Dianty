@@ -145,9 +145,37 @@
         "GtaVcWantedLevelRuleCardHeader": "每获得1枚好市民勋章",
         "GtaVcFellOffBikeRuleCardHeader": "从摩托车上摔下来时"
       },
-      "SafetyPageText": {},
-      "DebugPageText": {},
-      "SettingsPageText": {}
+      "SafetyPageText": {
+        "DisableAllDevicesButtonText": "立即停止所有设备输出",
+        "DisconnectAllDevicesButtonText": "立即断开所有设备连接"
+      },
+      "DebugPageText": {
+        "ClearLogButtonText": "清空日志"
+      },
+      "SettingsPageText": {
+        "AppearanceItemsHeader": "外观",
+        "AppThemeCardHeader": "应用主题",
+        "AppThemePlaceholderText": "选择应用主题",
+        "LightThemeItemText": "浅色",
+        "DarkThemeItemText": "深色",
+        "DefaultThemeItemText": "跟随系统",
+        "LanguageCardHeader": "语言",
+        "LanguagePlaceholderText": "选择语言",
+        "OtherItemsHeader": "其他",
+        "OtherSettingsCardHeader": "其他设置",
+        "MemeCardContent": "不给设",
+        "AboutItemsHeader": "关于",
+        "RepositoryLinkCardHeader": "查看源代码",
+        "DependenciesAndReferencesCardHeader": "依赖和引用",
+        "WinUIGalleryCardHeader": "部分代码参考了 WinUI 3 Gallery",
+        "OtherDependenciesCardHeader": "引用的其他项目",
+        "DependenciesLabel": "依赖项",
+        "DiantyCoreRepositoryDescription": "备注：DiantyCore 仓库暂未公开",
+        "LanguageSwitchFailedDialogText": {
+          "Title": "语言切换失败",
+          "CloseButtonText": "关闭"
+        }
+      }
     },
     "ToggleSwitchText": {
       "OffText": "关",

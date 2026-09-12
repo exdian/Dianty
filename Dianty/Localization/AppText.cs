@@ -190,17 +190,43 @@ public class GamesPageText
 
 public class SafetyPageText
 {
-
+    public string DisableAllDevicesButtonText { get; set; } = "立即停止所有设备输出";
+    public string DisconnectAllDevicesButtonText { get; set; } = "立即断开所有设备连接";
 }
 
 public class DebugPageText
 {
-
+    public string ClearLogButtonText { get; set; } = "清空日志";
 }
 
 public class SettingsPageText
 {
+    public string AppearanceItemsHeader { get; set; } = "外观";
+    public string AppThemeCardHeader { get; set; } = "应用主题";
+    public string AppThemePlaceholderText { get; set; } = "选择应用主题";
+    public string LightThemeItemText { get; set; } = "浅色";
+    public string DarkThemeItemText { get; set; } = "深色";
+    public string DefaultThemeItemText { get; set; } = "跟随系统";
+    public string LanguageCardHeader { get; set; } = "语言";
+    public string LanguagePlaceholderText { get; set; } = "选择语言";
+    public string OtherItemsHeader { get; set; } = "其他";
+    public string OtherSettingsCardHeader { get; set; } = "其他设置";
+    public string MemeCardContent { get; set; } = "不给设";
+    public string AboutItemsHeader { get; set; } = "关于";
+    public string RepositoryLinkCardHeader { get; set; } = "查看源代码";
+    public string DependenciesAndReferencesCardHeader { get; set; } = "依赖和引用";
+    public string WinUIGalleryCardHeader { get; set; } = "部分代码参考了 WinUI 3 Gallery";
+    public string OtherDependenciesCardHeader { get; set; } = "引用的其他项目";
+    public string DependenciesLabel { get; set; } = "依赖项";
+    public string DiantyCoreRepositoryDescription { get; set; } = "备注：DiantyCore 仓库暂未公开";
 
+    public LanguageSwitchFailedDialogText LanguageSwitchFailedDialogText { get; set; } = new();
+}
+
+public class LanguageSwitchFailedDialogText
+{
+    public string Title { get; set; } = "语言切换失败";
+    public string CloseButtonText { get; set; } = "关闭";
 }
 
 public class ToggleSwitchText

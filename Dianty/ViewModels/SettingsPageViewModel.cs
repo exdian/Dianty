@@ -6,10 +6,11 @@ using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using static Dianty.Services.ILocalizationService;
 
 namespace Dianty.ViewModels;
 
-public partial class SettingsPageViewModel : ObservableObject
+public partial class SettingsPageViewModel : ObservableObject, IDisposable
 {
     public SettingsPageViewModel(IQueueService queueService, IWindowService windowService, ILocalizationService localizationService)
     {
@@ -18,31 +19,50 @@ public partial class SettingsPageViewModel : ObservableObject
         _localizationService = localizationService;
 
         Version = VersionHelper.Version ?? string.Empty;
-        AppThemeSelectionItems =
-            [new AppThemeSelectionItem(ElementTheme.Light, "浅色"),
-            new AppThemeSelectionItem(ElementTheme.Dark, "深色"),
-            new AppThemeSelectionItem(ElementTheme.Default, "跟随系统"),];
+        AppThemeSelectionItems = AppThemeSelectionItem.GetSelectionItems(_localizationService);
         _queueService.TryEnqueue(() =>
             SelectedAppTheme = AppThemeSelectionItems.FirstOrDefault(t => t.Theme == _windowService.ColorTheme));
         _ = InitializeLanguageSelectionItems();
+
+        _localizationService.CurrentLanguageFileNameChanged += OnCurrentLanguageFileNameChanged;
     }
 
     private readonly IQueueService _queueService;
     private readonly IWindowService _windowService;
     private readonly ILocalizationService _localizationService;
+    private bool _isDisposed;
 
     public string Version { get; }
 
-    public AppThemeSelectionItem[] AppThemeSelectionItems { get; }
+    [ObservableProperty]
+    public partial AppThemeSelectionItem[] AppThemeSelectionItems { get; private set; }
 
     [ObservableProperty]
-    public partial AppThemeSelectionItem SelectedAppTheme { get; set; }
+    public partial AppThemeSelectionItem? SelectedAppTheme { get; set; }
 
     [ObservableProperty]
     public partial LanguageSelectionItem[] LanguageSelectionItems { get; private set; } = [];
 
     [ObservableProperty]
-    public partial LanguageSelectionItem SelectedLanguage { get; set; }
+    public partial LanguageSelectionItem? SelectedLanguage { get; set; }
+
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_isDisposed)
+            return;
+        _isDisposed = true;
+
+        if (disposing)
+        {
+            _localizationService.CurrentLanguageFileNameChanged -= OnCurrentLanguageFileNameChanged;
+        }
+    }
 
     private async Task InitializeLanguageSelectionItems()
     {
@@ -56,14 +76,30 @@ public partial class SettingsPageViewModel : ObservableObject
         });
     }
 
-    partial void OnSelectedAppThemeChanged(AppThemeSelectionItem value)
+    private void OnCurrentLanguageFileNameChanged(object? sender, CurrentLanguageFileNameChangedEventArgs e)
     {
+        if (SelectedAppTheme is null)
+            return;
+        var appThemeSelectionItems = AppThemeSelectionItem.GetSelectionItems(_localizationService);
+        var theme = SelectedAppTheme.Theme;
+        var selectedAppTheme = appThemeSelectionItems.FirstOrDefault(i => i.Theme == theme);
+        _queueService.TryEnqueue(() =>
+        {
+            AppThemeSelectionItems = appThemeSelectionItems;
+            SelectedAppTheme = selectedAppTheme;
+        });
+    }
+
+    partial void OnSelectedAppThemeChanged(AppThemeSelectionItem? value)
+    {
+        if (value is null)
+            return;
         _queueService.TryEnqueue(() => _windowService.ColorTheme = value.Theme);
     }
 
-    partial void OnSelectedLanguageChanged(LanguageSelectionItem value)
+    partial void OnSelectedLanguageChanged(LanguageSelectionItem? value)
     {
-        if (LanguageSelectionItems.Length == 0)
+        if (value is null)
             return;
 
         _queueService.TryEnqueue(async () =>
@@ -84,8 +120,9 @@ public partial class SettingsPageViewModel : ObservableObject
                 var dialog = _windowService.CreateContentDialog();
                 if (dialog is null)
                     return;
-                dialog.Title = "语言切换失败";
-                dialog.CloseButtonText = "关闭";
+                var dialogText = _localizationService.AppText.MainWindowText.MainViewText.SettingsPageText.LanguageSwitchFailedDialogText;
+                dialog.Title = dialogText.Title;
+                dialog.CloseButtonText = dialogText.CloseButtonText;
                 dialog.IsPrimaryButtonEnabled = false;
                 dialog.IsSecondaryButtonEnabled = false;
                 dialog.DefaultButton = ContentDialogButton.Close;
@@ -96,6 +133,26 @@ public partial class SettingsPageViewModel : ObservableObject
     }
 }
 
-public readonly record struct AppThemeSelectionItem(ElementTheme Theme, string Description);
+public record class AppThemeSelectionItem(ElementTheme Theme, string Description)
+{
+    private static AppThemeSelectionItem[]? s_SelectionItems;
 
-public readonly record struct LanguageSelectionItem(string FileName, string Description);
+    public static AppThemeSelectionItem[] GetSelectionItems(ILocalizationService service)
+    {
+        var text = service.AppText.MainWindowText.MainViewText.SettingsPageText;
+        if (s_SelectionItems is null
+            || s_SelectionItems.Length != 3
+            || !ReferenceEquals(s_SelectionItems[0].Description, text.LightThemeItemText)
+            || !ReferenceEquals(s_SelectionItems[1].Description, text.DarkThemeItemText)
+            || !ReferenceEquals(s_SelectionItems[2].Description, text.DefaultThemeItemText))
+        {
+            s_SelectionItems =
+                [new AppThemeSelectionItem(ElementTheme.Light, text.LightThemeItemText),
+                new AppThemeSelectionItem(ElementTheme.Dark, text.DarkThemeItemText),
+                new AppThemeSelectionItem(ElementTheme.Default, text.DefaultThemeItemText)];
+        }
+        return s_SelectionItems;
+    }
+}
+
+public record class LanguageSelectionItem(string FileName, string Description);

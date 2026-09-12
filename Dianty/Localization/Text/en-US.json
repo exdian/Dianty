@@ -145,9 +145,37 @@
         "GtaVcWantedLevelRuleCardHeader": "Per Wanted Star Earned",
         "GtaVcFellOffBikeRuleCardHeader": "When Falling Off a Motorcycle"
       },
-      "SafetyPageText": {},
-      "DebugPageText": {},
-      "SettingsPageText": {}
+      "SafetyPageText": {
+        "DisableAllDevicesButtonText": "Stop All Device Output Immediately",
+        "DisconnectAllDevicesButtonText": "Disconnect All Devices Immediately"
+      },
+      "DebugPageText": {
+        "ClearLogButtonText": "Clear Log"
+      },
+      "SettingsPageText": {
+        "AppearanceItemsHeader": "Appearance",
+        "AppThemeCardHeader": "App Theme",
+        "AppThemePlaceholderText": "Select App Theme",
+        "LightThemeItemText": "Light",
+        "DarkThemeItemText": "Dark",
+        "DefaultThemeItemText": "System Default",
+        "LanguageCardHeader": "Language",
+        "LanguagePlaceholderText": "Select Language",
+        "OtherItemsHeader": "Other",
+        "OtherSettingsCardHeader": "Other Settings",
+        "MemeCardContent": "Not Configurable",
+        "AboutItemsHeader": "About",
+        "RepositoryLinkCardHeader": "View Source Code",
+        "DependenciesAndReferencesCardHeader": "Dependencies and References",
+        "WinUIGalleryCardHeader": "Some code references WinUI 3 Gallery",
+        "OtherDependenciesCardHeader": "Other Referenced Projects",
+        "DependenciesLabel": "Dependencies",
+        "DiantyCoreRepositoryDescription": "Note: The DiantyCore repository is not yet public.",
+        "LanguageSwitchFailedDialogText": {
+          "Title": "Language Switch Failed",
+          "CloseButtonText": "Close"
+        }
+      }
     },
     "ToggleSwitchText": {
       "OffText": "Off",
