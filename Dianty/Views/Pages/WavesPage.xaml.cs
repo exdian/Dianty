@@ -2,11 +2,13 @@ using CommunityToolkit.Mvvm.Messaging;
 using Dianty.Services;
 using Dianty.Utils.Messages;
 using Dianty.ViewModels;
+using Dianty.Views.Controls;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
+using System;
 
 namespace Dianty.Views.Pages;
 
@@ -46,8 +48,11 @@ public sealed partial class WavesPage : Page
                 Effect = SlideNavigationTransitionEffect.FromRight
             }
         };
-        var requiredParameter = new WavePlayQueuePage.RequiredParameter(ViewModel,
-            [s => s.AppText.MainWindowText.MainViewText.MenuWaves], _queueService, _localizationService);
+        Func<ILocalizationService, string>[] pathGetters =
+            [s => s.AppText.MainWindowText.MainViewText.MenuWaves,
+            s => s.AppText.MainWindowText.MainViewText.WavesPageText.QueueMenuPath];
+        var pathBarParameter = new PathBar.RequiredParameter(_queueService, _localizationService, pathGetters);
+        var requiredParameter = new WavePlayQueuePage.RequiredParameter(ViewModel, pathBarParameter);
         WeakReferenceMessenger.Default.Send(new NavigationRequest(typeof(WavePlayQueuePage), requiredParameter, options));
     }
 
@@ -66,8 +71,11 @@ public sealed partial class WavesPage : Page
         };
         if (element.DataContext is WaveItem waveItem)
         {
-            var requiredParameter = new WaveSettingsPage.RequiredParameter(waveItem,
-                [s => s.AppText.MainWindowText.MainViewText.MenuWaves], _queueService, _localizationService);
+            Func<ILocalizationService, string>[] pathGetters =
+                [s => s.AppText.MainWindowText.MainViewText.MenuWaves,
+                s => s.AppText.MainWindowText.MainViewText.WavesPageText.DetailsMenuPath];
+            var pathBarParameter = new PathBar.RequiredParameter(_queueService, _localizationService, pathGetters);
+            var requiredParameter = new WaveSettingsPage.RequiredParameter(waveItem, pathBarParameter);
             WeakReferenceMessenger.Default.Send(new NavigationRequest(typeof(WaveSettingsPage), requiredParameter, options));
         }
     }

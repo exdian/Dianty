@@ -15,7 +15,7 @@
         <DataTemplate x:Key="NormalCoyoteItemTemplate" x:DataType="vm:CoyoteItem">
             <toolkit:SettingsCard
                 Header="{x:Bind Name}" Description="{x:Bind ConnectionMessage, Mode=OneWay}"
-                IsClickEnabled="True" Click="OnSettingsCardClick" Margin="0,0,0,4">
+                IsClickEnabled="True" Click="OnDeviceItemCardClick" Margin="0,0,0,4">
                 <toolkit:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="{x:Bind IsBleConnection, Converter={StaticResource CoyoteTypeIconConverter}}"/>
                 </toolkit:SettingsCard.HeaderIcon>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <UserControl
-    x:Class="Dianty.Views.Controls.CoyoteBleDetailCard"
+    x:Class="Dianty.Views.Controls.CoyoteWsDetailCards"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
@@ -29,6 +29,10 @@
                         <PaneThemeTransition Edge="Bottom"/>
                     </ContentControl.ContentTransitions>
                 </ContentControl>
+                <local:QrCodeButton
+                    IsDisplayed="{x:Bind ViewModel.IsQrCodeDisplayed, Mode=OneWay}"
+                    QrCodeGeometry="{x:Bind ViewModel.QrCodeSvgPath, Mode=OneWay, Converter={StaticResource QrCodeSvgPathConverter}}"
+                    Visibility="{x:Bind ViewModel.CanShowQrCode, Mode=OneWay, Converter={StaticResource VisibleIfTrueConverter}}"/>
                 <ToggleSwitch
                     IsOn="{x:Bind ViewModel.IsConnectingOrConnected, Mode=TwoWay}"
                     OnContent="{x:Null}" OffContent="{x:Null}" Margin="-8,0,0,0"/>
@@ -48,65 +52,6 @@
                 OffContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OffText, Mode=OneWay}"
                 OnContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OnText, Mode=OneWay}"/>
         </toolkit:SettingsCard>
-        <toolkit:SettingsExpander
-            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.StrengthLimitCardHeader, Mode=OneWay}"
-            HeaderIcon="Upload">
-            <toolkit:SettingsExpander.Items>
-                <toolkit:SettingsCard Header="A" Loaded="OnSettingsCardLoaded">
-                    <Slider
-                        Value="{x:Bind ViewModel.MaxStrengthA, Mode=TwoWay}"
-                        Minimum="0" Maximum="200" StepFrequency="1" SmallChange="1" LargeChange="10"/>
-                </toolkit:SettingsCard>
-                <toolkit:SettingsCard Header="B" Loaded="OnSettingsCardLoaded">
-                    <Slider
-                        Value="{x:Bind ViewModel.MaxStrengthB, Mode=TwoWay}"
-                        Minimum="0" Maximum="200" StepFrequency="1" SmallChange="1" LargeChange="10"/>
-                </toolkit:SettingsCard>
-            </toolkit:SettingsExpander.Items>
-        </toolkit:SettingsExpander>
-        <toolkit:SettingsExpander
-            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.OutputParametersCardHeader, Mode=OneWay}"
-            Description="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.OutputParametersCardDescription, Mode=OneWay}">
-            <toolkit:SettingsExpander.HeaderIcon>
-                <FontIcon Glyph="&#xE9E9;"/>
-            </toolkit:SettingsExpander.HeaderIcon>
-            <toolkit:SettingsExpander.Items>
-                <toolkit:SettingsCard
-                    Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.GentleModeCardHeader, Mode=OneWay}">
-                    <toolkit:SettingsCard.HeaderIcon>
-                        <FontIcon Glyph="&#xEC0A;"/>
-                    </toolkit:SettingsCard.HeaderIcon>
-                    <ToggleSwitch
-                        IsOn="{x:Bind ViewModel.IsGentle, Mode=TwoWay}"
-                        OffContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OffText, Mode=OneWay}"
-                        OnContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OnText, Mode=OneWay}"/>
-                </toolkit:SettingsCard>
-                <toolkit:SettingsCard Loaded="OnSettingsCardLoaded">
-                    <StackPanel Spacing="{StaticResource CommonControlSpacing}">
-                        <Slider
-                            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.ChannelAFrequencyBalanceSliderHeader, Mode=OneWay}"
-                            Value="{x:Bind ViewModel.BfFrequencyParamA, Mode=TwoWay}"
-                            Minimum="0" Maximum="255" StepFrequency="1" SmallChange="1" LargeChange="10"/>
-                        <Slider
-                            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.ChannelAStrengthBalanceSliderHeader, Mode=OneWay}"
-                            Value="{x:Bind ViewModel.BfStrengthParamA, Mode=TwoWay}"
-                            Minimum="0" Maximum="255" StepFrequency="1" SmallChange="1" LargeChange="10"/>
-                    </StackPanel>
-                </toolkit:SettingsCard>
-                <toolkit:SettingsCard Loaded="OnSettingsCardLoaded">
-                    <StackPanel Spacing="{StaticResource CommonControlSpacing}">
-                        <Slider
-                            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.ChannelBFrequencyBalanceSliderHeader, Mode=OneWay}"
-                            Value="{x:Bind ViewModel.BfFrequencyParamB, Mode=TwoWay}"
-                            Minimum="0" Maximum="255" StepFrequency="1" SmallChange="1" LargeChange="10"/>
-                        <Slider
-                            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.ChannelBStrengthBalanceSliderHeader, Mode=OneWay}"
-                            Value="{x:Bind ViewModel.BfStrengthParamB, Mode=TwoWay}"
-                            Minimum="0" Maximum="255" StepFrequency="1" SmallChange="1" LargeChange="10"/>
-                    </StackPanel>
-                </toolkit:SettingsCard>
-            </toolkit:SettingsExpander.Items>
-        </toolkit:SettingsExpander>
         <toolkit:SettingsExpander
             Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.MoreInfoCardHeader, Mode=OneWay}"
             IsExpanded="True">
@@ -129,11 +74,18 @@
                     <TextBlock Text="{x:Bind ViewModel.CurrentStrengthB, Mode=OneWay}"/>
                 </toolkit:SettingsCard>
                 <toolkit:SettingsCard
-                    Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.BatteryLevelCardHeader, Mode=OneWay}">
+                    Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.ChannelAStrengthLimitCardHeader, Mode=OneWay}">
                     <toolkit:SettingsCard.HeaderIcon>
-                        <FontIcon Glyph="{x:Bind ViewModel.BatteryLevel, Mode=OneWay, Converter={StaticResource IntToBatteryIconConverter}}"/>
+                        <FontIcon Glyph="&#xF093;"/>
                     </toolkit:SettingsCard.HeaderIcon>
-                    <TextBlock Text="{x:Bind ViewModel.BatteryLevel, Mode=OneWay, Converter={StaticResource IntToBatteryPercentageConverter}}"/>
+                    <TextBlock Text="{x:Bind ViewModel.StrengthCapA, Mode=OneWay}"/>
+                </toolkit:SettingsCard>
+                <toolkit:SettingsCard
+                    Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.ChannelBStrengthLimitCardHeader, Mode=OneWay}">
+                    <toolkit:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xF094;"/>
+                    </toolkit:SettingsCard.HeaderIcon>
+                    <TextBlock Text="{x:Bind ViewModel.StrengthCapB, Mode=OneWay}"/>
                 </toolkit:SettingsCard>
             </toolkit:SettingsExpander.Items>
         </toolkit:SettingsExpander>

@@ -3,9 +3,9 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace Dianty.Views.Controls;
 
-public sealed partial class CoyoteWsDetailCard : UserControl
+public sealed partial class CoyoteWsDetailCards : UserControl
 {
-    public CoyoteWsDetailCard(CoyoteWsItem coyoteWsItem)
+    public CoyoteWsDetailCards(CoyoteWsItem coyoteWsItem)
     {
         InitializeComponent();
 

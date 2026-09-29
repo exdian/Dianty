@@ -12,14 +12,21 @@
     <EnableMsixTooling>true</EnableMsixTooling>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+  	<Content Include="Localization\Text\*.json">
+  	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  	</Content>
+  </ItemGroup>
   <ItemGroup>
     <None Remove="LoadView.xaml" />
     <None Remove="MainView.xaml" />
     <None Remove="Resources\AppResourceDictionary.xaml" />
-    <None Remove="Views\Controls\CoyoteBleDetailCard.xaml" />
+    <None Remove="Views\Controls\CoyoteBleDetailCards.xaml" />
     <None Remove="Views\Controls\CoyoteDeletionCard.xaml" />
-    <None Remove="Views\Controls\CoyoteWsDetailCard.xaml" />
+    <None Remove="Views\Controls\CoyoteWsDetailCards.xaml" />
     <None Remove="Views\Controls\GtaVcRuleCard.xaml" />
+    <None Remove="Views\Controls\PathBar.xaml" />
     <None Remove="Views\Controls\QrCodeButton.xaml" />
     <None Remove="Views\Controls\WavePlayQueueListView.xaml" />
     <None Remove="Views\Pages\CoyoteDetailPage.xaml" />
@@ -81,6 +88,11 @@
     <ProjectReference Include="..\..\DiantyCore\GameMonitor\GameMonitor.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Page Update="Views\Controls\PathBar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
     <Page Update="Views\Pages\WaveSettingsPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -111,12 +123,12 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Controls\CoyoteWsDetailCard.xaml">
+    <Page Update="Views\Controls\CoyoteWsDetailCards.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Controls\CoyoteBleDetailCard.xaml">
+    <Page Update="Views\Controls\CoyoteBleDetailCards.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
@@ -183,10 +195,4 @@
     <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
     <PublishAot>True</PublishAot>
   </PropertyGroup>
-
-  <ItemGroup>
-  	<Content Include="Localization\Text\*.json">
-  	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-  	</Content>
-  </ItemGroup>
 </Project>

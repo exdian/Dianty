@@ -18,15 +18,7 @@
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <BreadcrumbBar
-            x:Name="PageHeader" Grid.ColumnSpan="2" ItemsSource="{x:Bind Paths}" Margin="12,6,12,12"
-            ItemClicked="OnBreadcrumbBarItemClicked">
-            <BreadcrumbBar.ItemTemplate>
-                <DataTemplate x:DataType="x:String">
-                    <TextBlock Text="{x:Bind}" Style="{StaticResource TitleTextBlockStyle}"/>
-                </DataTemplate>
-            </BreadcrumbBar.ItemTemplate>
-        </BreadcrumbBar>
+        <controls:PathBar x:Name="PageHeader" Grid.ColumnSpan="2" Margin="12,6,12,12" Parameter="{x:Bind PathBarParameter}"/>
         <controls:WavePlayQueueListView
             x:Name="ListViewA" Grid.Row="1" Padding="12,0,12,20"
             Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.WavesPageText.ChannelAQueueSwitchHeader, Mode=OneWay}"

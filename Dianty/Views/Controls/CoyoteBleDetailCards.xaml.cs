@@ -6,9 +6,9 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace Dianty.Views.Controls;
 
-public sealed partial class CoyoteBleDetailCard : UserControl
+public sealed partial class CoyoteBleDetailCards : UserControl
 {
-    public CoyoteBleDetailCard(CoyoteBleItem coyoteBleItem)
+    public CoyoteBleDetailCards(CoyoteBleItem coyoteBleItem)
     {
         InitializeComponent();
 
