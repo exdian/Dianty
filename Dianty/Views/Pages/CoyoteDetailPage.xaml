@@ -15,7 +15,7 @@
         </Grid.RowDefinitions>
         <controls:PathBar x:Name="PageHeader" Margin="12,6,12,12" Parameter="{x:Bind PathBarParameter}"/>
         <ScrollViewer
-            x:Name="_pageContent" Grid.Row="1" Padding="12,0" Loaded="OnScrollViewerLoaded"
+            x:Name="_pageContent" Grid.Row="1" Padding="12,0" Loaded="OnPageContentScrollViewerLoaded"
             VerticalScrollBarVisibility="Auto" VerticalScrollMode="Auto"/>
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>

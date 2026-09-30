@@ -12,5 +12,5 @@ public sealed partial class CoyoteWsDetailCards : UserControl
         ViewModel = coyoteWsItem;
     }
 
-    private CoyoteWsItem ViewModel { get; set; }
+    private CoyoteWsItem ViewModel { get; }
 }

@@ -31,7 +31,7 @@ public sealed partial class CoyoteDetailPage : Page
         }
     }
 
-    private void OnScrollViewerLoaded(object sender, RoutedEventArgs e)
+    private void OnPageContentScrollViewerLoaded(object sender, RoutedEventArgs e)
     {
         if (_queueService is null)
             return;

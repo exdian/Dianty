@@ -14,35 +14,8 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <controls:PathBar x:Name="PageHeader" Grid.ColumnSpan="2" Margin="12,6,12,12" Parameter="{x:Bind PathBarParameter}"/>
-        <controls:WavePlayQueueListView
-            x:Name="ListViewA" Grid.Row="1" Padding="12,0,12,20"
-            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.WavesPageText.ChannelAQueueSwitchHeader, Mode=OneWay}"
-            IsChannelEnabled="{x:Bind ViewModel.IsChannelEnabledA, Mode=TwoWay}"
-            WavePlayingItemsSource="{x:Bind ViewModel.WavePlayingItemsA}"
-            PlaybackModeItemsSource="{x:Bind ViewModel.WavePlaybackModeItems}"
-            SelectedPlaybackMode="{x:Bind ViewModel.WavePlaybackModeA, Mode=TwoWay}"
-            WaveIntervalItemsSource="{x:Bind ViewModel.WaveIntervalItems}"
-            SelectedWaveInterval="{x:Bind ViewModel.WaveIntervalA, Mode=TwoWay}"
-            PlayWaveCommand="{x:Bind ViewModel.PlayWaveACommand}"
-            RemoveWaveCommand="{x:Bind ViewModel.RemovePlayingItemACommand}"
-            ClearPlayingItemsCommand="{x:Bind ViewModel.ClearPlayingItemsACommand}"/>
-        <controls:WavePlayQueueListView
-            x:Name="ListViewB" Grid.Row="1" Grid.Column="1" Padding="12,0,12,20"
-            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.WavesPageText.ChannelBQueueSwitchHeader, Mode=OneWay}"
-            IsChannelEnabled="{x:Bind ViewModel.IsChannelEnabledB, Mode=TwoWay}"
-            WavePlayingItemsSource="{x:Bind ViewModel.WavePlayingItemsB}"
-            PlaybackModeItemsSource="{x:Bind ViewModel.WavePlaybackModeItems}"
-            SelectedPlaybackMode="{x:Bind ViewModel.WavePlaybackModeB, Mode=TwoWay}"
-            WaveIntervalItemsSource="{x:Bind ViewModel.WaveIntervalItems}"
-            SelectedWaveInterval="{x:Bind ViewModel.WaveIntervalB, Mode=TwoWay}"
-            PlayWaveCommand="{x:Bind ViewModel.PlayWaveBCommand}"
-            RemoveWaveCommand="{x:Bind ViewModel.RemovePlayingItemBCommand}"
-            ClearPlayingItemsCommand="{x:Bind ViewModel.ClearPlayingItemsBCommand}"/>
+        <controls:PathBar x:Name="PageHeader" Margin="12,6,12,12" Parameter="{x:Bind PathBarParameter}"/>
+        <Border x:Name="_pageContent" Grid.Row="1" Loaded="OnPageContentBorderLoaded"/>
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
                 <VisualState>
@@ -57,8 +30,6 @@
                     <VisualState.Setters>
                         <!-- NavigationView.DisplayMode != Minimal -->
                         <Setter Target="PageHeader.Margin" Value="24,12,24,12"/>
-                        <Setter Target="ListViewA.Margin" Value="12,0,0,0"/>
-                        <Setter Target="ListViewB.Margin" Value="0,0,12,0"/>
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>

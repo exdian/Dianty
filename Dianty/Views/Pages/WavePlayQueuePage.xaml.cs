@@ -1,5 +1,8 @@
+using Dianty.Services;
 using Dianty.ViewModels;
 using Dianty.Views.Controls;
+using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 
@@ -12,6 +15,8 @@ public sealed partial class WavePlayQueuePage : Page
         InitializeComponent();
     }
 
+    private IQueueService? _queueService;
+
     private WavesPageViewModel? ViewModel { get; set; }
     private PathBar.RequiredParameter? PathBarParameter { get; set; }
 
@@ -22,8 +27,21 @@ public sealed partial class WavePlayQueuePage : Page
         {
             ViewModel = parameter.ViewModel;
             PathBarParameter = parameter.PathBarParameter;
+            _queueService = parameter.QueueService;
         }
     }
 
-    public record class RequiredParameter(WavesPageViewModel ViewModel, PathBar.RequiredParameter PathBarParameter);
+    private void OnPageContentBorderLoaded(object sender, RoutedEventArgs e)
+    {
+        if (_queueService is null || ViewModel is null)
+            return;
+
+        _queueService.TryEnqueue(DispatcherQueuePriority.Low, () =>
+        {
+            _pageContent.Child = new WavePlayQueueControl(ViewModel);
+        });
+    }
+
+    public record class RequiredParameter(WavesPageViewModel ViewModel, PathBar.RequiredParameter PathBarParameter,
+        IQueueService QueueService);
 }

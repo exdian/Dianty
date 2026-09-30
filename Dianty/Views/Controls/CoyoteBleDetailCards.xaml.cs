@@ -15,7 +15,7 @@ public sealed partial class CoyoteBleDetailCards : UserControl
         ViewModel = coyoteBleItem;
     }
 
-    private CoyoteBleItem ViewModel { get; set; }
+    private CoyoteBleItem ViewModel { get; }
 
     private void OnSettingsCardLoaded(object sender, RoutedEventArgs e)
     {

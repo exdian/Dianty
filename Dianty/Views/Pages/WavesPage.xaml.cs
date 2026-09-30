@@ -52,7 +52,7 @@ public sealed partial class WavesPage : Page
             [s => s.AppText.MainWindowText.MainViewText.MenuWaves,
             s => s.AppText.MainWindowText.MainViewText.WavesPageText.QueueMenuPath];
         var pathBarParameter = new PathBar.RequiredParameter(_queueService, _localizationService, pathGetters);
-        var requiredParameter = new WavePlayQueuePage.RequiredParameter(ViewModel, pathBarParameter);
+        var requiredParameter = new WavePlayQueuePage.RequiredParameter(ViewModel, pathBarParameter, _queueService);
         WeakReferenceMessenger.Default.Send(new NavigationRequest(typeof(WavePlayQueuePage), requiredParameter, options));
     }
 
