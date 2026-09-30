@@ -14,7 +14,7 @@
         x:Name="RootListView" Padding="{x:Bind Padding, Mode=OneWay}" SelectionMode="None" CanReorderItems="True" AllowDrop="True"
         ItemsSource="{x:Bind WavePlayingItemsSource}" ItemContainerStyle="{StaticResource StretchListViewItemStyle}">
         <ListView.Header>
-            <Grid x:Name="ListViewHeader" Margin="0,0,0,8">
+            <Grid x:Name="ListViewHeader" Margin="0,0,0,8" ColumnSpacing="{StaticResource CommonControlSpacing}">
                 <Grid.Resources>
                     <Thickness x:Key="ToggleSwitchTopHeaderMargin">0</Thickness>
                 </Grid.Resources>
@@ -22,9 +22,10 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" MaxWidth="76" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <ToggleSwitch
@@ -44,7 +45,8 @@
                     </ComboBox.ItemTemplate>
                 </ComboBox>
                 <ComboBox
-                    Grid.Row="1" Grid.Column="1" ItemsSource="{x:Bind WaveIntervalItemsSource}" SelectedItem="{x:Bind SelectedWaveInterval, Mode=TwoWay}"
+                    x:Name="WaveIntervalComboBox" Grid.Row="1" Grid.Column="1"
+                    ItemsSource="{x:Bind WaveIntervalItemsSource}" SelectedItem="{x:Bind SelectedWaveInterval, Mode=TwoWay}"
                     PlaceholderText="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.WavesPageText.QueueIntervalPlaceholderText, Mode=OneWay}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate x:DataType="x:Int32">
@@ -94,12 +96,24 @@
             <VisualStateGroup>
                 <VisualState>
                     <VisualState.StateTriggers>
-                        <ui:ControlSizeTrigger MaxWidth="245" TargetElement="{x:Bind ListViewHeader}" />
+                        <ui:ControlSizeTrigger MinWidth="150" MaxWidth="245" TargetElement="{x:Bind ListViewHeader}" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="ClearButton.(Grid.Row)" Value="2"/>
                         <Setter Target="ClearButton.HorizontalAlignment" Value="Left"/>
                         <Setter Target="ClearButton.Margin" Value="0,8,0,0"/>
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <ui:ControlSizeTrigger MaxWidth="150" TargetElement="{x:Bind ListViewHeader}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="ClearButton.(Grid.Row)" Value="3"/>
+                        <Setter Target="ClearButton.HorizontalAlignment" Value="Left"/>
+                        <Setter Target="WaveIntervalComboBox.(Grid.Row)" Value="2"/>
+                        <Setter Target="WaveIntervalComboBox.(Grid.Column)" Value="0"/>
+                        <Setter Target="WaveIntervalComboBox.Margin" Value="0,8"/>
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
