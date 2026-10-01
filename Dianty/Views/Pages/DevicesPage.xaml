@@ -117,7 +117,6 @@
                         <AdaptiveTrigger MinWindowWidth="{StaticResource MinimalModeThresholdWidth}" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <!-- NavigationView.DisplayMode != Minimal -->
                         <Setter Target="_pageHeader.Margin" Value="24,12"/>
                         <Setter Target="_pageContent.Padding" Value="24,0,24,20"/>
                         <Setter Target="_sortButton.HorizontalAlignment" Value="Right"/>

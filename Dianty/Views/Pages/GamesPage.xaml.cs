@@ -2,6 +2,7 @@ using Dianty.Services;
 using Dianty.ViewModels;
 using Dianty.Views.Controls;
 using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 
@@ -28,17 +29,16 @@ public sealed partial class GamesPage : Page
         }
     }
 
-    private void StackPanel_Loaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    private void OnRootGridLoaded(object sender, RoutedEventArgs e)
     {
-        // 实测该元素更晚触发 Loaded 事件
         if (_queueService is null || ViewModel is null)
             return;
 
         _queueService.TryEnqueue(DispatcherQueuePriority.Low, () =>
         {
-            var rulesCard = new GtaVcRuleCard(ViewModel.GtaVcRuleCardViewModel);
-            var collection = _gamesPageStackPanel.Children;
-            collection.Insert(collection.Count - 1, rulesCard);
+            var content = new GamesPageContent(ViewModel, _queueService);
+            Grid.SetRow(content, 1);
+            _rootGrid.Children.Add(content);
         });
     }
 

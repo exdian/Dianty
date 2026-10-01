@@ -3,9 +3,9 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace Dianty.Views.Controls;
 
-public sealed partial class WavePlayQueueControl : UserControl
+public sealed partial class WavePlayQueuePageContent : UserControl
 {
-    public WavePlayQueueControl(WavesPageViewModel viewModel)
+    public WavePlayQueuePageContent(WavesPageViewModel viewModel)
     {
         InitializeComponent();
         ViewModel = viewModel;

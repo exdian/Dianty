@@ -15,9 +15,9 @@ public sealed partial class WavePlayQueuePage : Page
         InitializeComponent();
     }
 
+    private WavesPageViewModel? _viewModel;
     private IQueueService? _queueService;
 
-    private WavesPageViewModel? ViewModel { get; set; }
     private PathBar.RequiredParameter? PathBarParameter { get; set; }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -25,23 +25,25 @@ public sealed partial class WavePlayQueuePage : Page
         base.OnNavigatedTo(e);
         if (e.Parameter is RequiredParameter parameter)
         {
-            ViewModel = parameter.ViewModel;
             PathBarParameter = parameter.PathBarParameter;
+            _viewModel = parameter.ViewModel;
             _queueService = parameter.QueueService;
         }
     }
 
-    private void OnPageContentBorderLoaded(object sender, RoutedEventArgs e)
+    private void OnRootGridLoaded(object sender, RoutedEventArgs e)
     {
-        if (_queueService is null || ViewModel is null)
+        if (_queueService is null || _viewModel is null)
             return;
 
         _queueService.TryEnqueue(DispatcherQueuePriority.Low, () =>
         {
-            _pageContent.Child = new WavePlayQueueControl(ViewModel);
+            var content = new WavePlayQueuePageContent(_viewModel);
+            Grid.SetRow(content, 1);
+            _rootGrid.Children.Add(content);
         });
     }
 
-    public record class RequiredParameter(WavesPageViewModel ViewModel, PathBar.RequiredParameter PathBarParameter,
-        IQueueService QueueService);
+    public record class RequiredParameter(
+        PathBar.RequiredParameter PathBarParameter, WavesPageViewModel ViewModel, IQueueService QueueService);
 }

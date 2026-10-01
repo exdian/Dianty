@@ -25,11 +25,12 @@
     <None Remove="Views\Controls\CoyoteBleDetailCards.xaml" />
     <None Remove="Views\Controls\CoyoteDeletionCard.xaml" />
     <None Remove="Views\Controls\CoyoteWsDetailCards.xaml" />
+    <None Remove="Views\Controls\GamesPageContent.xaml" />
     <None Remove="Views\Controls\GtaVcRuleCard.xaml" />
     <None Remove="Views\Controls\PathBar.xaml" />
     <None Remove="Views\Controls\QrCodeButton.xaml" />
-    <None Remove="Views\Controls\WavePlayQueueControl.xaml" />
     <None Remove="Views\Controls\WavePlayQueueListView.xaml" />
+    <None Remove="Views\Controls\WavePlayQueuePageContent.xaml" />
     <None Remove="Views\Pages\CoyoteDetailPage.xaml" />
     <None Remove="Views\Pages\DebugPage.xaml" />
     <None Remove="Views\Pages\DevicesPage.xaml" />
@@ -89,7 +90,12 @@
     <ProjectReference Include="..\..\DiantyCore\GameMonitor\GameMonitor.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Controls\WavePlayQueueControl.xaml">
+    <Page Update="Views\Controls\GamesPageContent.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Controls\WavePlayQueuePageContent.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

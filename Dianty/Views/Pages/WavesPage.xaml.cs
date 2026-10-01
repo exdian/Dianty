@@ -52,7 +52,7 @@ public sealed partial class WavesPage : Page
             [s => s.AppText.MainWindowText.MainViewText.MenuWaves,
             s => s.AppText.MainWindowText.MainViewText.WavesPageText.QueueMenuPath];
         var pathBarParameter = new PathBar.RequiredParameter(_queueService, _localizationService, pathGetters);
-        var requiredParameter = new WavePlayQueuePage.RequiredParameter(ViewModel, pathBarParameter, _queueService);
+        var requiredParameter = new WavePlayQueuePage.RequiredParameter(pathBarParameter, ViewModel, _queueService);
         WeakReferenceMessenger.Default.Send(new NavigationRequest(typeof(WavePlayQueuePage), requiredParameter, options));
     }
 
@@ -75,7 +75,7 @@ public sealed partial class WavesPage : Page
                 [s => s.AppText.MainWindowText.MainViewText.MenuWaves,
                 s => s.AppText.MainWindowText.MainViewText.WavesPageText.DetailsMenuPath];
             var pathBarParameter = new PathBar.RequiredParameter(_queueService, _localizationService, pathGetters);
-            var requiredParameter = new WaveSettingsPage.RequiredParameter(waveItem, pathBarParameter);
+            var requiredParameter = new WaveSettingsPage.RequiredParameter(pathBarParameter, waveItem);
             WeakReferenceMessenger.Default.Send(new NavigationRequest(typeof(WaveSettingsPage), requiredParameter, options));
         }
     }

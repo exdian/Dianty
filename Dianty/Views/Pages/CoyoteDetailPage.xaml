@@ -15,7 +15,7 @@
         </Grid.RowDefinitions>
         <controls:PathBar x:Name="PageHeader" Margin="12,6,12,12" Parameter="{x:Bind PathBarParameter}"/>
         <ScrollViewer
-            x:Name="_pageContent" Grid.Row="1" Padding="12,0" Loaded="OnPageContentScrollViewerLoaded"
+            x:Name="_pageContent" Grid.Row="1" Padding="12,0" Loaded="OnPageScrollViewerLoaded"
             VerticalScrollBarVisibility="Auto" VerticalScrollMode="Auto"/>
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
@@ -29,7 +29,6 @@
                         <AdaptiveTrigger MinWindowWidth="{StaticResource MinimalModeThresholdWidth}" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <!-- NavigationView.DisplayMode != Minimal -->
                         <Setter Target="PageHeader.Margin" Value="24,12"/>
                         <Setter Target="_pageContent.Padding" Value="24,0"/>
                     </VisualState.Setters>

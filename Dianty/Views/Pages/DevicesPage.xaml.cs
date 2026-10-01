@@ -53,7 +53,7 @@ public sealed partial class DevicesPage : Page
                 [s => s.AppText.MainWindowText.MainViewText.MenuDevices,
                 s => s.AppText.MainWindowText.MainViewText.DevicesPageText.DetailsMenuPath];
             var pathBarParameter = new PathBar.RequiredParameter(_queueService, _localizationService, pathGetters);
-            var requiredParameter = new CoyoteDetailPage.RequiredParameter(coyoteItem, _queueService, pathBarParameter);
+            var requiredParameter = new CoyoteDetailPage.RequiredParameter(pathBarParameter, coyoteItem, _queueService);
             WeakReferenceMessenger.Default.Send(new NavigationRequest(typeof(CoyoteDetailPage), requiredParameter, options));
         }
     }

@@ -42,7 +42,6 @@
                         <AdaptiveTrigger MinWindowWidth="{StaticResource MinimalModeThresholdWidth}" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <!-- NavigationView.DisplayMode != Minimal -->
                         <Setter Target="ClearButton.Margin" Value="24,24,24,0"/>
                         <Setter Target="_logListView.Padding" Value="21,0"/>
                     </VisualState.Setters>

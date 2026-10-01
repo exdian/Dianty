@@ -36,7 +36,7 @@
                 </toolkit:SettingsCard>
                 <toolkit:SettingsCard
                     Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.MenuDevices, Mode=OneWay}"
-                    IsClickEnabled="True" CornerRadius="0,0,8,8" Click="OnDeviceCardClick">
+                    IsClickEnabled="True" CornerRadius="0,0,8,8" Click="OnMenuCardClick" Tag="{x:Bind DevicesPage}">
                     <toolkit:SettingsCard.HeaderIcon>
                         <PathIcon
                             Data="M0 20 20 0H84l20 20V146L84 166H20L0 146ZM10 26V52L22 64v38L10 114v26l16 16H78l16-16V
@@ -62,7 +62,7 @@
                 </toolkit:SettingsCard>
                 <toolkit:SettingsCard
                     Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.MenuWaves, Mode=OneWay}"
-                    IsClickEnabled="True" CornerRadius="0,0,8,8" Click="OnWaveCardClick">
+                    IsClickEnabled="True" CornerRadius="0,0,8,8" Click="OnMenuCardClick" Tag="{x:Bind WavesPage}">
                     <toolkit:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE9D9;"/>
                     </toolkit:SettingsCard.HeaderIcon>
@@ -83,7 +83,7 @@
                 </toolkit:SettingsCard>
                 <toolkit:SettingsCard
                     Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.MenuGames, Mode=OneWay}"
-                    IsClickEnabled="True" CornerRadius="0,0,8,8" Click="OnGameCardClick">
+                    IsClickEnabled="True" CornerRadius="0,0,8,8" Click="OnMenuCardClick" Tag="{x:Bind GamesPage}">
                     <toolkit:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE7FC;"/>
                     </toolkit:SettingsCard.HeaderIcon>
@@ -102,7 +102,6 @@
                         <AdaptiveTrigger MinWindowWidth="{StaticResource MinimalModeThresholdWidth}" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <!-- NavigationView.DisplayMode != Minimal -->
                         <Setter Target="PageContent.Padding" Value="24,0"/>
                     </VisualState.Setters>
                 </VisualState>

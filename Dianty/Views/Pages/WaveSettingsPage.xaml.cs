@@ -12,18 +12,18 @@ public sealed partial class WaveSettingsPage : Page
         InitializeComponent();
     }
 
-    private WaveItem? ViewModel { get; set; }
     private PathBar.RequiredParameter? PathBarParameter { get; set; }
+    private WaveItem? ViewModel { get; set; }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
         if (e.Parameter is RequiredParameter parameter)
         {
-            ViewModel = parameter.ViewModel;
             PathBarParameter = parameter.PathBarParameter;
+            ViewModel = parameter.ViewModel;
         }
     }
 
-    public record class RequiredParameter(WaveItem ViewModel, PathBar.RequiredParameter PathBarParameter);
+    public record class RequiredParameter(PathBar.RequiredParameter PathBarParameter, WaveItem ViewModel);
 }
