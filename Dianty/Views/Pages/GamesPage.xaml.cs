@@ -15,32 +15,27 @@ public sealed partial class GamesPage : Page
         InitializeComponent();
     }
 
-    private IQueueService? _queueService;
-
-    private GamesPageViewModel? ViewModel { get; set; }
+    private RequiredParameter? _parameter;
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
-        if (e.Parameter is RequiredParameter requiredParameter)
-        {
-            ViewModel = requiredParameter.ViewModel;
-            _queueService = requiredParameter.QueueService;
-        }
+        _parameter = e.Parameter as RequiredParameter;
     }
 
     private void OnRootGridLoaded(object sender, RoutedEventArgs e)
     {
-        if (_queueService is null || ViewModel is null)
-            return;
-
-        _queueService.TryEnqueue(DispatcherQueuePriority.Low, () =>
-        {
-            var content = new GamesPageContent(ViewModel, _queueService);
-            Grid.SetRow(content, 1);
-            _rootGrid.Children.Add(content);
-        });
+        _parameter?.QueueService.TryEnqueue(DispatcherQueuePriority.Low, LoadContent);
     }
 
-    public record class RequiredParameter(GamesPageViewModel ViewModel, IQueueService QueueService);
+    private void LoadContent()
+    {
+        var content = new GamesPageContent(_parameter!);
+        Grid.SetRow(content, 1);
+        _rootGrid.Children.Add(content);
+    }
+
+    public record class RequiredParameter(
+        GamesPageViewModel GamesPageViewModel, GtaVcRuleCardViewModel GtaVcRuleCardViewModel,
+        IQueueService QueueService, ILocalizationService LocalizationService);
 }

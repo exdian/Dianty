@@ -14,6 +14,7 @@ using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Shapes;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Windows.Foundation;
 using Windows.Graphics;
@@ -113,6 +114,7 @@ public sealed partial class MainView : UserControl
             else if (message.PageType is not null)
             {
                 var viewModel = message.NeedParameter ? ServiceLocator.GetViewModel(message.PageType) : message.Parameter;
+                Debug.Assert(viewModel is not UIElement);
                 _contentFrame.Navigate(message.PageType, viewModel, message.NavigationOptions.TransitionInfoOverride);
                 if (!isNavigationStackEnabled && _contentFrame.BackStack.Count > 0)
                     _contentFrame.BackStack.RemoveAt(_contentFrame.BackStack.Count - 1);
@@ -309,7 +311,7 @@ public sealed partial class MainView : UserControl
 
     private void OnFrameNavigated(object sender, NavigationEventArgs e)
     {
-        var topPageType = TopPageLocator.GetTopPage(_contentFrame.SourcePageType.Name);
+        var topPageType = PageHelper.GetTopPageType(_contentFrame.SourcePageType.Name);
         if (topPageType is null)
         {
             _navView.SelectedItem = null;

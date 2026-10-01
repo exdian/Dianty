@@ -36,8 +36,6 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
     private readonly ILocalizationService _localizationService;
     private bool _isDisposed;
 
-    public required GtaVcRuleCardViewModel GtaVcRuleCardViewModel { get; init; }
-
     [ObservableProperty]
     public partial OutputModeSelectionItem[] OutputModeSelectionItems { get; private set; }
 

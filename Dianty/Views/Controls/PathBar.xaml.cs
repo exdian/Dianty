@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Dianty.Services;
 using Dianty.Utils.Messages;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
@@ -100,7 +101,12 @@ public sealed partial class PathBar : UserControl
             Paths.RemoveAt(i);
         }
 
-        WeakReferenceMessenger.Default.Send(navigationRequest);
+        // 削减的路径会在导航页面加载完成之后才更新，所以可能会看到路径栏短暂消失，将导航放到低优先级队列中可以减少此问题发生
+        var queueService = Parameter?.QueueService;
+        if (queueService is not null)
+            queueService.TryEnqueue(DispatcherQueuePriority.Low, () => WeakReferenceMessenger.Default.Send(navigationRequest));
+        else
+            WeakReferenceMessenger.Default.Send(navigationRequest);
     }
 
     public record class RequiredParameter(

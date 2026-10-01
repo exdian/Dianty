@@ -3,7 +3,7 @@ using Dianty.Models;
 using Dianty.Services;
 using Dianty.Utils;
 using Dianty.ViewModels;
-using Dianty.Views;
+using Dianty.Views.Controls;
 using Dianty.Views.Pages;
 using DungeonToolkit.Coyote;
 using GameMonitor;
@@ -67,7 +67,7 @@ public partial class App : Application
         ToDoList.Plan += RegisterService;
         ToDoList.UiPlan += MergeDictionaries;
         ToDoList.UiPlan += SetWindowIcon;
-        TopPageLocator.Init(GetTopPage);
+        PageHelper.Init(GetTopPageType, GetPageHeaderGetter, GetPageContent);
         window.ViewModel = new MainViewModel(window);
         _window = window;
         _window.Activate();
@@ -105,11 +105,8 @@ public partial class App : Application
         {
             GtaVcGameRule = gtaVcGameRule
         };
+        var gamesPageViewModel = new GamesPageViewModel(gameManager, queueService, localizationService);
         var gtaVcRuleCardViewModel = new GtaVcRuleCardViewModel(gtaVcGameRule, queueService, localizationService);
-        var gamesPageViewModel = new GamesPageViewModel(gameManager, queueService, localizationService)
-        {
-            GtaVcRuleCardViewModel = gtaVcRuleCardViewModel
-        };
         ServiceLocator.Register(gamesPageViewModel);
         ServiceLocator.Register(gtaVcRuleCardViewModel);
 
@@ -122,7 +119,7 @@ public partial class App : Application
             new WavesPageViewModel(coyoteManager, queueService, windowService, localizationService),
             queueService, localizationService));
         ServiceLocator.RegisterViewModel(typeof(GamesPage), new GamesPage.RequiredParameter(
-            gamesPageViewModel, queueService));
+            gamesPageViewModel, gtaVcRuleCardViewModel, queueService, localizationService));
         ServiceLocator.RegisterViewModel(typeof(SafetyPage), new SafetyPageViewModel(coyoteItems));
         ServiceLocator.RegisterViewModel(typeof(DebugPage), new DebugPageViewModel(queueService));
         ServiceLocator.RegisterViewModel(typeof(SettingsPage),
@@ -164,17 +161,35 @@ public partial class App : Application
         _window.AppWindow.SetIcon(file);
     }
 
-    private static Type? GetTopPage(string pageName)
+    private static Type? GetTopPageType(string pageName)
     {
         return pageName switch
         {
             nameof(HomePage) => typeof(HomePage),
             nameof(DevicesPage) or nameof(CoyoteDetailPage) => typeof(DevicesPage),
             nameof(WavesPage) or nameof(WavePlayQueuePage) or nameof(WaveSettingsPage) => typeof(WavesPage),
-            nameof(GamesPage) => typeof(GamesPage),
+            nameof(GamesPage) or nameof(GameplayDetailPage) => typeof(GamesPage),
             nameof(SafetyPage) => typeof(SafetyPage),
             nameof(DebugPage) => typeof(DebugPage),
             nameof(SettingsPage) => typeof(SettingsPage),
+            _ => null
+        };
+    }
+
+    private static Func<ILocalizationService, string>? GetPageHeaderGetter(string contentName)
+    {
+        return contentName switch
+        {
+            nameof(GtaVcRuleCards) => s => s.AppText.MainWindowText.MainViewText.GamesPageText.GtaVcGameplayHeader,
+            _ => null
+        };
+    }
+
+    private static FrameworkElement? GetPageContent(string contentName)
+    {
+        return contentName switch
+        {
+            nameof(GtaVcRuleCards) => new GtaVcRuleCards(ServiceLocator.GetService<GtaVcRuleCardViewModel>()),
             _ => null
         };
     }

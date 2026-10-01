@@ -26,7 +26,7 @@
     <None Remove="Views\Controls\CoyoteDeletionCard.xaml" />
     <None Remove="Views\Controls\CoyoteWsDetailCards.xaml" />
     <None Remove="Views\Controls\GamesPageContent.xaml" />
-    <None Remove="Views\Controls\GtaVcRuleCard.xaml" />
+    <None Remove="Views\Controls\GtaVcRuleCards.xaml" />
     <None Remove="Views\Controls\PathBar.xaml" />
     <None Remove="Views\Controls\QrCodeButton.xaml" />
     <None Remove="Views\Controls\WavePlayQueueListView.xaml" />
@@ -34,6 +34,7 @@
     <None Remove="Views\Pages\CoyoteDetailPage.xaml" />
     <None Remove="Views\Pages\DebugPage.xaml" />
     <None Remove="Views\Pages\DevicesPage.xaml" />
+    <None Remove="Views\Pages\GameplayDetailPage.xaml" />
     <None Remove="Views\Pages\GamesPage.xaml" />
     <None Remove="Views\Pages\HomePage.xaml" />
     <None Remove="Views\Pages\SafetyPage.xaml" />
@@ -88,6 +89,16 @@
   <ItemGroup>
     <ProjectReference Include="..\..\DiantyCore\DungeonToolkit\DungeonToolkit.csproj" />
     <ProjectReference Include="..\..\DiantyCore\GameMonitor\GameMonitor.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Controls\GtaVcRuleCards.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Pages\GameplayDetailPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\Controls\GamesPageContent.xaml">
@@ -151,11 +162,6 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\Pages\DebugPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Views\Controls\GtaVcRuleCard.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

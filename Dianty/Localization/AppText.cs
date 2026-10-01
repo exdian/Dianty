@@ -168,9 +168,10 @@ public class GamesPageText
     public string StrengthModePlaceholderText { get; set; } = "选择处理模式";
     public string MaximumModeItemText { get; set; } = "取最大值";
     public string SumModeItemText { get; set; } = "叠加强度";
-    public string RuleItemsHeader { get; set; } = "规则";
-    public string EmptyRuleCardHeader { get; set; } = "敬请期待";
+    public string InternalGameItemsHeader { get; set; } = "内置玩法";
+    public string EmptyGameplayCardHeader { get; set; } = "敬请期待";
     public string RepositoryLinkCardHeader { get; set; } = "查看更新";
+    public string GameSwitchCardHeader { get; set; } = "玩法开关";
     public string GameDisabledStateText { get; set; } = "未接入游戏";
     public string FindTargetProcessStateText { get; set; } = "查找游戏进程";
     public string GameEnabledStateText { get; set; } = "已接入";
@@ -178,8 +179,8 @@ public class GamesPageText
     public string GameStrengthModeCardDescription { get; set; } = "多条规则同时生效时";
     public string RuleStrengthHeader { get; set; } = "惩罚强度";
     public string RuleDurationHeader { get; set; } = "持续时间（秒）";
-    public string GtaVcRuleCardHeader { get; set; } = "侠盗飞车 罪恶都市";
-    public string GtaVcRuleCardDescription { get; set; } = "包含6条规则";
+    public string GtaVcGameplayHeader { get; set; } = "侠盗飞车 罪恶都市";
+    public string GtaVcGameplayCardDescription { get; set; } = "包含6条规则";
     public string GtaVcDamageRuleCardHeader { get; set; } = "每累计受到伤害";
     public string GtaVcBustedRuleCardHeader { get; set; } = "被捕时，每拥有1枚好市民勋章";
     public string GtaVcWastedRuleCardHeader { get; set; } = "血量为0时";

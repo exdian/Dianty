@@ -10,8 +10,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <ScrollViewer x:Name="RootScrollViewer" Grid.Row="1" Padding="12,0" VerticalScrollBarVisibility="Auto" VerticalScrollMode="Auto">
-        <StackPanel x:Name="_contentStackPanel" Spacing="{StaticResource CommonCardSpacing}" Margin="0,0,0,24" Loaded="OnContentStackPanelLoaded">
+    <ScrollViewer x:Name="RootScrollViewer" Padding="12,0" VerticalScrollBarVisibility="Auto" VerticalScrollMode="Auto">
+        <StackPanel Spacing="{StaticResource CommonCardSpacing}" Margin="0,0,0,24">
             <StackPanel.ChildrenTransitions>
                 <RepositionThemeTransition />
             </StackPanel.ChildrenTransitions>
@@ -94,10 +94,28 @@
             </toolkit:SettingsCard>
             <TextBlock
                 Style="{StaticResource BodyStrongTextBlockStyle}" Margin="1,14,0,4"
-                Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.RuleItemsHeader, Mode=OneWay}"/>
+                Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.InternalGameItemsHeader, Mode=OneWay}"/>
+            <toolkit:SettingsCard
+                Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.GtaVcGameplayHeader, Mode=OneWay}"
+                Description="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.GtaVcGameplayCardDescription, Mode=OneWay}"
+                IsClickEnabled="True" Click="OnGameplayCardClick" Tag="{x:Bind GtaVcRuleCards}">
+                <toolkit:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE804;"/>
+                </toolkit:SettingsCard.HeaderIcon>
+                <StackPanel Orientation="Horizontal" Spacing="{StaticResource CommonControlSpacing}">
+                    <ProgressRing IsActive="{x:Bind GtaVcRuleCardViewModel.IsAccessing, Mode=OneWay}"/>
+                    <ContentControl Content="{x:Bind GtaVcRuleCardViewModel.StateMessage, Mode=OneWay}" VerticalAlignment="Center">
+                        <ContentControl.ContentTransitions>
+                            <PaneThemeTransition Edge="Bottom"/>
+                        </ContentControl.ContentTransitions>
+                    </ContentControl>
+                    <ToggleSwitch
+                        IsOn="{x:Bind GtaVcRuleCardViewModel.IsEnabled, Mode=TwoWay}"
+                        OnContent="{x:Null}" OffContent="{x:Null}" Margin="-8,0,0,0"/>
+                </StackPanel>
+            </toolkit:SettingsCard>
             <toolkit:SettingsExpander
-                x:Name="_emptyRuleCard"
-                Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.EmptyRuleCardHeader, Mode=OneWay}">
+                Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.EmptyGameplayCardHeader, Mode=OneWay}">
                 <toolkit:SettingsExpander.HeaderIcon>
                     <FontIcon Glyph="&#xE897;"/>
                 </toolkit:SettingsExpander.HeaderIcon>

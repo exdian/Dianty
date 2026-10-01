@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <UserControl
-    x:Class="Dianty.Views.Controls.GtaVcRuleCard"
+    x:Class="Dianty.Views.Controls.GtaVcRuleCards"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="using:Dianty.ViewModels"
@@ -10,24 +10,26 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <toolkit:SettingsExpander
-        Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.GtaVcRuleCardHeader, Mode=OneWay}"
-        Description="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.GtaVcRuleCardDescription, Mode=OneWay}">
-        <toolkit:SettingsExpander.HeaderIcon>
-            <FontIcon Glyph="&#xE804;"/>
-        </toolkit:SettingsExpander.HeaderIcon>
-        <StackPanel Orientation="Horizontal" Spacing="{StaticResource CommonControlSpacing}">
-            <ProgressRing IsActive="{x:Bind ViewModel.IsAccessing, Mode=OneWay}"/>
-            <ContentControl Content="{x:Bind ViewModel.StateMessage, Mode=OneWay}" VerticalAlignment="Center">
-                <ContentControl.ContentTransitions>
-                    <PaneThemeTransition Edge="Bottom"/>
-                </ContentControl.ContentTransitions>
-            </ContentControl>
-            <ToggleSwitch
-                IsOn="{x:Bind ViewModel.IsEnabled, Mode=TwoWay}"
-                OnContent="{x:Null}" OffContent="{x:Null}" Margin="-8,0,0,0"/>
-        </StackPanel>
-        <toolkit:SettingsExpander.Items>
+    <ScrollViewer x:Name="RootScrollViewer" Padding="12,0" VerticalScrollBarVisibility="Auto" VerticalScrollMode="Auto">
+        <StackPanel Spacing="{StaticResource CommonCardSpacing}" Margin="0,0,0,24">
+            <StackPanel.ChildrenTransitions>
+                <RepositionThemeTransition />
+            </StackPanel.ChildrenTransitions>
+            <toolkit:SettingsCard
+                Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.GameSwitchCardHeader, Mode=OneWay}">
+                <toolkit:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE7E8;"/>
+                </toolkit:SettingsCard.HeaderIcon>
+                <StackPanel Orientation="Horizontal" Spacing="{StaticResource CommonControlSpacing}">
+                    <ProgressRing IsActive="{x:Bind ViewModel.IsAccessing, Mode=OneWay}"/>
+                    <ContentControl Content="{x:Bind ViewModel.StateMessage, Mode=OneWay}" VerticalAlignment="Center">
+                        <ContentControl.ContentTransitions>
+                            <PaneThemeTransition Edge="Bottom"/>
+                        </ContentControl.ContentTransitions>
+                    </ContentControl>
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.IsEnabled, Mode=TwoWay}" OnContent="{x:Null}" OffContent="{x:Null}" Margin="-8,0,0,0"/>
+                </StackPanel>
+            </toolkit:SettingsCard>
             <toolkit:SettingsCard
                 Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.GameStrengthModeCardHeader, Mode=OneWay}"
                 Description="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.GameStrengthModeCardDescription, Mode=OneWay}">
@@ -237,6 +239,23 @@
                     OffContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OffText, Mode=OneWay}"
                     OnContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OnText, Mode=OneWay}"/>
             </toolkit:SettingsCard>
-        </toolkit:SettingsExpander.Items>
-    </toolkit:SettingsExpander>
+        </StackPanel>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1" />
+                    </VisualState.StateTriggers>
+                </VisualState>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource MinimalModeThresholdWidth}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="RootScrollViewer.Padding" Value="24,0"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+    </ScrollViewer>
 </UserControl>
