@@ -70,7 +70,7 @@ internal partial class CoyoteBleService : ICoyoteBleService
 
             // 获取电池特征
             GattCharacteristic? batteryCharacteristic = null;
-            if (batteryService is not null)
+            if (batteryService != null)
             {
                 var batteryCharacteristicsResult = await batteryService.GetCharacteristicsAsync().AsTask(token).ConfigureAwait(false);
                 batteryCharacteristic = batteryCharacteristicsResult.Characteristics.FirstOrDefault(c => c.Uuid == gattServiceInfo.BatteryCharacteristicUuid);
@@ -99,7 +99,7 @@ internal partial class CoyoteBleService : ICoyoteBleService
             {
                 result.Dispose();
             }
-            else if (bleDevice is not null)
+            else if (bleDevice != null)
             {
                 try
                 {

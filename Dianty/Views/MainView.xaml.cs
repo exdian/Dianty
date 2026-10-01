@@ -125,7 +125,7 @@ public sealed partial class MainView : UserControl
         _contentFrame.Navigate(HomePage, ServiceLocator.GetViewModel(HomePage));
 
         var splitView = VisualTreeHelperExtension.FindChildByName(_navView, "RootSplitView") as SplitView;
-        if (splitView is not null)
+        if (splitView != null)
         {
             _titleBarService.SetTitleBar(splitView);
 
@@ -135,7 +135,7 @@ public sealed partial class MainView : UserControl
             {
                 var element = VisualTreeHelperExtension
                     .FindChildByName(_navView, interactableElementNames[i]) as FrameworkElement;
-                if (element is not null)
+                if (element != null)
                 {
                     _interactableElements.Add(element);
                     if (element is ScrollViewer scrollViewer)
@@ -162,7 +162,7 @@ public sealed partial class MainView : UserControl
 
             // 面板浮动打开时的透明矩形
             var rectangle = VisualTreeHelperExtension.FindChildByName(splitView, "LightDismissLayer") as Rectangle;
-            if (rectangle is not null)
+            if (rectangle != null)
             {
                 var clip = new RectangleGeometry
                 {
@@ -289,7 +289,7 @@ public sealed partial class MainView : UserControl
         {
             Navigate(SettingsPage, args.RecommendedNavigationTransitionInfo);
         }
-        else if (args.InvokedItemContainer is not null)
+        else if (args.InvokedItemContainer != null)
         {
             Type navPageType = args.InvokedItemContainer.Tag as Type ?? HomePage;
             Navigate(navPageType, args.RecommendedNavigationTransitionInfo);
@@ -331,7 +331,7 @@ public sealed partial class MainView : UserControl
     {
         var selectedItem = _navView.MenuItems.OfType<NavigationViewItem>()
             .FirstOrDefault(i => i.Tag.Equals(pageType));
-        if (selectedItem is not null && !ReferenceEquals(selectedItem, _navView.SelectedItem))
+        if (selectedItem != null && !ReferenceEquals(selectedItem, _navView.SelectedItem))
             _navView.SelectedItem = selectedItem;
     }
 

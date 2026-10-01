@@ -19,7 +19,7 @@ internal class VisualTreeHelperExtension
         {
             var child = VisualTreeHelper.GetChild(parent, i);
             var result = FindChildByName(child, name);
-            if (result is not null)
+            if (result != null)
             {
                 return result;
             }
