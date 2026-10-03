@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Dianty.EventArguments;
 using Dianty.Services;
 using System;
 using System.Collections.Concurrent;
@@ -9,13 +10,12 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Windows.System.UserProfile;
-using static Dianty.Services.ILocalizationService;
 
 namespace Dianty.Localization;
 
-public partial class Localizer : ObservableObject, ILocalizationService
+public sealed partial class Localizer : ObservableObject, ILocalizationService
 {
-    public static Localizer Instance { get; set; } = null!;
+    public static Localizer? Instance { get; set; }
 
     [ObservableProperty]
     public partial AppText AppText { get; private set; }
@@ -30,14 +30,14 @@ public partial class Localizer : ObservableObject, ILocalizationService
             if (field != value)
             {
                 field = value;
-                OnCurrentLanguageFileNameChanged(value);
+                OnCurrentLanguageChanged(value);
             }
         }
     } = string.Empty;
 
-    public event EventHandler<CurrentLanguageFileNameChangedEventArgs>? CurrentLanguageFileNameChanged;
+    public event EventHandler<CurrentLanguageChangedEventArgs>? CurrentLanguageChanged;
 
-    public static void Init()
+    public static Localizer Init()
     {
         const string simplifiedChinese = "zh-Hans";
         const string english = "en-US";
@@ -82,6 +82,7 @@ public partial class Localizer : ObservableObject, ILocalizationService
         localizer.AppText = appText;
         localizer.CurrentLanguageFileName = fileName;
         Instance = localizer;
+        return localizer;
     }
 
     public async Task<IEnumerable<KeyValuePair<string, string>>> GetAvailableLanguagesAsync()
@@ -134,9 +135,9 @@ public partial class Localizer : ObservableObject, ILocalizationService
         }
     }
 
-    private void OnCurrentLanguageFileNameChanged(string currentLanguageFileName)
+    private void OnCurrentLanguageChanged(string currentLanguageFileName)
     {
-        var args = new CurrentLanguageFileNameChangedEventArgs(currentLanguageFileName);
-        CurrentLanguageFileNameChanged?.Invoke(this, args);
+        var args = new CurrentLanguageChangedEventArgs(currentLanguageFileName);
+        CurrentLanguageChanged?.Invoke(this, args);
     }
 }

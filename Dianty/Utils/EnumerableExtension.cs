@@ -7,7 +7,7 @@ public static class EnumerableExtension
 {
     extension<T>(IEnumerable<T> source) where T : allows ref struct
     {
-        public int FirstIndex(Func<T, bool> predicate)
+        public int FirstLocationOf(Func<T, bool> predicate)
         {
             int i = 0;
             foreach (var item in source)
@@ -19,7 +19,7 @@ public static class EnumerableExtension
             return -1;
         }
 
-        public int LastIndex(Func<T, bool> predicate)
+        public int LastLocationOf(Func<T, bool> predicate)
         {
             int i = 0;
             int result = -1;

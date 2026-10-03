@@ -1,5 +1,5 @@
 using CommunityToolkit.Mvvm.Messaging;
-using Dianty.Utils.Messages;
+using Dianty.Services.Messages;
 using Dianty.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -18,7 +18,7 @@ public sealed partial class HomePage : Page
 
 #pragma warning disable CA1822 // 将成员标记为 static
     private Type DevicesPage => typeof(DevicesPage);
-    private Type WavesPage => typeof(WavesPage);
+    private Type WaveformsPage => typeof(WaveformsPage);
     private Type GamesPage => typeof(GamesPage);
 #pragma warning restore CA1822 // 将成员标记为 static
 

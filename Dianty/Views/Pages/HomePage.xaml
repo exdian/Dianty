@@ -50,17 +50,17 @@
                                 Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.HomePageText.NowPlayingCardHeader, Mode=OneWay}"
                                 Style="{ThemeResource SubtitleTextBlockStyle}" Margin="0,0,0,6"/>
                             <TextBlock
-                                Text="{x:Bind ViewModel.FormattedWaveNameA, Mode=OneWay}"
+                                Text="{x:Bind ViewModel.FormattedWaveformNameA, Mode=OneWay}"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                             <TextBlock
-                                Text="{x:Bind ViewModel.FormattedWaveNameB, Mode=OneWay}"
+                                Text="{x:Bind ViewModel.FormattedWaveformNameB, Mode=OneWay}"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                         </StackPanel>
                     </toolkit:SettingsCard.Header>
                 </toolkit:SettingsCard>
                 <toolkit:SettingsCard
-                    Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.MenuWaves, Mode=OneWay}"
-                    IsClickEnabled="True" CornerRadius="0,0,8,8" Click="OnMenuCardClick" Tag="{x:Bind WavesPage}">
+                    Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.MenuWaveforms, Mode=OneWay}"
+                    IsClickEnabled="True" CornerRadius="0,0,8,8" Click="OnMenuCardClick" Tag="{x:Bind WaveformsPage}">
                     <toolkit:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE9D9;"/>
                     </toolkit:SettingsCard.HeaderIcon>

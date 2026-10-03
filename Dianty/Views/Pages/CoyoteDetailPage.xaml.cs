@@ -15,7 +15,8 @@ public sealed partial class CoyoteDetailPage : Page
         InitializeComponent();
     }
 
-    private CoyoteItem? _viewModel;
+    private DevicesPageViewModel? _viewModel;
+    private CoyoteItemBase? _coyoteItem;
     private IQueueService? _queueService;
 
     private PathBar.RequiredParameter? PathBarParameter { get; set; }
@@ -27,24 +28,25 @@ public sealed partial class CoyoteDetailPage : Page
         {
             PathBarParameter = parameter.PathBarParameter;
             _viewModel = parameter.ViewModel;
+            _coyoteItem = parameter.CoyoteItem;
             _queueService = parameter.QueueService;
         }
     }
 
     private void OnPageScrollViewerLoaded(object sender, RoutedEventArgs e)
     {
-        if (_queueService is null)
+        if (_viewModel is null || _queueService is null)
             return;
 
         _queueService.TryEnqueue(DispatcherQueuePriority.Low, () =>
         {
-            if (_viewModel is CoyoteBleItem coyoteBleItem)
-                _pageContent.Content = new CoyoteBleDetailCards(coyoteBleItem);
-            else if (_viewModel is CoyoteWsItem coyoteWsItem)
-                _pageContent.Content = new CoyoteWsDetailCards(coyoteWsItem);
+            if (_coyoteItem is CoyoteBleItem coyoteBleItem)
+                _pageContent.Content = new CoyoteBleDetailCards(coyoteBleItem, _viewModel.DeleteCoyoteCommand);
+            else if (_coyoteItem is CoyoteWsItem coyoteWsItem)
+                _pageContent.Content = new CoyoteWsDetailCards(coyoteWsItem, _viewModel.DeleteCoyoteCommand);
         });
     }
 
-    public record class RequiredParameter(
-        PathBar.RequiredParameter PathBarParameter, CoyoteItem ViewModel, IQueueService QueueService);
+    public sealed record class RequiredParameter(
+        PathBar.RequiredParameter PathBarParameter, DevicesPageViewModel ViewModel, CoyoteItemBase CoyoteItem, IQueueService QueueService);
 }

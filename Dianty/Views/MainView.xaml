@@ -54,8 +54,8 @@
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
                 <NavigationViewItem
-                    Tag="{x:Bind WavesPage}"
-                    Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.MenuWaves, Mode=OneWay}">
+                    Tag="{x:Bind WaveformsPage}"
+                    Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.MenuWaveforms, Mode=OneWay}">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE9D9;"/>
                     </NavigationViewItem.Icon>

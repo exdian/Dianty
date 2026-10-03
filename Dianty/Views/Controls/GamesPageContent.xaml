@@ -35,10 +35,10 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock
                     Grid.Row="0" Grid.Column="0" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                    Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.EnabledGameCountLabel, Mode=OneWay}" />
+                    Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.EnabledGameIntegrationCountLabel, Mode=OneWay}" />
                 <TextBlock
                     Grid.Row="1" Grid.Column="0"
-                    Text="{x:Bind ViewModel.EnabledGameCount, Mode=OneWay}" FontSize="20" FontWeight="Bold" />
+                    Text="{x:Bind ViewModel.EnabledGameIntegrationCount, Mode=OneWay}" FontSize="20" FontWeight="Bold" />
                 <TextBlock
                     Grid.Row="0" Grid.Column="1" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                     Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.OutputStrengthLabel, Mode=OneWay}" />
@@ -65,7 +65,7 @@
                 <toolkit:SettingsExpander.Items>
                     <toolkit:SettingsCard
                         Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.ManualSwitchCardHeader, Mode=OneWay}"
-                        IsEnabled="{x:Bind ViewModel.IsAutoStartStop, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}">
+                        IsEnabled="{x:Bind ViewModel.IsAutomaticStartStop, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}">
                         <toolkit:SettingsCard.HeaderIcon>
                             <FontIcon Glyph="&#xE815;"/>
                         </toolkit:SettingsCard.HeaderIcon>
@@ -94,28 +94,28 @@
             </toolkit:SettingsCard>
             <TextBlock
                 Style="{StaticResource BodyStrongTextBlockStyle}" Margin="1,14,0,4"
-                Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.InternalGameItemsHeader, Mode=OneWay}"/>
+                Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.InternalGameIntegrationItemsHeader, Mode=OneWay}"/>
             <toolkit:SettingsCard
-                Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.GtaVcGameplayHeader, Mode=OneWay}"
-                Description="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.GtaVcGameplayCardDescription, Mode=OneWay}"
-                IsClickEnabled="True" Click="OnGameplayCardClick" Tag="{x:Bind GtaVcRuleCards}">
+                Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.GtaVcGameIntegrationHeader, Mode=OneWay}"
+                Description="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.GtaVcGameIntegrationCardDescription, Mode=OneWay}"
+                IsClickEnabled="True" Click="OnGameIntegrationCardClick" Tag="{x:Bind GtaVcRuleCards}">
                 <toolkit:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE804;"/>
                 </toolkit:SettingsCard.HeaderIcon>
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource CommonControlSpacing}">
-                    <ProgressRing IsActive="{x:Bind GtaVcRuleCardViewModel.IsAccessing, Mode=OneWay}"/>
-                    <ContentControl Content="{x:Bind GtaVcRuleCardViewModel.StateMessage, Mode=OneWay}" VerticalAlignment="Center">
+                    <ProgressRing IsActive="{x:Bind GtaVcGameIntegrationViewModel.IsAccessing, Mode=OneWay}"/>
+                    <ContentControl Content="{x:Bind GtaVcGameIntegrationViewModel.StateMessage, Mode=OneWay}" VerticalAlignment="Center">
                         <ContentControl.ContentTransitions>
                             <PaneThemeTransition Edge="Bottom"/>
                         </ContentControl.ContentTransitions>
                     </ContentControl>
                     <ToggleSwitch
-                        IsOn="{x:Bind GtaVcRuleCardViewModel.IsEnabled, Mode=TwoWay}"
+                        IsOn="{x:Bind GtaVcGameIntegrationViewModel.IsEnabled, Mode=TwoWay}"
                         OnContent="{x:Null}" OffContent="{x:Null}" Margin="-8,0,0,0"/>
                 </StackPanel>
             </toolkit:SettingsCard>
             <toolkit:SettingsExpander
-                Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.EmptyGameplayCardHeader, Mode=OneWay}">
+                Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.EmptyGameIntegrationCardHeader, Mode=OneWay}">
                 <toolkit:SettingsExpander.HeaderIcon>
                     <FontIcon Glyph="&#xE897;"/>
                 </toolkit:SettingsExpander.HeaderIcon>

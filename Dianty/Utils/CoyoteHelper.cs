@@ -3,9 +3,9 @@ using QRCoder;
 
 namespace Dianty.Utils;
 
-internal class CoyoteHelper
+internal sealed class CoyoteHelper
 {
-    public static string CreateQrCodeSvgPathString(CoyoteWS coyote)
+    public static string CreateQrCodeSvgPathString(IClientInfo coyote)
     {
         var clientId = coyote.ClientId;
         using QRCodeGenerator qrGenerator = new();

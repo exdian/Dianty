@@ -21,7 +21,7 @@
         </toolkit:SettingsCard>
         <toolkit:SettingsCard
             Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionStatusCardHeader, Mode=OneWay}"
-            HeaderIcon="Link" Description="{x:Bind ViewModel.ConnectionTypeDescription, Mode=OneWay}">
+            HeaderIcon="Link" Description="{x:Bind ViewModel.ConnectionKindDescription, Mode=OneWay}">
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource CommonControlSpacing}">
                 <ProgressRing IsActive="{x:Bind ViewModel.IsConnecting, Mode=OneWay}"/>
                 <ContentControl Content="{x:Bind ViewModel.ConnectionMessage, Mode=OneWay}" VerticalAlignment="Center">
@@ -31,10 +31,10 @@
                 </ContentControl>
                 <local:QrCodeButton
                     IsDisplayed="{x:Bind ViewModel.IsQrCodeDisplayed, Mode=OneWay}"
-                    QrCodeGeometry="{x:Bind ViewModel.QrCodeSvgPath, Mode=OneWay, Converter={StaticResource QrCodeSvgPathConverter}}"
+                    QrCodeGeometry="{x:Bind ViewModel.QrCodeSvgPath, Mode=OneWay, Converter={StaticResource SvgPathConverter}}"
                     Visibility="{x:Bind ViewModel.CanShowQrCode, Mode=OneWay, Converter={StaticResource VisibleIfTrueConverter}}"/>
                 <ToggleSwitch
-                    IsOn="{x:Bind ViewModel.IsConnectingOrConnected, Mode=TwoWay}"
+                    IsOn="{x:Bind ViewModel.ConnectionSwitchValue, Mode=TwoWay}"
                     OnContent="{x:Null}" OffContent="{x:Null}" Margin="-8,0,0,0"/>
             </StackPanel>
         </toolkit:SettingsCard>
@@ -78,17 +78,19 @@
                     <toolkit:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xF093;"/>
                     </toolkit:SettingsCard.HeaderIcon>
-                    <TextBlock Text="{x:Bind ViewModel.StrengthCapA, Mode=OneWay}"/>
+                    <TextBlock Text="{x:Bind ViewModel.StrengthLimitA, Mode=OneWay}"/>
                 </toolkit:SettingsCard>
                 <toolkit:SettingsCard
                     Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.ChannelBStrengthLimitCardHeader, Mode=OneWay}">
                     <toolkit:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xF094;"/>
                     </toolkit:SettingsCard.HeaderIcon>
-                    <TextBlock Text="{x:Bind ViewModel.StrengthCapB, Mode=OneWay}"/>
+                    <TextBlock Text="{x:Bind ViewModel.StrengthLimitB, Mode=OneWay}"/>
                 </toolkit:SettingsCard>
             </toolkit:SettingsExpander.Items>
         </toolkit:SettingsExpander>
-        <local:CoyoteDeletionCard TargetName="{x:Bind ViewModel.Name}" DeleteCommand="{x:Bind ViewModel.DeleteThisCommand}"/>
+        <local:CoyoteDeletionCard
+            LocalizedText="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.DeviceDeletionCardText.ConfirmationDialogText, Mode=OneWay}"
+            TargetName="{x:Bind ViewModel.Name}" DeleteCommand="{x:Bind DeleteCommand}" CommandParameter="{x:Bind ViewModel}"/>
     </StackPanel>
 </UserControl>

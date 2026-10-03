@@ -1,7 +1,6 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Dianty.Services;
-using Dianty.Utils;
-using Dianty.Utils.Messages;
+using Dianty.Services.Messages;
 using Dianty.ViewModels;
 using Dianty.Views.Pages;
 using Microsoft.UI.Xaml;
@@ -18,22 +17,26 @@ public sealed partial class GamesPageContent : UserControl
     {
         InitializeComponent();
         ViewModel = requiredParameter.GamesPageViewModel;
-        GtaVcRuleCardViewModel = requiredParameter.GtaVcRuleCardViewModel;
+        GtaVcGameIntegrationViewModel = requiredParameter.GtaVcGameIntegrationViewModel;
+        _pageHeaderSelectorFactory = requiredParameter.PageHeaderSelectorFactory;
+        _pageContentFactory = requiredParameter.PageContentFactory;
         _queueService = requiredParameter.QueueService;
         _localizationService = requiredParameter.LocalizationService;
     }
 
+    private readonly Func<string, Func<ILocalizationService, string>> _pageHeaderSelectorFactory;
+    private readonly Func<string, FrameworkElement?> _pageContentFactory;
     private readonly IQueueService _queueService;
     private readonly ILocalizationService _localizationService;
 
     private GamesPageViewModel ViewModel { get; }
-    private GtaVcRuleCardViewModel GtaVcRuleCardViewModel { get; }
+    private GtaVcGameIntegrationViewModel GtaVcGameIntegrationViewModel { get; }
 
 #pragma warning disable CA1822 // 将成员标记为 static
     private Type GtaVcRuleCards => typeof(GtaVcRuleCards);
 #pragma warning restore CA1822 // 将成员标记为 static
 
-    private void OnGameplayCardClick(object sender, RoutedEventArgs e)
+    private void OnGameIntegrationCardClick(object sender, RoutedEventArgs e)
     {
         if (sender is not FrameworkElement element || element.Tag is not Type contentType)
             return;
@@ -48,9 +51,9 @@ public sealed partial class GamesPageContent : UserControl
         };
         Func<ILocalizationService, string>[] pathGetters =
             [s => s.AppText.MainWindowText.MainViewText.MenuGames,
-            PageHelper.GetPagePageHeaderGetter(contentType.Name)];
+            _pageHeaderSelectorFactory.Invoke(contentType.Name)];
         var pathBarParameter = new PathBar.RequiredParameter(_queueService, _localizationService, pathGetters);
-        var requiredParameter = new GameplayDetailPage.RequiredParameter(pathBarParameter, contentType.Name, _queueService);
-        WeakReferenceMessenger.Default.Send(new NavigationRequest(typeof(GameplayDetailPage), requiredParameter, options));
+        var requiredParameter = new GameIntegrationDetailPage.RequiredParameter(pathBarParameter, contentType.Name, _pageContentFactory, _queueService);
+        WeakReferenceMessenger.Default.Send(new NavigationRequest(typeof(GameIntegrationDetailPage), requiredParameter, options));
     }
 }

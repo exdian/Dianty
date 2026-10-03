@@ -1,0 +1,28 @@
+﻿namespace DungeonToolkit.Coyote;
+
+public sealed class WaveformPlayer : IDisposable, IWaveformPlaylist, IWaveformPublisher, IWaveformPlayNotification 
+{
+    public WaveformPlayer(
+        IRegistry<WaveformDecoderId, IWaveformDecoder> waveformDecoderRegistry,
+        IDataSource<IWaveformDecoderInfo> waveformDecoderInfoDataSource,
+        IOrderStore<WaveformDecoderId> orderStore,
+        IRegistryReader<WaveformId, IWaveform> waveformRegistry,
+        IWaveformDecoderFactory factory,
+        IIdPool<WaveformDecoderId> waveformDecoderIdPool);
+    public bool IsEnabled { get; set; }
+    public WaveformPlaybackMode PlaybackMode { get; set; }
+    public int SwitchInterval { get; set; }
+    public PulseData CurrentPulseData { get; }
+    public IWaveformDecoder? CurrentWaveformDecoder { get; }
+    public WaveformId? CurrentWaveformId { get; }
+    public event EventHandler? CurrentWaveformChanged;
+    public bool Add(WaveformId id);
+    public bool Remove(WaveformId id);
+    public bool Remove(WaveformDecoderId id);
+    public void Clear();
+    public bool Play(WaveformDecoderId id);
+    public int SetSpeed(WaveformDecoderId id, int speed);
+    public bool TryGetNextPulseData(out PulseData pulseData);
+    public void Dispose();
+}
+

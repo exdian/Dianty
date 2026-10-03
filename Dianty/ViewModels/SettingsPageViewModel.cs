@@ -1,36 +1,42 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Dianty.EventArguments;
 using Dianty.Services;
-using Dianty.Utils;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using static Dianty.Services.ILocalizationService;
 
 namespace Dianty.ViewModels;
 
-public partial class SettingsPageViewModel : ObservableObject, IDisposable
+public sealed partial class SettingsPageViewModel : ObservableObject, IDisposable
 {
-    public SettingsPageViewModel(IQueueService queueService, IWindowService windowService, ILocalizationService localizationService)
-    {
-        _queueService = queueService;
-        _windowService = windowService;
-        _localizationService = localizationService;
-
-        Version = VersionHelper.Version ?? string.Empty;
-        AppThemeSelectionItems = AppThemeSelectionItem.GetSelectionItems(_localizationService);
-        _queueService.TryEnqueue(() =>
-            SelectedAppTheme = AppThemeSelectionItems.FirstOrDefault(t => t.Theme == _windowService.ColorTheme));
-        _ = InitializeLanguageSelectionItems();
-
-        _localizationService.CurrentLanguageFileNameChanged += OnCurrentLanguageFileNameChanged;
-    }
-
     private readonly IQueueService _queueService;
-    private readonly IWindowService _windowService;
+    private readonly IWindowThemeService _windowThemeService;
+    private readonly IWindowContentService _windowContentService;
     private readonly ILocalizationService _localizationService;
     private bool _isDisposed;
+
+    public SettingsPageViewModel(
+        IQueueService queueService,
+        IWindowThemeService windowThemeService,
+        IWindowContentService windowContentService,
+        ILocalizationService localizationService,
+        string appVersion)
+    {
+        _queueService = queueService;
+        _windowThemeService = windowThemeService;
+        _windowContentService = windowContentService;
+        _localizationService = localizationService;
+        Version = appVersion;
+
+        AppThemeSelectionItems = AppThemeSelectionItem.GetSelectionItems(_localizationService);
+        _queueService.TryEnqueue(() =>
+            SelectedAppTheme = AppThemeSelectionItems.FirstOrDefault(t => t.Theme == _windowThemeService.ColorTheme));
+        _ = InitializeLanguageSelectionItems();
+
+        _localizationService.CurrentLanguageChanged += OnCurrentLanguageChanged;
+    }
 
     public string Version { get; }
 
@@ -52,16 +58,17 @@ public partial class SettingsPageViewModel : ObservableObject, IDisposable
         GC.SuppressFinalize(this);
     }
 
-    protected virtual void Dispose(bool disposing)
+    private void Dispose(bool disposing)
     {
         if (_isDisposed)
             return;
-        _isDisposed = true;
 
         if (disposing)
         {
-            _localizationService.CurrentLanguageFileNameChanged -= OnCurrentLanguageFileNameChanged;
+            _localizationService.CurrentLanguageChanged -= OnCurrentLanguageChanged;
         }
+
+        _isDisposed = true;
     }
 
     private async Task InitializeLanguageSelectionItems()
@@ -76,7 +83,7 @@ public partial class SettingsPageViewModel : ObservableObject, IDisposable
         });
     }
 
-    private void OnCurrentLanguageFileNameChanged(object? sender, CurrentLanguageFileNameChangedEventArgs e)
+    private void OnCurrentLanguageChanged(object? sender, CurrentLanguageChangedEventArgs e)
     {
         var appThemeSelectionItems = AppThemeSelectionItem.GetSelectionItems(_localizationService);
         var selectedAppTheme = SelectedAppTheme;
@@ -96,7 +103,7 @@ public partial class SettingsPageViewModel : ObservableObject, IDisposable
     {
         if (value is null)
             return;
-        _queueService.TryEnqueue(() => _windowService.ColorTheme = value.Theme);
+        _queueService.TryEnqueue(() => _windowThemeService.ColorTheme = value.Theme);
     }
 
     partial void OnSelectedLanguageChanged(LanguageSelectionItem? value)
@@ -119,7 +126,7 @@ public partial class SettingsPageViewModel : ObservableObject, IDisposable
             }
             if (isExceptionOccurred)
             {
-                var dialog = _windowService.CreateContentDialog();
+                var dialog = _windowContentService.CreateContentDialog();
                 if (dialog == null)
                     return;
                 var dialogText = _localizationService.AppText.MainWindowText.MainViewText.SettingsPageText.LanguageSwitchFailedDialogText;
@@ -135,7 +142,7 @@ public partial class SettingsPageViewModel : ObservableObject, IDisposable
     }
 }
 
-public record class AppThemeSelectionItem(ElementTheme Theme, string Description)
+public sealed record class AppThemeSelectionItem(ElementTheme Theme, string Description)
 {
     private static AppThemeSelectionItem[]? s_SelectionItems;
 
@@ -157,4 +164,4 @@ public record class AppThemeSelectionItem(ElementTheme Theme, string Description
     }
 }
 
-public record class LanguageSelectionItem(string FileName, string Description);
+public sealed record class LanguageSelectionItem(string FileName, string Description);

@@ -12,12 +12,12 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-        <DataTemplate x:Key="NormalCoyoteItemTemplate" x:DataType="vm:CoyoteItem">
+        <DataTemplate x:Key="NormalCoyoteItemTemplate" x:DataType="vm:CoyoteItemBase">
             <toolkit:SettingsCard
                 Header="{x:Bind Name}" Description="{x:Bind ConnectionMessage, Mode=OneWay}"
                 IsClickEnabled="True" Click="OnDeviceItemCardClick" Margin="0,0,0,4">
                 <toolkit:SettingsCard.HeaderIcon>
-                    <FontIcon Glyph="{x:Bind IsBleConnection, Converter={StaticResource CoyoteTypeIconConverter}}"/>
+                    <FontIcon Glyph="{x:Bind ConnectionKind, Converter={StaticResource ConnectionKindConverter}}"/>
                 </toolkit:SettingsCard.HeaderIcon>
                 <ToggleSwitch
                     IsOn="{x:Bind IsEnabled, Mode=TwoWay}"
@@ -25,10 +25,10 @@
                     OnContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OnText, Mode=OneWay}"/>
             </toolkit:SettingsCard>
         </DataTemplate>
-        <DataTemplate x:Key="SortCoyoteItemTemplate" x:DataType="vm:CoyoteItem">
+        <DataTemplate x:Key="SortCoyoteItemTemplate" x:DataType="vm:CoyoteItemBase">
             <toolkit:SettingsCard Header="{x:Bind Name}" Description="{x:Bind ConnectionMessage, Mode=OneWay}" Margin="0,0,0,4">
                 <toolkit:SettingsCard.HeaderIcon>
-                    <FontIcon Glyph="{x:Bind IsBleConnection, Converter={StaticResource CoyoteTypeIconConverter}}"/>
+                    <FontIcon Glyph="{x:Bind ConnectionKind, Converter={StaticResource ConnectionKindConverter}}"/>
                 </toolkit:SettingsCard.HeaderIcon>
                 <ToggleSwitch
                     IsOn="{x:Bind IsEnabled, Mode=TwoWay}"
@@ -88,7 +88,7 @@
                             Visibility="{x:Bind ViewModel.IsConnecting, Mode=OneWay, Converter={StaticResource VisibleIfTrueConverter}}"/>
                         <controls:QrCodeButton
                             IsDisplayed="{x:Bind ViewModel.IsQrCodeDisplayed, Mode=OneWay}"
-                            QrCodeGeometry="{x:Bind ViewModel.QrCodeSvgPath, Mode=OneWay, Converter={StaticResource QrCodeSvgPathConverter}}"
+                            QrCodeGeometry="{x:Bind ViewModel.QrCodeSvgPath, Mode=OneWay, Converter={StaticResource SvgPathConverter}}"
                             Visibility="{x:Bind ViewModel.CanShowQrCode, Mode=OneWay, Converter={StaticResource VisibleIfTrueConverter}}"/>
                         <ProgressRing
                             IsActive="{x:Bind ViewModel.IsConnecting, Mode=OneWay}"

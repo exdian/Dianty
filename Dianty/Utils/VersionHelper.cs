@@ -2,17 +2,15 @@
 
 namespace Dianty.Utils;
 
-public class VersionHelper
+public static class VersionHelper
 {
-    public static string? Version { get; private set; }
-
-    public static void Init()
+    public static string GetVersion()
     {
         var process = Process.GetCurrentProcess();
         var fileVersionInfo = process.MainModule?.FileVersionInfo;
         if (fileVersionInfo is not null)
-        {
-            Version = $"{fileVersionInfo.FileMajorPart}.{fileVersionInfo.FileMinorPart}.{fileVersionInfo.FileBuildPart}.{fileVersionInfo.FilePrivatePart}";
-        }
+            return $"{fileVersionInfo.FileMajorPart}.{fileVersionInfo.FileMinorPart}.{fileVersionInfo.FileBuildPart}.{fileVersionInfo.FilePrivatePart}";
+        else
+            return "0.0.0.0";
     }
 }

@@ -1,7 +1,8 @@
 using CommunityToolkit.Mvvm.Messaging;
+using Dianty.EventArguments;
 using Dianty.Services;
+using Dianty.Services.Messages;
 using Dianty.Utils;
-using Dianty.Utils.Messages;
 using Dianty.Views.Pages;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Input;
@@ -18,19 +19,39 @@ using System.Diagnostics;
 using System.Linq;
 using Windows.Foundation;
 using Windows.Graphics;
-using static Dianty.Services.ILocalizationService;
 
 namespace Dianty.Views;
 
 public sealed partial class MainView : UserControl
 {
-    public MainView(ITitleBarService titleBarService, IWindowService windowService, IQueueService queueService, ILocalizationService localizationService)
+    private readonly ITitleBarService _titleBarService;
+    private readonly IWindowInputService _windowInputService;
+    private readonly IQueueService _queueService;
+    private readonly ILocalizationService _localizationService;
+    private readonly Func<Type, object> _viewModelLocator;
+    private readonly Func<string, Type?> _topPageTypeMatcher;
+    private readonly List<FrameworkElement> _interactableElements = [];
+    private readonly KeySequenceTrigger _keySequenceTrigger = new();
+    private RectInt32[] _previousPassthroughRects = [];
+    private Button? _backButton;
+    private Button? _closePaneButton;
+    private Button? _togglePaneButton;
+
+    public MainView(
+        ITitleBarService titleBarService,
+        IWindowInputService windowInputService,
+        IQueueService queueService,
+        ILocalizationService localizationService,
+        Func<Type, object> viewModelLocator,
+        Func<string, Type?> topPageTypeMatcher)
     {
         InitializeComponent();
         _titleBarService = titleBarService;
-        _windowService = windowService;
+        _windowInputService = windowInputService;
         _queueService = queueService;
         _localizationService = localizationService;
+        _viewModelLocator = viewModelLocator;
+        _topPageTypeMatcher = topPageTypeMatcher;
 
         // 导航按钮不居中，需要手动刷新一下
         _navView.IsPaneOpen = false;
@@ -45,21 +66,10 @@ public sealed partial class MainView : UserControl
         Unloaded += MainView_Unloaded;
     }
 
-    private readonly ITitleBarService _titleBarService;
-    private readonly IWindowService _windowService;
-    private readonly IQueueService _queueService;
-    private readonly ILocalizationService _localizationService;
-    private readonly List<FrameworkElement> _interactableElements = [];
-    private readonly KeySequenceTrigger _keySequenceTrigger = new();
-    private RectInt32[] _previousPassthroughRects = [];
-    private Button? _backButton;
-    private Button? _closePaneButton;
-    private Button? _togglePaneButton;
-
 #pragma warning disable CA1822 // 将成员标记为 static
     private Type HomePage => typeof(HomePage);
     private Type DevicesPage => typeof(DevicesPage);
-    private Type WavesPage => typeof(WavesPage);
+    private Type WaveformsPage => typeof(WaveformsPage);
     private Type GamesPage => typeof(GamesPage);
     private Type SafetyPage => typeof(SafetyPage);
     private Type DebugPage => typeof(DebugPage);
@@ -68,21 +78,21 @@ public sealed partial class MainView : UserControl
 
     private void MainView_Loaded(object sender, RoutedEventArgs e)
     {
-        WeakReferenceMessenger.Default.Register<KeyDownMessage>(this, ProcessKey);
         WeakReferenceMessenger.Default.Register<NavigationRequest>(this, ProcessNavigationRequest);
-        _localizationService.CurrentLanguageFileNameChanged += OnLocalizationServiceCurrentLanguageFileNameChanged;
+        _windowInputService.LetterKeyDownWithoutTextInput += OnLetterKeyDownWithoutTextInput;
+        _localizationService.CurrentLanguageChanged += OnCurrentLanguageChanged;
     }
 
     private void MainView_Unloaded(object sender, RoutedEventArgs e)
     {
-        WeakReferenceMessenger.Default.Unregister<KeyDownMessage>(this);
         WeakReferenceMessenger.Default.Unregister<NavigationRequest>(this);
-        _localizationService.CurrentLanguageFileNameChanged -= OnLocalizationServiceCurrentLanguageFileNameChanged;
+        _windowInputService.LetterKeyDownWithoutTextInput -= OnLetterKeyDownWithoutTextInput;
+        _localizationService.CurrentLanguageChanged -= OnCurrentLanguageChanged;
     }
 
-    private void ProcessKey(object recipient, KeyDownMessage message)
+    private void OnLetterKeyDownWithoutTextInput(object? sender, LetterKeyDownWithoutTextInputEventArgs e)
     {
-        _keySequenceTrigger.ProcessKey(message.Key);
+        _keySequenceTrigger.ProcessKey(e.Key);
     }
 
     private void ToggleDebugMenuItem()
@@ -113,7 +123,7 @@ public sealed partial class MainView : UserControl
             }
             else if (message.PageType is not null)
             {
-                var viewModel = message.NeedParameter ? ServiceLocator.GetViewModel(message.PageType) : message.Parameter;
+                var viewModel = message.NeedParameter ? _viewModelLocator.Invoke(message.PageType) : message.Parameter;
                 Debug.Assert(viewModel is not UIElement);
                 _contentFrame.Navigate(message.PageType, viewModel, message.NavigationOptions.TransitionInfoOverride);
                 if (!isNavigationStackEnabled && _contentFrame.BackStack.Count > 0)
@@ -124,7 +134,7 @@ public sealed partial class MainView : UserControl
 
     private void NavView_Loaded(object sender, RoutedEventArgs e)
     {
-        _contentFrame.Navigate(HomePage, ServiceLocator.GetViewModel(HomePage));
+        _contentFrame.Navigate(HomePage, _viewModelLocator.Invoke(HomePage));
 
         var splitView = VisualTreeHelperExtension.FindChildByName(_navView, "RootSplitView") as SplitView;
         if (splitView != null)
@@ -151,10 +161,10 @@ public sealed partial class MainView : UserControl
             UpdateIconRegion();
 
             // 图标区域在窗口发生交互时很可能会被重置，因此需要重新设置
-            var nonClientPointerSource = _windowService.GetInputNonClientPointerSource();
+            var nonClientPointerSource = _windowInputService.GetInputNonClientPointerSource();
             nonClientPointerSource?.ExitedMoveSize += MainView_ExitedMoveSize;
 
-            var activationListener = _windowService.GetInputActivationListener();
+            var activationListener = _windowInputService.GetInputActivationListener();
             activationListener?.InputActivationChanged += ActivationListener_InputActivationChanged;
 
             // 获取所有可能位于标题栏区域的元素
@@ -177,10 +187,10 @@ public sealed partial class MainView : UserControl
 
     private void NavView_Unloaded(object sender, RoutedEventArgs e)
     {
-        var nonClientPointerSource = _windowService.GetInputNonClientPointerSource();
+        var nonClientPointerSource = _windowInputService.GetInputNonClientPointerSource();
         nonClientPointerSource?.ExitedMoveSize -= MainView_ExitedMoveSize;
 
-        var activationListener = _windowService.GetInputActivationListener();
+        var activationListener = _windowInputService.GetInputActivationListener();
         activationListener?.InputActivationChanged -= ActivationListener_InputActivationChanged;
     }
 
@@ -219,7 +229,7 @@ public sealed partial class MainView : UserControl
             return;
 
         _previousPassthroughRects = passthroughRects;
-        var nonClientPointerSource = _windowService.GetInputNonClientPointerSource();
+        var nonClientPointerSource = _windowInputService.GetInputNonClientPointerSource();
         if (passthroughRects.Length > 0)
         {
             nonClientPointerSource?.SetRegionRects(NonClientRegionKind.Passthrough, passthroughRects);
@@ -232,7 +242,7 @@ public sealed partial class MainView : UserControl
 
     private void UpdateIconRegion()
     {
-        var nonClientPointerSource = _windowService.GetInputNonClientPointerSource();
+        var nonClientPointerSource = _windowInputService.GetInputNonClientPointerSource();
         if (nonClientPointerSource == null)
             return;
 
@@ -280,7 +290,7 @@ public sealed partial class MainView : UserControl
         Type targetPageType = _contentFrame.CurrentSourcePageType;
         if (pageType is not null && !pageType.Equals(targetPageType))
         {
-            var viewModel = ServiceLocator.GetViewModel(pageType);
+            var viewModel = _viewModelLocator.Invoke(pageType);
             _contentFrame.Navigate(pageType, viewModel, transitionInfo);
         }
     }
@@ -311,7 +321,7 @@ public sealed partial class MainView : UserControl
 
     private void OnFrameNavigated(object sender, NavigationEventArgs e)
     {
-        var topPageType = PageHelper.GetTopPageType(_contentFrame.SourcePageType.Name);
+        var topPageType = _topPageTypeMatcher.Invoke(_contentFrame.SourcePageType.Name);
         if (topPageType is null)
         {
             _navView.SelectedItem = null;
@@ -362,7 +372,7 @@ public sealed partial class MainView : UserControl
         }
     }
 
-    private void OnLocalizationServiceCurrentLanguageFileNameChanged(object? sender, CurrentLanguageFileNameChangedEventArgs e)
+    private void OnCurrentLanguageChanged(object? sender, CurrentLanguageChangedEventArgs e)
     {
         _queueService.TryEnqueue(() =>
         {

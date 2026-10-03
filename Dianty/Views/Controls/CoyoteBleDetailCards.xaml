@@ -21,7 +21,7 @@
         </toolkit:SettingsCard>
         <toolkit:SettingsCard
             Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionStatusCardHeader, Mode=OneWay}"
-            HeaderIcon="Link" Description="{x:Bind ViewModel.ConnectionTypeDescription, Mode=OneWay}">
+            HeaderIcon="Link" Description="{x:Bind ViewModel.ConnectionKindDescription, Mode=OneWay}">
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource CommonControlSpacing}">
                 <ProgressRing IsActive="{x:Bind ViewModel.IsConnecting, Mode=OneWay}"/>
                 <ContentControl Content="{x:Bind ViewModel.ConnectionMessage, Mode=OneWay}" VerticalAlignment="Center">
@@ -30,7 +30,7 @@
                     </ContentControl.ContentTransitions>
                 </ContentControl>
                 <ToggleSwitch
-                    IsOn="{x:Bind ViewModel.IsConnectingOrConnected, Mode=TwoWay}"
+                    IsOn="{x:Bind ViewModel.ConnectionSwitchValue, Mode=TwoWay}"
                     OnContent="{x:Null}" OffContent="{x:Null}" Margin="-8,0,0,0"/>
             </StackPanel>
         </toolkit:SettingsCard>
@@ -54,12 +54,12 @@
             <toolkit:SettingsExpander.Items>
                 <toolkit:SettingsCard Header="A" Loaded="OnSettingsCardLoaded">
                     <Slider
-                        Value="{x:Bind ViewModel.MaxStrengthA, Mode=TwoWay}"
+                        Value="{x:Bind ViewModel.StrengthLimitA, Mode=TwoWay}"
                         Minimum="0" Maximum="200" StepFrequency="1" SmallChange="1" LargeChange="10"/>
                 </toolkit:SettingsCard>
                 <toolkit:SettingsCard Header="B" Loaded="OnSettingsCardLoaded">
                     <Slider
-                        Value="{x:Bind ViewModel.MaxStrengthB, Mode=TwoWay}"
+                        Value="{x:Bind ViewModel.StrengthLimitB, Mode=TwoWay}"
                         Minimum="0" Maximum="200" StepFrequency="1" SmallChange="1" LargeChange="10"/>
                 </toolkit:SettingsCard>
             </toolkit:SettingsExpander.Items>
@@ -85,11 +85,11 @@
                     <StackPanel Spacing="{StaticResource CommonControlSpacing}">
                         <Slider
                             Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.ChannelAFrequencyBalanceSliderHeader, Mode=OneWay}"
-                            Value="{x:Bind ViewModel.BfFrequencyParamA, Mode=TwoWay}"
+                            Value="{x:Bind ViewModel.FrequencyBalanceA, Mode=TwoWay}"
                             Minimum="0" Maximum="255" StepFrequency="1" SmallChange="1" LargeChange="10"/>
                         <Slider
-                            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.ChannelAStrengthBalanceSliderHeader, Mode=OneWay}"
-                            Value="{x:Bind ViewModel.BfStrengthParamA, Mode=TwoWay}"
+                            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.ChannelAIntensityBalanceSliderHeader, Mode=OneWay}"
+                            Value="{x:Bind ViewModel.IntensityBalanceA, Mode=TwoWay}"
                             Minimum="0" Maximum="255" StepFrequency="1" SmallChange="1" LargeChange="10"/>
                     </StackPanel>
                 </toolkit:SettingsCard>
@@ -97,11 +97,11 @@
                     <StackPanel Spacing="{StaticResource CommonControlSpacing}">
                         <Slider
                             Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.ChannelBFrequencyBalanceSliderHeader, Mode=OneWay}"
-                            Value="{x:Bind ViewModel.BfFrequencyParamB, Mode=TwoWay}"
+                            Value="{x:Bind ViewModel.FrequencyBalanceB, Mode=TwoWay}"
                             Minimum="0" Maximum="255" StepFrequency="1" SmallChange="1" LargeChange="10"/>
                         <Slider
-                            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.ChannelBStrengthBalanceSliderHeader, Mode=OneWay}"
-                            Value="{x:Bind ViewModel.BfStrengthParamB, Mode=TwoWay}"
+                            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.ChannelBIntensityBalanceSliderHeader, Mode=OneWay}"
+                            Value="{x:Bind ViewModel.IntensityBalanceB, Mode=TwoWay}"
                             Minimum="0" Maximum="255" StepFrequency="1" SmallChange="1" LargeChange="10"/>
                     </StackPanel>
                 </toolkit:SettingsCard>
@@ -137,6 +137,8 @@
                 </toolkit:SettingsCard>
             </toolkit:SettingsExpander.Items>
         </toolkit:SettingsExpander>
-        <local:CoyoteDeletionCard TargetName="{x:Bind ViewModel.Name}" DeleteCommand="{x:Bind ViewModel.DeleteThisCommand}"/>
+        <local:CoyoteDeletionCard
+            LocalizedText="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.DeviceDeletionCardText.ConfirmationDialogText, Mode=OneWay}"
+            TargetName="{x:Bind ViewModel.Name}" DeleteCommand="{x:Bind DeleteCommand}" CommandParameter="{x:Bind ViewModel}"/>
     </StackPanel>
 </UserControl>

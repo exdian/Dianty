@@ -1,0 +1,9 @@
+﻿namespace DungeonToolkit.Coyote;
+
+public interface ICoyoteBleDetector  
+{
+    Task<ulong?> ScanAsync(Guid uuid, string name, CancellationToken cancellationToken);
+    Task<bool> ScanAsync(ulong address, CancellationToken cancellationToken);
+    Task<ICoyoteBleService?> ConnectAsync(ulong address, GattServiceInfo gattServiceInfo, CancellationToken cancellationToken);
+}
+

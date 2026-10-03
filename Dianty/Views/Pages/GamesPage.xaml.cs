@@ -5,6 +5,7 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using System;
 
 namespace Dianty.Views.Pages;
 
@@ -35,7 +36,11 @@ public sealed partial class GamesPage : Page
         _rootGrid.Children.Add(content);
     }
 
-    public record class RequiredParameter(
-        GamesPageViewModel GamesPageViewModel, GtaVcRuleCardViewModel GtaVcRuleCardViewModel,
-        IQueueService QueueService, ILocalizationService LocalizationService);
+    public sealed record class RequiredParameter(
+        GamesPageViewModel GamesPageViewModel,
+        GtaVcGameIntegrationViewModel GtaVcGameIntegrationViewModel,
+        Func<string, Func<ILocalizationService, string>> PageHeaderSelectorFactory,
+        Func<string, FrameworkElement?> PageContentFactory,
+        IQueueService QueueService,
+        ILocalizationService LocalizationService);
 }

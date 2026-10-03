@@ -1,0 +1,18 @@
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace DungeonToolkit;
+
+public abstract class RegistryBase<TKey, TValue> : IRegistry<TKey, TValue>, IDataSource<TValue> where TKey : notnull
+{
+    public event EventHandler? Changed;
+    public event EventHandler<RegistryChangedEventArgs>? RegistryChanged;
+    public bool ContainsKey(TKey key);
+    public bool TryGetValue(TKey key, [MaybeNullWhen(false)] out TValue value);
+    public bool TryAdd(TKey key, TValue value);
+    public IReadOnlyList<bool> TryAdd(IReadOnlyList<TValue> values, Func<TValue, TKey> keySelector);
+    public bool Remove(TKey key);
+    public IReadOnlyList<bool> Remove(IReadOnlyList<TKey> keys);
+    public void Clear();
+    public IReadOnlyList<TValue> GetSnapshot();
+}
+

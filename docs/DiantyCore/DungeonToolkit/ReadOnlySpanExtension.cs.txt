@@ -1,0 +1,13 @@
+﻿namespace DungeonToolkit;
+
+public static class ReadOnlySpanExtension  
+{
+    extension(ReadOnlySpan<char> source)  
+    {
+        public bool FindChar(char target, ref int newIndex);
+        public int GetInt(ref int newIndex);
+        public bool GetFlag(ref int newIndex);
+        public float GetFloat(ref int newIndex);
+    }
+}
+

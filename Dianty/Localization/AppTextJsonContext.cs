@@ -5,24 +5,24 @@ using System.Text.Json.Serialization;
 namespace Dianty.Localization;
 
 [JsonSerializable(typeof(AppText))]
-internal partial class AppTextJsonContext : JsonSerializerContext
+internal sealed partial class AppTextJsonContext : JsonSerializerContext
 {
-    private static AppTextJsonContext? _unsafe;
+    private static AppTextJsonContext? s_Unsafe;
 
     public static AppTextJsonContext Unsafe
     {
         get
         {
-            if (_unsafe is null)
+            if (s_Unsafe is null)
             {
                 var options = new JsonSerializerOptions
                 {
                     WriteIndented = true,
                     Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
                 };
-                _unsafe = new AppTextJsonContext(options);
+                s_Unsafe = new AppTextJsonContext(options);
             }
-            return _unsafe;
+            return s_Unsafe;
         }
     }
 }

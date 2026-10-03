@@ -4,7 +4,7 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace Dianty.Views.Controls;
 
-internal partial class TemplateContentControl : ContentControl
+internal sealed partial class TemplateContentControl : ContentControl
 {
     public ITemplateContent TemplateContent
     {

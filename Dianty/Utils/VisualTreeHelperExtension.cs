@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml.Media;
 
 namespace Dianty.Utils;
 
-internal class VisualTreeHelperExtension
+internal static class VisualTreeHelperExtension
 {
     public static DependencyObject? FindChildByName(DependencyObject parent, string name)
     {

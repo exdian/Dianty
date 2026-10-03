@@ -1,31 +1,60 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DungeonToolkit;
+using DungeonToolkit.Coyote;
+using System;
+using System.Threading;
 
 namespace Dianty.ViewModels;
 
-public partial class SafetyPageViewModel(CoyoteCollection coyoteCollection) : ObservableObject
+public sealed partial class SafetyPageViewModel : ObservableObject
 {
-    private readonly CoyoteCollection _coyoteCollection = coyoteCollection;
+    private readonly IDataSource<CoyoteItemBase> _coyoteDataSource;
+    private readonly IDataSource<IWaveformOutputDevice> _waveformOutputDeviceDataSource;
+    private readonly IDataSource<IConnectableDevice> _connectableDeviceDataSource;
+
+    public SafetyPageViewModel(
+        IDataSource<CoyoteItemBase> coyoteDataSource,
+        IDataSource<IWaveformOutputDevice> WaveformOutputDeviceDataSource,
+        IDataSource<IConnectableDevice> connectableDeviceDataSource)
+    {
+        _coyoteDataSource = coyoteDataSource;
+        _waveformOutputDeviceDataSource = WaveformOutputDeviceDataSource;
+        _connectableDeviceDataSource = connectableDeviceDataSource;
+    }
 
     [RelayCommand]
     private void Disable()
     {
-        foreach (var item in _coyoteCollection)
+        var devices = _coyoteDataSource.GetSnapshot();
+        var outputDevices = _waveformOutputDeviceDataSource.GetSnapshot();
+
+        var count = Math.Min(devices.Count, outputDevices.Count);
+        for (int i = 0; i < count; i++)
         {
-            item.IsEnabled = false;
+            devices[i].IsEnabled = false;
+            outputDevices[i].CancelOutputAsync();
+        }
+
+        for (int i = count; i < devices.Count; i++)
+        {
+            devices[i].IsEnabled = false;
+        }
+
+        for (int i = count; i < outputDevices.Count; i++)
+        {
+            outputDevices[i].CancelOutputAsync();
         }
     }
 
     [RelayCommand]
     private void Disconnect()
     {
-        foreach (var item in _coyoteCollection)
-        {
-            if (item is CoyoteBleItem coyoteBleItem)
-                coyoteBleItem.IsConnectingOrConnected = false;
-            else if (item is CoyoteWsItem coyoteWsItem)
-                coyoteWsItem.IsConnectingOrConnected = false;
+        var connectableDevices = _connectableDeviceDataSource.GetSnapshot();
 
+        foreach (var item in connectableDevices)
+        {
+            item.DisconnectAsync(CancellationToken.None);
         }
     }
 }

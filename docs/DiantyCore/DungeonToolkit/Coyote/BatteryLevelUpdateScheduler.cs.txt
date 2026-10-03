@@ -1,0 +1,8 @@
+﻿namespace DungeonToolkit.Coyote;
+
+public sealed class BatteryLevelUpdateScheduler : IDisposable 
+{
+    public BatteryLevelUpdateScheduler(IDataSource<IBatteryInfo> devices, TimeSpan period);
+    public void Dispose();
+}
+

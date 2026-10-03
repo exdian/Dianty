@@ -1,0 +1,37 @@
+﻿using System.Diagnostics;
+
+namespace DungeonToolkit.Coyote;
+
+public sealed class CoyoteBLE : IDisposable,
+    IRegisterableDevice,
+    IStrengthInfo,
+    IOutputParameterConfig,
+    IBatteryInfo 
+{
+    public CoyoteBLE(DeviceId id, ICoyoteBleDetector bleDetector);
+    public DeviceId Id { get; }
+    public ConnectionKind ConnectionKind { get; }
+    public ConnectionStatus ConnectionStatus { get; }
+    public bool IsEnabled { get; set; }
+    public byte CurrentStrengthA { get; }
+    public byte CurrentStrengthB { get; }
+    public byte StrengthLimitA { get; }
+    public byte StrengthLimitB { get; }
+    public byte BatteryLevel { get; }
+    public bool IsGentle { get; set; }
+    public OutputParameter CurrentParameter { get; }
+    public event EventHandler<ConnectionStatusChangedEventArgs>? ConnectionStatusChanged;
+    public event EventHandler<StrengthChangedEventArgs>? StrengthChanged;
+    public event EventHandler<BatteryLevelChangedEventArgs>? BatteryLevelChanged;
+    public async Task<bool> ConnectAsync(CancellationToken cancellationToken);
+    public Task DisconnectAsync(CancellationToken cancellationToken);
+    public void Disconnect();
+    public async Task SetOutputParameterAsync(OutputParameter parameter);
+    public async Task OutputAsync(
+        IReadOnlyList<PulseData> waveformA, IReadOnlyList<PulseData> waveformB, int strengthA, int strengthB);
+    public async Task CancelOutputAsync();
+    public async Task UpdateBatteryLevelAsync();
+    public async Task<bool> SetEyeColorAsync(LightColor color);
+    public void Dispose();
+}
+

@@ -1,67 +1,60 @@
-﻿using Dianty.Services;
-using DungeonToolkit.Coyote;
+﻿using DungeonToolkit;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Threading;
 
 namespace Dianty.ViewModels;
 
-public partial class CoyoteCollection : ObservableCollection<CoyoteItem>, ICoyoteListService
+public sealed partial class CoyoteCollection : ObservableCollection<CoyoteItemBase>, IDataSource<CoyoteItemBase>, IDisposable
 {
-    public CoyoteCollection(CoyoteManager coyoteManager) : base()
+    private IReadOnlyList<CoyoteItemBase> _coyoteItemSnapshot = [];
+    private EventHandler? _coyoteItemDataSourceChanged;
+    private bool _isDisposed;
+
+    event EventHandler? IDataSource<CoyoteItemBase>.Changed
     {
-        _coyoteManager = coyoteManager;
+        add => _coyoteItemDataSourceChanged += value;
+        remove => _coyoteItemDataSourceChanged -= value;
     }
 
-    public CoyoteCollection(CoyoteManager coyoteManager, IEnumerable<CoyoteItem> collection) : base(collection)
+    IReadOnlyList<CoyoteItemBase> IDataSource<CoyoteItemBase>.GetSnapshot()
     {
-        _coyoteManager = coyoteManager;
+        return Volatile.Read(ref _coyoteItemSnapshot);
     }
 
-    public CoyoteCollection(CoyoteManager coyoteManager, List<CoyoteItem> list) : base(list)
+    protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
     {
-        _coyoteManager = coyoteManager;
+        base.OnCollectionChanged(e);
+        OnCoyoteItemDataSourceChanged();
     }
 
-    private readonly CoyoteManager _coyoteManager;
-
-    protected override void ClearItems()
+    public void Dispose()
     {
-        _coyoteManager.ClearCoyotes();
-        base.ClearItems();
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 
-    protected override void InsertItem(int index, CoyoteItem item)
+    private void Dispose(bool disposing)
     {
-        AddCoyote(item);
-        base.InsertItem(index, item);
+        if (_isDisposed)
+            return;
+
+        if (disposing)
+        {
+            for (int i = 0; i < Count; i++)
+            {
+                this[i].Dispose();
+            }
+        }
+
+        _isDisposed = true;
     }
 
-    protected override void RemoveItem(int index)
+    private void OnCoyoteItemDataSourceChanged()
     {
-        RemoveCoyote(this[index]);
-        base.RemoveItem(index);
-    }
-
-    protected override void SetItem(int index, CoyoteItem item)
-    {
-        RemoveCoyote(this[index]);
-        AddCoyote(item);
-        base.SetItem(index, item);
-    }
-
-    private void AddCoyote(CoyoteItem coyoteItem)
-    {
-        if (coyoteItem is CoyoteBleItem coyoteBleItem)
-            _coyoteManager.AddCoyote(coyoteBleItem.Coyote);
-        else if (coyoteItem is CoyoteWsItem coyoteWsItem)
-            _coyoteManager.AddCoyote(coyoteWsItem.Coyote);
-    }
-
-    private void RemoveCoyote(CoyoteItem coyoteItem)
-    {
-        if (coyoteItem is CoyoteBleItem coyoteBleItem)
-            _coyoteManager.RemoveCoyote(coyoteBleItem.Coyote);
-        else if (coyoteItem is CoyoteWsItem coyoteWsItem)
-            _coyoteManager.RemoveCoyote(coyoteWsItem.Coyote);
+        Volatile.Write(ref _coyoteItemSnapshot, [.. this]);
+        _coyoteItemDataSourceChanged?.Invoke(this, EventArgs.Empty);
     }
 }

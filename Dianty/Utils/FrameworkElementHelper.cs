@@ -5,7 +5,7 @@ using Windows.Graphics;
 
 namespace Dianty.Utils;
 
-internal class FrameworkElementHelper
+internal static class FrameworkElementHelper
 {
     public static RectInt32 GetBounds(FrameworkElement element)
     {

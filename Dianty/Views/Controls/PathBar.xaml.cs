@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.Messaging;
+using Dianty.EventArguments;
 using Dianty.Services;
-using Dianty.Utils.Messages;
+using Dianty.Services.Messages;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -10,7 +11,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using static Dianty.Services.ILocalizationService;
 
 namespace Dianty.Views.Controls;
 
@@ -35,8 +35,8 @@ public sealed partial class PathBar : UserControl
         var newValue = (RequiredParameter)e.NewValue;
         var oldValue = (RequiredParameter)e.OldValue;
 
-        oldValue?.LocalizationService.CurrentLanguageFileNameChanged -= control.OnCurrentLanguageFileNameChanged;
-        newValue?.LocalizationService.CurrentLanguageFileNameChanged += control.OnCurrentLanguageFileNameChanged;
+        oldValue?.LocalizationService.CurrentLanguageChanged -= control.OnCurrentLanguageChanged;
+        newValue?.LocalizationService.CurrentLanguageChanged += control.OnCurrentLanguageChanged;
         control.UpdatePaths(newValue);
     }
 
@@ -70,17 +70,17 @@ public sealed partial class PathBar : UserControl
         var localizationService = Parameter?.LocalizationService;
         if (localizationService is not null)
         {
-            localizationService.CurrentLanguageFileNameChanged -= OnCurrentLanguageFileNameChanged;
-            localizationService.CurrentLanguageFileNameChanged += OnCurrentLanguageFileNameChanged;
+            localizationService.CurrentLanguageChanged -= OnCurrentLanguageChanged;
+            localizationService.CurrentLanguageChanged += OnCurrentLanguageChanged;
         }
     }
 
     private void OnPathBarUnloaded(object sender, RoutedEventArgs e)
     {
-        Parameter?.LocalizationService.CurrentLanguageFileNameChanged -= OnCurrentLanguageFileNameChanged;
+        Parameter?.LocalizationService.CurrentLanguageChanged -= OnCurrentLanguageChanged;
     }
 
-    private void OnCurrentLanguageFileNameChanged(object? sender, CurrentLanguageFileNameChangedEventArgs e)
+    private void OnCurrentLanguageChanged(object? sender, CurrentLanguageChangedEventArgs e)
     {
         UpdatePaths(Parameter);
     }
@@ -109,7 +109,7 @@ public sealed partial class PathBar : UserControl
             WeakReferenceMessenger.Default.Send(navigationRequest);
     }
 
-    public record class RequiredParameter(
+    public sealed record class RequiredParameter(
         IQueueService QueueService, ILocalizationService LocalizationService,
         IReadOnlyList<Func<ILocalizationService, string>> PathGetters)
     {

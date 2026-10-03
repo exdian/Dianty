@@ -1,0 +1,19 @@
+﻿namespace DungeonToolkit.Coyote;
+
+public sealed class Waveform : IWaveform 
+{
+    public WaveformId Id { get; }
+    public int Speed { get; }
+    public IReadOnlyList<WaveformSection> GetAvailableSection();
+    public static Waveform Parse(ReadOnlySpan<char> span, WaveformId id);
+}
+public sealed class WaveformSection  
+{
+    public bool IsEnabled { get; set; }
+    public byte PulseFrequency1 { get; set; }
+    public byte PulseFrequency2 { get; set; }
+    public byte Duration { get; set; }
+    public WaveformGradientFrequencyMode FrequencyMode { get; set; }
+    public List<byte> PulseUnitStrengths { get; }
+}
+

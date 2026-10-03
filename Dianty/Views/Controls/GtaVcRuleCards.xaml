@@ -16,7 +16,7 @@
                 <RepositionThemeTransition />
             </StackPanel.ChildrenTransitions>
             <toolkit:SettingsCard
-                Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.GameSwitchCardHeader, Mode=OneWay}">
+                Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.GameIntegrationSwitchCardHeader, Mode=OneWay}">
                 <toolkit:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE7E8;"/>
                 </toolkit:SettingsCard.HeaderIcon>
@@ -31,8 +31,8 @@
                 </StackPanel>
             </toolkit:SettingsCard>
             <toolkit:SettingsCard
-                Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.GameStrengthModeCardHeader, Mode=OneWay}"
-                Description="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.GameStrengthModeCardDescription, Mode=OneWay}">
+                Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.GameIntegrationStrengthModeCardHeader, Mode=OneWay}"
+                Description="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.GamesPageText.GameIntegrationStrengthModeCardDescription, Mode=OneWay}">
                 <toolkit:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE9E9;"/>
                 </toolkit:SettingsCard.HeaderIcon>
