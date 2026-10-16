@@ -170,7 +170,7 @@ public partial class App : Application
         var viewModelItemFactory = new ViewModelItemFactory(deviceRegistry, deviceRegistry, deviceRegistry, deviceManager, deviceManager, queueService, localizationService, waveformNameRegistry, waveformPlayerA, waveformPlayerB, waveformDecoderRegistryA, waveformDecoderRegistryB, waveformPlayerA, waveformPlayerB);
         var coyoteCollection = new CoyoteCollection();
 
-        var homePageViewModel = new HomePageViewModel(deviceRegistry, waveformPlayerA, waveformPlayerB, waveformNameRegistry, waveformPusher, gameIntegrationManager, queueService, localizationService);
+        var homePageViewModel = new HomePageViewModel(deviceRegistry, deviceManager, waveformPlayerA, waveformPlayerB, waveformNameRegistry, waveformPusher, gameIntegrationManager, queueService, localizationService);
         var devicesPageViewModel = new DevicesPageViewModel(coyoteCollection, deviceManager, deviceRegistry, deviceManager, deviceManager, viewModelItemFactory, queueService, localizationService);
         var waveformsPageViewModel = new WaveformsPageViewModel(coyoteFunctionFactory, waveformIdPool, waveformRegistry, viewModelItemFactory, waveformRegistry, waveformNameRegistry, waveformPlayerA, waveformPlayerB, waveformDecoderRegistryA, waveformDecoderRegistryB, waveformDecoderIdMemoryOrderStoreA, waveformDecoderIdMemoryOrderStoreB, windowService, queueService, localizationService);
         var gamesPageViewModel = new GamesPageViewModel(gameIntegrationManager, waveformPusher, waveformPusher, queueService, localizationService);

@@ -100,6 +100,10 @@ public interface IDeviceManager
     bool Register(DeviceId id);
     IReadOnlyList<bool> Register(IReadOnlyList<IDeviceInfo> devices, Func<IDeviceInfo, DeviceId> idSelector);
 }
+public interface IDeviceConnectionStatusMonitor  
+{
+    event EventHandler<DeviceConnectionStatusChangedEventArgs>? DeviceConnectionStatusChanged;
+}
 public interface IDeviceConnectionService  
 {
     Task<bool> ConnectAsync(DeviceId id, CancellationToken cancellationToken);
@@ -224,6 +228,11 @@ public sealed class StrengthChangedEventArgs(
 }
 public sealed class ConnectionStatusChangedEventArgs(ConnectionStatus status) : EventArgs 
 {
+    public ConnectionStatus ConnectionStatus { get; }
+}
+public sealed class DeviceConnectionStatusChangedEventArgs(DeviceId deviceId, ConnectionStatus status) : EventArgs 
+{
+    public DeviceId DeviceId { get; }
     public ConnectionStatus ConnectionStatus { get; }
 }
 public sealed class MessageReceivedEventArgs(byte[] message) : EventArgs 

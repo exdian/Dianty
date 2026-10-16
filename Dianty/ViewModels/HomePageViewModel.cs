@@ -10,6 +10,7 @@ namespace Dianty.ViewModels;
 public sealed partial class HomePageViewModel : ObservableObject, IDisposable
 {
     private readonly IDataSource<IDeviceInfo> _coyotes;
+    private readonly IDeviceConnectionStatusMonitor _deviceConnectionStatusMonitor;
     private readonly IWaveformPlayNotification _channelA;
     private readonly IWaveformPlayNotification _channelB;
     private readonly INameRegistryReader<WaveformId> _waveformNameTable;
@@ -21,6 +22,7 @@ public sealed partial class HomePageViewModel : ObservableObject, IDisposable
 
     public HomePageViewModel(
         IDataSource<IDeviceInfo> coyotes,
+        IDeviceConnectionStatusMonitor deviceConnectionStatusMonitor,
         IWaveformPlayNotification channelA,
         IWaveformPlayNotification channelB,
         INameRegistryReader<WaveformId> waveformNameTable,
@@ -30,6 +32,7 @@ public sealed partial class HomePageViewModel : ObservableObject, IDisposable
         ILocalizationService localizationService)
     {
         _coyotes = coyotes;
+        _deviceConnectionStatusMonitor = deviceConnectionStatusMonitor;
         _channelA = channelA;
         _channelB = channelB;
         _waveformNameTable = waveformNameTable;
@@ -46,8 +49,10 @@ public sealed partial class HomePageViewModel : ObservableObject, IDisposable
             ? _gameIntegrationStrength.OutputStrength : NoneLabel);
 
         _coyotes.Changed += OnCoyoteCollectionChanged;
+        _deviceConnectionStatusMonitor.DeviceConnectionStatusChanged += OnDeviceConnectionStatusChanged;
         _channelA.CurrentWaveformChanged += OnChannelACurrentWaveformChanged;
         _channelB.CurrentWaveformChanged += OnChannelBCurrentWaveformChanged;
+        _waveformNameTable.RegisteredNameChanged += OnWaveformNameTableChanged;
         _waveformPusherStatus.PushStatusChanged += OnWaveformPusherStatusChanged;
         _gameIntegrationStrength.OutputStrengthChanged += OnGameIntegrationManagerOutputStrengthChanged;
         _localizationService.CurrentLanguageChanged += OnCurrentLanguageChanged;
@@ -115,8 +120,10 @@ public sealed partial class HomePageViewModel : ObservableObject, IDisposable
         if (disposing)
         {
             _coyotes.Changed -= OnCoyoteCollectionChanged;
+            _deviceConnectionStatusMonitor.DeviceConnectionStatusChanged -= OnDeviceConnectionStatusChanged;
             _channelA.CurrentWaveformChanged -= OnChannelACurrentWaveformChanged;
             _channelB.CurrentWaveformChanged -= OnChannelBCurrentWaveformChanged;
+            _waveformNameTable.RegisteredNameChanged -= OnWaveformNameTableChanged;
             _waveformPusherStatus.PushStatusChanged -= OnWaveformPusherStatusChanged;
             _gameIntegrationStrength.OutputStrengthChanged -= OnGameIntegrationManagerOutputStrengthChanged;
             _localizationService.CurrentLanguageChanged -= OnCurrentLanguageChanged;
@@ -154,6 +161,15 @@ public sealed partial class HomePageViewModel : ObservableObject, IDisposable
         });
     }
 
+    private void OnDeviceConnectionStatusChanged(object? sender, DeviceConnectionStatusChangedEventArgs e)
+    {
+        var status = e.ConnectionStatus;
+        if (status == ConnectionStatus.Disconnected)
+            _queueService.TryEnqueue(() => ConnectedCount--);
+        else if (status == ConnectionStatus.Connected)
+            _queueService.TryEnqueue(() => ConnectedCount++);
+    }
+
     private void OnChannelACurrentWaveformChanged(object? sender, EventArgs e)
     {
         _queueService.TryEnqueue(() => FormattedWaveformNameA = string.Format(AChannelFormat, GetWaveformName(_channelA.CurrentWaveformId) ?? NoneLabel));
@@ -162,6 +178,18 @@ public sealed partial class HomePageViewModel : ObservableObject, IDisposable
     private void OnChannelBCurrentWaveformChanged(object? sender, EventArgs e)
     {
         _queueService.TryEnqueue(() => FormattedWaveformNameB = string.Format(BChannelFormat, GetWaveformName(_channelB.CurrentWaveformId) ?? NoneLabel));
+    }
+
+    private void OnWaveformNameTableChanged(object? sender, RegisteredNameChangedEventArgs<WaveformId> e)
+    {
+        _queueService.TryEnqueue(() =>
+        {
+            var key = e.Key;
+            if (key == _channelA.CurrentWaveformId)
+                FormattedWaveformNameA = string.Format(AChannelFormat, GetWaveformName(_channelA.CurrentWaveformId) ?? NoneLabel);
+            if (key == _channelB.CurrentWaveformId)
+                FormattedWaveformNameB = string.Format(BChannelFormat, GetWaveformName(_channelB.CurrentWaveformId) ?? NoneLabel);
+        });
     }
 
     private void OnWaveformPusherStatusChanged(object? sender, PushStatusChangedEventArgs e)

@@ -24,6 +24,7 @@ public sealed partial class DevicesPageViewModel : ObservableObject, IDisposable
     private readonly IQueueService _queueService;
     private readonly ILocalizationService _localizationService;
     private IDeviceInfo? _connectingCoyote;
+    private ConnectionState _connectionState = ConnectionState.Unknown;
     private CancellationTokenSource? _cts;
     private TaskCompletionSource? _tcs;
     private int _connectionSwitchCount;
@@ -122,17 +123,15 @@ public sealed partial class DevicesPageViewModel : ObservableObject, IDisposable
 
             if (!_deviceManager.Register(coyote.Id))
                 throw new Exception();
-
-            ConnectionMessage = ConnectionSuccessfulStateText;
         }
         catch (OperationCanceledException)
         {
-            ConnectionMessage = ConnectionCanceledStateText;
+            _connectionState = ConnectionState.ConnectionCanceled;
             _deviceManager.Destroy(coyote.Id);
         }
         catch
         {
-            ConnectionMessage = ConnectionFailedStateText;
+            _connectionState = ConnectionState.ConnectionFailed;
             _deviceManager.Destroy(coyote.Id);
         }
         finally
@@ -142,11 +141,15 @@ public sealed partial class DevicesPageViewModel : ObservableObject, IDisposable
             _cts.Cancel();
             _cts.Dispose();
             _cts = null;
+            UpdateBluetoothConnectionMessage();
             IsConnecting = false;
 
             await Task.Delay(3000);
             if (count == _connectionSwitchCount)
+            {
+                _connectionState = ConnectionState.Unknown;
                 ConnectionMessage = string.Empty;
+            }
         }
     }
 
@@ -183,17 +186,15 @@ public sealed partial class DevicesPageViewModel : ObservableObject, IDisposable
 
             if (!_deviceManager.Register(coyote.Id))
                 throw new Exception();
-
-            ConnectionMessage = ConnectionSuccessfulStateText;
         }
         catch (OperationCanceledException)
         {
-            ConnectionMessage = ConnectionCanceledStateText;
+            _connectionState = ConnectionState.ConnectionCanceled;
             _deviceManager.Destroy(coyote.Id);
         }
         catch
         {
-            ConnectionMessage = ConnectionFailedStateText;
+            _connectionState = ConnectionState.ConnectionFailed;
             _deviceManager.Destroy(coyote.Id);
         }
         finally
@@ -207,11 +208,13 @@ public sealed partial class DevicesPageViewModel : ObservableObject, IDisposable
             _tcs = null;
             IsQrCodeDisplayed = false;
             CanShowQrCode = false;
+            UpdateBluetoothConnectionMessage();
             IsConnecting = false;
 
             await Task.Delay(3000);
             if (count == _connectionSwitchCount)
             {
+                _connectionState = ConnectionState.Unknown;
                 QrCodeSvgPath = string.Empty;
                 ConnectionMessage = string.Empty;
             }
@@ -288,63 +291,72 @@ public sealed partial class DevicesPageViewModel : ObservableObject, IDisposable
         });
     }
 
-    private void UpdateBluetoothConnectionMessage(ConnectionStatus status)
+    private void UpdateConnectionState(ConnectionStatus status)
+    {
+        switch (status)
+        {
+            case ConnectionStatus.Disconnected:
+                if (!IsConnecting)
+                    _connectionState = ConnectionState.Disconnected;
+                break;
+            case ConnectionStatus.Searching:
+                _connectionState = ConnectionState.Searching;
+                break;
+            case ConnectionStatus.Connecting:
+                _connectionState = ConnectionState.Connecting;
+                break;
+            case ConnectionStatus.Connected:
+                _connectionState = IsConnecting ? ConnectionState.ConnectionSuccessful : ConnectionState.Connected;
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void UpdateBluetoothConnectionMessage()
     {
         _queueService.TryEnqueue(() =>
         {
-            switch (status)
+            ConnectionMessage = _connectionState switch
             {
-                case ConnectionStatus.Disconnected:
-                    break;
-                case ConnectionStatus.Searching:
-                    ConnectionMessage = BluetoothSearchingStateText;
-                    break;
-                case ConnectionStatus.Connecting:
-                    ConnectionMessage = BluetoothConnectingStateText;
-                    break;
-                case ConnectionStatus.Connected:
-                    ConnectionMessage = ConnectionSuccessfulStateText;
-                    break;
-                default:
-                    ConnectionMessage = string.Empty;
-                    break;
-            }
+                ConnectionState.Searching => BluetoothSearchingStateText,
+                ConnectionState.Connecting => BluetoothConnectingStateText,
+                ConnectionState.ConnectionFailed => ConnectionFailedStateText,
+                ConnectionState.ConnectionSuccessful => ConnectionSuccessfulStateText,
+                ConnectionState.ConnectionCanceled => ConnectionCanceledStateText,
+                _ or ConnectionState.Unknown or ConnectionState.Disconnected or ConnectionState.Connected => string.Empty,
+            };
         });
     }
 
     private void OnBluetoothConnectionStatusChanged(object? sender, ConnectionStatusChangedEventArgs e)
     {
-        UpdateBluetoothConnectionMessage(e.ConnectionStatus);
+        UpdateConnectionState(e.ConnectionStatus);
+        UpdateBluetoothConnectionMessage();
     }
 
-    private void UpdateWebSocketConnectionMessage(ConnectionStatus status)
+    private void UpdateWebSocketConnectionMessage()
     {
         _queueService.TryEnqueue(() =>
         {
-            switch (status)
+            ConnectionMessage = _connectionState switch
             {
-                case ConnectionStatus.Disconnected:
-                    break;
-                case ConnectionStatus.Searching:
-                    ConnectionMessage = WebSocketSearchingStateText;
-                    break;
-                case ConnectionStatus.Connecting:
-                    ConnectionMessage = WebSocketConnectingStateText;
-                    _tcs?.TrySetResult();
-                    break;
-                case ConnectionStatus.Connected:
-                    ConnectionMessage = ConnectionSuccessfulStateText;
-                    break;
-                default:
-                    ConnectionMessage = string.Empty;
-                    break;
-            }
+                ConnectionState.Searching => WebSocketSearchingStateText,
+                ConnectionState.Connecting => WebSocketConnectingStateText,
+                ConnectionState.ConnectionFailed => ConnectionFailedStateText,
+                ConnectionState.ConnectionSuccessful => ConnectionSuccessfulStateText,
+                ConnectionState.ConnectionCanceled => ConnectionCanceledStateText,
+                _ or ConnectionState.Unknown or ConnectionState.Disconnected or ConnectionState.Connected => string.Empty,
+            };
         });
     }
 
     private void OnWebSocketConnectionStatusChanged(object? sender, ConnectionStatusChangedEventArgs e)
     {
-        UpdateWebSocketConnectionMessage(e.ConnectionStatus);
+        UpdateConnectionState(e.ConnectionStatus);
+        UpdateWebSocketConnectionMessage();
+        if (e.ConnectionStatus == ConnectionStatus.Connecting)
+            _tcs?.TrySetResult();
     }
 
     private void OnCurrentLanguageChanged(object? sender, CurrentLanguageChangedEventArgs e)
@@ -358,12 +370,30 @@ public sealed partial class DevicesPageViewModel : ObservableObject, IDisposable
                 case ConnectionKind.Unknown:
                     break;
                 case ConnectionKind.BLE:
-                    UpdateBluetoothConnectionMessage(coyote.ConnectionStatus);
+                    UpdateBluetoothConnectionMessage();
                     break;
                 case ConnectionKind.WebSocket:
-                    UpdateWebSocketConnectionMessage(coyote.ConnectionStatus);
+                    UpdateWebSocketConnectionMessage();
                     break;
             }
         }
+        else
+        {
+            var connectionMessage = _connectionState switch
+            {
+                ConnectionState.ConnectionFailed => ConnectionFailedStateText,
+                ConnectionState.ConnectionSuccessful => ConnectionSuccessfulStateText,
+                ConnectionState.ConnectionCanceled => ConnectionCanceledStateText,
+                _ => string.Empty,
+            };
+
+            if (connectionMessage != string.Empty)
+                _queueService.TryEnqueue(() => ConnectionMessage = connectionMessage);
+        }
+    }
+
+    private enum ConnectionState
+    {
+        Unknown = -1, Disconnected = 0, Searching, Connecting, Connected, ConnectionFailed, ConnectionSuccessful, ConnectionCanceled
     }
 }

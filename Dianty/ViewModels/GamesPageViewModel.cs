@@ -136,14 +136,15 @@ public sealed partial class GamesPageViewModel : ObservableObject, IDisposable
         });
     }
 
-    partial void OnSelectedOutputModeChanged(OutputModeSelectionItem? oldValue, OutputModeSelectionItem? newValue)
+    partial void OnSelectedOutputModeChanged(OutputModeSelectionItem? value)
     {
-        if (newValue is null)
-            return;
-        if (oldValue is not null && oldValue.IsAutomaticStartStop == newValue.IsAutomaticStartStop)
+        if (value is null)
             return;
 
-        var isAutomaticStartStop = newValue.IsAutomaticStartStop;
+        var isAutomaticStartStop = value.IsAutomaticStartStop;
+        if (_waveformPusherControl.IsAutomaticStartStop == isAutomaticStartStop)
+            return;
+
         IsOutputting = false;
         IsAutomaticStartStop = isAutomaticStartStop;
         _waveformPusherControl.IsAutomaticStartStop = isAutomaticStartStop;

@@ -115,6 +115,7 @@ public sealed partial class CoyoteBleItem : CoyoteItemBase
     private readonly IDeviceConnectionService _deviceConnectionService;
     private readonly Timer _outputParameterConfigTimer;
     private const int ParameterConfigCooldownTime = 1500;
+    private readonly bool _isConstructed;
     private ConnectionState _connectionState;
     private int _connectionSwitchCount;
     private bool _isDisposed;
@@ -150,6 +151,8 @@ public sealed partial class CoyoteBleItem : CoyoteItemBase
 
         _strengthInfo.StrengthChanged += OnCurrentStrengthChanged;
         _batteryInfo.BatteryLevelChanged += OnBatteryLevelChanged;
+
+        _isConstructed = true;
     }
 
     private string DisconnectedStateText =>
@@ -274,6 +277,9 @@ public sealed partial class CoyoteBleItem : CoyoteItemBase
 
     async partial void OnConnectionSwitchValueChanged(bool value)
     {
+        if (!_isConstructed)
+            return;
+
         if (value)
         {
             _connectionSwitchCount++;
@@ -368,6 +374,7 @@ public sealed partial class CoyoteWsItem : CoyoteItemBase
     private readonly IStrengthInfo _strengthInfo;
     private readonly IClientInfo _clientInfo;
     private readonly IDeviceConnectionService _deviceConnectionService;
+    private readonly bool _isConstructed;
     private ConnectionState _connectionState;
     private int _connectionSwitchCount;
     private bool _isDisposed;
@@ -396,6 +403,8 @@ public sealed partial class CoyoteWsItem : CoyoteItemBase
 
         _strengthInfo.StrengthChanged += OnStrengthInfoChanged;
         _clientInfo.FeedbackReceived += OnClientFeedbackReceived;
+
+        _isConstructed = true;
     }
 
     private string DisconnectedStateText =>
@@ -445,6 +454,9 @@ public sealed partial class CoyoteWsItem : CoyoteItemBase
 
     async partial void OnConnectionSwitchValueChanged(bool value)
     {
+        if (!_isConstructed)
+            return;
+
         if (value)
         {
             _connectionSwitchCount++;

@@ -4,10 +4,12 @@ using System.Diagnostics.CodeAnalysis;
 namespace DungeonToolkit.Coyote;
 
 public sealed class DeviceManager : IDeviceManager,
+    IDeviceConnectionStatusMonitor,
     IDeviceConnectionService,
     IRegistryReader<DeviceId, IClientInfo>,
     IDisposable 
 {
+    public event EventHandler<DeviceConnectionStatusChangedEventArgs>? DeviceConnectionStatusChanged;
     public event EventHandler<RegistryChangedEventArgs>? RegistryChanged;
     public DeviceManager(
         IRegistry<DeviceId, IRegisterableDevice> registry,
@@ -17,7 +19,8 @@ public sealed class DeviceManager : IDeviceManager,
     public IDeviceInfo Create(ConnectionKind connectionKind);
     public bool Destroy(DeviceId id);
     public bool Register(DeviceId id);
-    public IReadOnlyList<bool> Register(IReadOnlyList<IDeviceInfo> devices, Func<IDeviceInfo, DeviceId> idSelector);
+    public IReadOnlyList<bool> Register(
+        IReadOnlyList<IDeviceInfo> devices, Func<IDeviceInfo, DeviceId> idSelector);
     public async Task<bool> ConnectAsync(DeviceId id, CancellationToken cancellationToken);
     public async Task DisconnectAsync(DeviceId id, CancellationToken cancellationToken);
     public async Task<bool> ToggleAsync(DeviceId id, CancellationToken cancellationToken);
