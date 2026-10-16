@@ -1,0 +1,32 @@
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+
+namespace DungeonToolkit.Coyote;
+
+public sealed class DeviceManager : IDeviceManager,
+    IDeviceConnectionStatusMonitor,
+    IDeviceConnectionService,
+    IRegistryReader<DeviceId, IClientInfo>,
+    IDisposable 
+{
+    public event EventHandler<DeviceConnectionStatusChangedEventArgs>? DeviceConnectionStatusChanged;
+    public event EventHandler<RegistryChangedEventArgs>? RegistryChanged;
+    public DeviceManager(
+        IRegistry<DeviceId, IRegisterableDevice> registry,
+        IRegisterableDeviceFactory factory,
+        IIdPool<DeviceId> deviceIdPool,
+        IDataSource<IRegisterableDevice> deviceDataSource);
+    public IDeviceInfo Create(ConnectionKind connectionKind);
+    public bool Destroy(DeviceId id);
+    public bool Register(DeviceId id);
+    public IReadOnlyList<bool> Register(
+        IReadOnlyList<IDeviceInfo> devices, Func<IDeviceInfo, DeviceId> idSelector);
+    public async Task<bool> ConnectAsync(DeviceId id, CancellationToken cancellationToken);
+    public async Task DisconnectAsync(DeviceId id, CancellationToken cancellationToken);
+    public async Task<bool> ToggleAsync(DeviceId id, CancellationToken cancellationToken);
+    bool IRegistryReader<DeviceId, IClientInfo>.TryGetValue(
+        DeviceId key, [MaybeNullWhen(false)] out IClientInfo value);
+    public bool ContainsKey(DeviceId key);
+    public void Dispose();
+}
+

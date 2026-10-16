@@ -2,8 +2,10 @@ using Dianty.Services;
 using Dianty.ViewModels;
 using Dianty.Views.Controls;
 using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using System;
 
 namespace Dianty.Views.Pages;
 
@@ -14,33 +16,31 @@ public sealed partial class GamesPage : Page
         InitializeComponent();
     }
 
-    private IQueueService? _queueService;
-
-    private GamesPageViewModel? ViewModel { get; set; }
+    private RequiredParameter? _parameter;
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
-        if (e.Parameter is RequiredParameter requiredParameter)
-        {
-            ViewModel = requiredParameter.ViewModel;
-            _queueService = requiredParameter.QueueService;
-        }
+        _parameter = e.Parameter as RequiredParameter;
     }
 
-    private void StackPanel_Loaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    private void OnRootGridLoaded(object sender, RoutedEventArgs e)
     {
-        // 实测该元素更晚触发 Loaded 事件
-        if (_queueService is null || ViewModel is null)
-            return;
-
-        _queueService.TryEnqueue(DispatcherQueuePriority.Low, () =>
-        {
-            var rulesCard = new GtaVcRuleCard(ViewModel.GtaVcRuleCardViewModel);
-            var collection = _gamesPageStackPanel.Children;
-            collection.Insert(collection.Count - 1, rulesCard);
-        });
+        _parameter?.QueueService.TryEnqueue(DispatcherQueuePriority.Low, LoadContent);
     }
 
-    public record class RequiredParameter(GamesPageViewModel ViewModel, IQueueService QueueService);
+    private void LoadContent()
+    {
+        var content = new GamesPageContent(_parameter!);
+        Grid.SetRow(content, 1);
+        _rootGrid.Children.Add(content);
+    }
+
+    public sealed record class RequiredParameter(
+        GamesPageViewModel GamesPageViewModel,
+        GtaVcGameIntegrationViewModel GtaVcGameIntegrationViewModel,
+        Func<string, Func<ILocalizationService, string>> PageHeaderSelectorFactory,
+        Func<string, FrameworkElement?> PageContentFactory,
+        IQueueService QueueService,
+        ILocalizationService LocalizationService);
 }

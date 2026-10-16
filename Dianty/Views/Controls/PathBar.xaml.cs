@@ -1,0 +1,121 @@
+using CommunityToolkit.Mvvm.Messaging;
+using Dianty.EventArguments;
+using Dianty.Services;
+using Dianty.Services.Messages;
+using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Animation;
+using Microsoft.UI.Xaml.Navigation;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+
+namespace Dianty.Views.Controls;
+
+public sealed partial class PathBar : UserControl
+{
+    public RequiredParameter Parameter
+    {
+        get => (RequiredParameter)GetValue(ParameterProperty);
+        set => SetValue(ParameterProperty, value);
+    }
+
+    public static readonly DependencyProperty ParameterProperty
+        = DependencyProperty.Register(
+            nameof(Parameter),
+            typeof(RequiredParameter),
+            typeof(PathBar),
+            new PropertyMetadata(null, OnParameterChanged));
+
+    private static void OnParameterChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var control = (PathBar)d;
+        var newValue = (RequiredParameter)e.NewValue;
+        var oldValue = (RequiredParameter)e.OldValue;
+
+        oldValue?.LocalizationService.CurrentLanguageChanged -= control.OnCurrentLanguageChanged;
+        newValue?.LocalizationService.CurrentLanguageChanged += control.OnCurrentLanguageChanged;
+        control.UpdatePaths(newValue);
+    }
+
+    public PathBar()
+    {
+        InitializeComponent();
+        Loaded += OnPathBarLoaded;
+        Unloaded += OnPathBarUnloaded;
+    }
+
+    private ObservableCollection<string> Paths { get; } = [];
+
+    private void UpdatePaths(RequiredParameter? parameter)
+    {
+        if (parameter is null)
+            return;
+
+        var paths = parameter.PathGetters.Select(f => f.Invoke(parameter.LocalizationService));
+        parameter.QueueService.TryEnqueue(() =>
+        {
+            Paths.Clear();
+            foreach (string path in paths)
+            {
+                Paths.Add(path);
+            }
+        });
+    }
+
+    private void OnPathBarLoaded(object sender, RoutedEventArgs e)
+    {
+        var localizationService = Parameter?.LocalizationService;
+        if (localizationService is not null)
+        {
+            localizationService.CurrentLanguageChanged -= OnCurrentLanguageChanged;
+            localizationService.CurrentLanguageChanged += OnCurrentLanguageChanged;
+        }
+    }
+
+    private void OnPathBarUnloaded(object sender, RoutedEventArgs e)
+    {
+        Parameter?.LocalizationService.CurrentLanguageChanged -= OnCurrentLanguageChanged;
+    }
+
+    private void OnCurrentLanguageChanged(object? sender, CurrentLanguageChangedEventArgs e)
+    {
+        UpdatePaths(Parameter);
+    }
+
+    private void OnBreadcrumbBarItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args)
+    {
+        var options = new FrameNavigationOptions
+        {
+            IsNavigationStackEnabled = true,
+            TransitionInfoOverride = new SlideNavigationTransitionInfo
+            {
+                Effect = SlideNavigationTransitionEffect.FromLeft
+            }
+        };
+        var navigationRequest = new NavigationRequest(Paths.Count - 1 - args.Index, options);
+        for (int i = Paths.Count - 1; i > args.Index; i--)
+        {
+            Paths.RemoveAt(i);
+        }
+
+        // 削减的路径会在导航页面加载完成之后才更新，所以可能会看到路径栏短暂消失，将导航放到低优先级队列中可以减少此问题发生
+        var queueService = Parameter?.QueueService;
+        if (queueService is not null)
+            queueService.TryEnqueue(DispatcherQueuePriority.Low, () => WeakReferenceMessenger.Default.Send(navigationRequest));
+        else
+            WeakReferenceMessenger.Default.Send(navigationRequest);
+    }
+
+    public sealed record class RequiredParameter(
+        IQueueService QueueService, ILocalizationService LocalizationService,
+        IReadOnlyList<Func<ILocalizationService, string>> PathGetters)
+    {
+        public RequiredParameter Concat(IEnumerable<Func<ILocalizationService, string>> tail)
+        {
+            return this with { PathGetters = [.. PathGetters, .. tail] };
+        }
+    }
+}

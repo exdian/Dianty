@@ -1,0 +1,254 @@
+﻿namespace DungeonToolkit.Coyote;
+
+public sealed record class GattServiceInfo(
+    Guid CommandServiceUuid, Guid CommandCharacteristicUuid, Guid MessageCharacteristicUuid,
+    Guid BatteryServiceUuid, Guid BatteryCharacteristicUuid)  
+{
+}
+public readonly record struct PulseData(
+    byte Frequency1, byte Frequency2, byte Frequency3, byte Frequency4,
+    byte Strength1, byte Strength2, byte Strength3, byte Strength4)  
+{
+    public static readonly PulseData Empty;
+}
+public readonly record struct DeviceId(int Id)  
+{
+}
+public readonly record struct WaveformId(int Id)  
+{
+}
+public readonly record struct WaveformDecoderId(int Id)  
+{
+}
+public readonly record struct OutputParameter(
+    byte StrengthLimitA, byte StrengthLimitB,
+    byte FrequencyBalanceA, byte FrequencyBalanceB,
+    byte IntensityBalanceA, byte IntensityBalanceB)  
+{
+    public static readonly OutputParameter Default;
+}
+public enum Channel 
+{
+    None,
+    A,
+    B,
+}
+public enum WebSocketStrengthMode 
+{
+    Sub,
+    Add,
+    Abs,
+}
+public enum WaveformPlaybackMode 
+{
+    RepeatAll,
+    Shuffle,
+    RepeatOne,
+}
+public enum WaveformGradientFrequencyMode 
+{
+    Unknown,
+    Fixed,
+    InsideSection,
+    InsidePulseUnit,
+    BetweenPulseUnit,
+}
+public enum ConnectionKind 
+{
+    Unknown,
+    BLE,
+    WebSocket,
+}
+public enum ConnectionStatus 
+{
+    Disconnected,
+    Searching,
+    Connecting,
+    Connected,
+}
+public interface IDeviceInfo  
+{
+    DeviceId Id { get; }
+    ConnectionKind ConnectionKind { get; }
+    ConnectionStatus ConnectionStatus { get; }
+    bool IsEnabled { get; set; }
+    event EventHandler<ConnectionStatusChangedEventArgs>? ConnectionStatusChanged;
+}
+public interface IWaveformOutputDevice  
+{
+    ConnectionKind ConnectionKind { get; }
+    Task OutputAsync(IReadOnlyList<PulseData> waveformA, IReadOnlyList<PulseData> waveformB, int strengthA, int strengthB);
+    Task CancelOutputAsync();
+}
+public interface IConnectableDevice  
+{
+    ConnectionStatus ConnectionStatus { get; }
+    Task<bool> ConnectAsync(CancellationToken cancellationToken);
+    Task DisconnectAsync(CancellationToken cancellationToken);
+}
+public interface IRegisterableDevice : IDeviceInfo, IWaveformOutputDevice, IConnectableDevice 
+{
+}
+public interface IRegisterableDeviceFactory  
+{
+    IRegisterableDevice Create(DeviceId id, ConnectionKind connectionKind);
+}
+public interface IDeviceManager  
+{
+    IDeviceInfo Create(ConnectionKind connectionKind);
+    bool Destroy(DeviceId id);
+    bool Register(DeviceId id);
+    IReadOnlyList<bool> Register(IReadOnlyList<IDeviceInfo> devices, Func<IDeviceInfo, DeviceId> idSelector);
+}
+public interface IDeviceConnectionStatusMonitor  
+{
+    event EventHandler<DeviceConnectionStatusChangedEventArgs>? DeviceConnectionStatusChanged;
+}
+public interface IDeviceConnectionService  
+{
+    Task<bool> ConnectAsync(DeviceId id, CancellationToken cancellationToken);
+    Task DisconnectAsync(DeviceId id, CancellationToken cancellationToken);
+    Task<bool> ToggleAsync(DeviceId id, CancellationToken cancellationToken);
+}
+public interface IStrengthInfo  
+{
+    byte CurrentStrengthA { get; }
+    byte CurrentStrengthB { get; }
+    byte StrengthLimitA { get; }
+    byte StrengthLimitB { get; }
+    event EventHandler<StrengthChangedEventArgs>? StrengthChanged;
+}
+public interface IBatteryInfo  
+{
+    byte BatteryLevel { get; }
+    event EventHandler<BatteryLevelChangedEventArgs>? BatteryLevelChanged;
+    Task UpdateBatteryLevelAsync();
+}
+public interface IOutputParameterConfig  
+{
+    bool IsGentle { get; set; }
+    OutputParameter CurrentParameter { get; }
+    Task SetOutputParameterAsync(OutputParameter parameter);
+}
+public interface IClientInfo  
+{
+    string ClientId { get; }
+    event EventHandler<FeedbackReceivedEventArgs>? FeedbackReceived;
+}
+public interface IWaveformPusherConfig  
+{
+    int PulseDataBufferCapacity { get; set; }
+    int StrengthA { get; set; }
+    int StrengthB { get; set; }
+    bool IsAutomaticStartStop { get; set; }
+    void SetPushPeriod(int dueTime, int period);
+}
+public interface IWaveformPusherControl  
+{
+    bool IsAutomaticStartStop { get; set; }
+    void Start();
+    void Stop();
+}
+public interface IWaveformPusherStatus  
+{
+    bool IsPushing { get; }
+    event EventHandler<PushStatusChangedEventArgs>? PushStatusChanged;
+}
+public interface IWaveformPusher : IWaveformPusherConfig, IWaveformPusherControl, IWaveformPusherStatus 
+{
+}
+public interface IWaveformPlaylist  
+{
+    bool IsEnabled { get; set; }
+    WaveformPlaybackMode PlaybackMode { get; set; }
+    int SwitchInterval { get; set; }
+    bool Add(WaveformId id);
+    bool Remove(WaveformId id);
+    bool Remove(WaveformDecoderId id);
+    void Clear();
+    bool Play(WaveformDecoderId id);
+    int SetSpeed(WaveformDecoderId id, int speed);
+}
+public interface IWaveformPublisher  
+{
+    PulseData CurrentPulseData { get; }
+    bool TryGetNextPulseData(out PulseData pulseData);
+}
+public interface IWaveformPlayNotification  
+{
+    WaveformId? CurrentWaveformId { get; }
+    event EventHandler? CurrentWaveformChanged;
+}
+public interface IWaveformDecoder : IWaveformDecoderInfo, IWaveformDecoderConfig 
+{
+    PulseData CurrentPulseData { get; }
+    PulseData NextPulseData();
+}
+public interface IWaveformDecoderInfo  
+{
+    WaveformId WaveformId { get; }
+    WaveformDecoderId WaveformDecoderId { get; }
+    int Speed { get; }
+}
+public interface IWaveformDecoderConfig  
+{
+    int Speed { get; }
+    int SetSpeed(int speed);
+}
+public interface IWaveformDecoderFactory  
+{
+    IWaveformDecoder Create(WaveformDecoderId id, IWaveform waveform);
+}
+public interface IWaveform : IWaveformInfo 
+{
+    int Speed { get; }
+    IReadOnlyList<WaveformSection> GetAvailableSection();
+}
+public interface IWaveformInfo  
+{
+    WaveformId Id { get; }
+}
+public interface IWaveformFactory  
+{
+    IWaveform Create(WaveformId id, string waveform);
+}
+public sealed class WaveformException : Exception 
+{
+    public WaveformException(): base();
+    public WaveformException(string message): base(message);
+    public WaveformException(string? message, Exception? innerException): base(message, innerException);
+}
+public sealed class StrengthChangedEventArgs(
+    byte currentStrengthA, byte currentStrengthB, byte strengthLimitA, byte strengthLimitB) : EventArgs 
+{
+    public byte CurrentStrengthA { get; }
+    public byte CurrentStrengthB { get; }
+    public byte StrengthLimitA { get; }
+    public byte StrengthLimitB { get; }
+}
+public sealed class ConnectionStatusChangedEventArgs(ConnectionStatus status) : EventArgs 
+{
+    public ConnectionStatus ConnectionStatus { get; }
+}
+public sealed class DeviceConnectionStatusChangedEventArgs(DeviceId deviceId, ConnectionStatus status) : EventArgs 
+{
+    public DeviceId DeviceId { get; }
+    public ConnectionStatus ConnectionStatus { get; }
+}
+public sealed class MessageReceivedEventArgs(byte[] message) : EventArgs 
+{
+    public byte[] Message { get; }
+}
+public sealed class BatteryLevelChangedEventArgs(byte batteryLevel) : EventArgs 
+{
+    public byte BatteryLevel { get; }
+}
+public sealed class FeedbackReceivedEventArgs(int feedback) : EventArgs 
+{
+    public int Feedback { get; }
+}
+public sealed class PushStatusChangedEventArgs(bool isPushing) : EventArgs 
+{
+    public bool IsPushing { get; }
+}
+

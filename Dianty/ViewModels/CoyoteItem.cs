@@ -1,73 +1,51 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+using Dianty.EventArguments;
 using Dianty.Services;
 using Dianty.Utils;
 using DungeonToolkit.Coyote;
-using Microsoft.UI.Dispatching;
 using System;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using static Dianty.Services.ILocalizationService;
 
 namespace Dianty.ViewModels;
 
-public partial class CoyoteItem : ObservableObject, IDisposable
+public abstract partial class CoyoteItemBase : ObservableObject, IDisposable
 {
-    public CoyoteItem(CoyoteBLE coyote, IQueueService queueService, ICoyoteListService coyoteListService, ILocalizationService localizationService)
-    {
-        _coyoteBLE = coyote;
-        _queueService = queueService;
-        _coyoteListService = coyoteListService;
-        _localizationService = localizationService;
-        IsBleConnection = true;
-        Name = coyote.DeviceName;
-        IsEnabled = coyote.IsEnabled;
-        ConnectionTypeDescription = _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionStatusCardBluetoothDescription;
-        UpdateConnectionMessage(coyote.IsConnected);
-        _localizationService.CurrentLanguageFileNameChanged += OnCurrentLanguageFileNameChanged;
-    }
-
-    public CoyoteItem(CoyoteWS coyote, IQueueService queueService, ICoyoteListService coyoteListService, ILocalizationService localizationService)
-    {
-        _coyoteWS = coyote;
-        _queueService = queueService;
-        _coyoteListService = coyoteListService;
-        _localizationService = localizationService;
-        Name = coyote.DeviceName;
-        IsEnabled = coyote.IsEnabled;
-        ConnectionTypeDescription = _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionStatusCardSocketDescription;
-        UpdateConnectionMessage(coyote.IsBound);
-        _localizationService.CurrentLanguageFileNameChanged += OnCurrentLanguageFileNameChanged;
-    }
-
-    protected readonly CoyoteBLE? _coyoteBLE;
-    protected readonly CoyoteWS? _coyoteWS;
+    protected readonly IDeviceInfo _deviceInfo;
     protected readonly IQueueService _queueService;
-    protected readonly ICoyoteListService _coyoteListService;
     protected readonly ILocalizationService _localizationService;
     private bool _isDisposed;
 
-    public bool IsBleConnection { get; }
+    protected CoyoteItemBase(IDeviceInfo deviceInfo, IQueueService queueService, ILocalizationService localizationService)
+    {
+        _deviceInfo = deviceInfo;
+        _queueService = queueService;
+        _localizationService = localizationService;
+
+        UpdateConnectionKindDescription();
+        UpdateConnectionState(_deviceInfo.ConnectionStatus);
+        UpdateConnectionMessage();
+        IsEnabled = _deviceInfo.IsEnabled;
+
+        _deviceInfo.ConnectionStatusChanged += OnConnectionStatusChanged;
+        _localizationService.CurrentLanguageChanged += OnCurrentLanguageChanged;
+    }
+
+    public DeviceId Id => _deviceInfo.Id;
+
+    public ConnectionKind ConnectionKind => _deviceInfo.ConnectionKind;
 
     [ObservableProperty]
-    public partial string Name { get; set; }
+    public partial string Name { get; set; } = string.Empty;
 
     [ObservableProperty]
-    public partial string ConnectionTypeDescription { get; private set; }
+    public partial string ConnectionKindDescription { get; private set; } = string.Empty;
 
     [ObservableProperty]
     public partial string ConnectionMessage { get; protected set; } = string.Empty;
 
     [ObservableProperty]
     public partial bool IsEnabled { get; set; }
-
-    [RelayCommand]
-    private void DeleteThis()
-    {
-        _coyoteListService.Remove(this);
-        Dispose();
-    }
 
     public void Dispose()
     {
@@ -77,80 +55,114 @@ public partial class CoyoteItem : ObservableObject, IDisposable
 
     protected virtual void Dispose(bool disposing)
     {
-        if (_isDisposed)
-            return;
-        _isDisposed = true;
-
-        if (disposing)
+        if (!_isDisposed)
         {
-            _localizationService.CurrentLanguageFileNameChanged -= OnCurrentLanguageFileNameChanged;
-            _coyoteBLE?.Dispose();
-            _coyoteWS?.Dispose();
+            if (disposing)
+            {
+                _deviceInfo.ConnectionStatusChanged -= OnConnectionStatusChanged;
+                _localizationService.CurrentLanguageChanged -= OnCurrentLanguageChanged;
+            }
+
+            _isDisposed = true;
         }
     }
 
-    protected virtual void OnCurrentLanguageFileNameChanged(object? sender, CurrentLanguageFileNameChangedEventArgs e)
+    protected abstract void UpdateConnectionState(ConnectionStatus status);
+
+    protected abstract void UpdateConnectionMessage();
+
+    protected virtual void OnConnectionStatusChanged(object? sender, ConnectionStatusChangedEventArgs e)
+    {
+        UpdateConnectionState(e.ConnectionStatus);
+        UpdateConnectionMessage();
+    }
+
+    protected virtual void OnCurrentLanguageChanged(object? sender, CurrentLanguageChangedEventArgs e)
+    {
+        UpdateConnectionKindDescription();
+        UpdateConnectionMessage();
+    }
+
+    private void UpdateConnectionKindDescription()
     {
         _queueService.TryEnqueue(() =>
         {
-            ConnectionTypeDescription = IsBleConnection
-                ? _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionStatusCardBluetoothDescription
-                : _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionStatusCardSocketDescription;
+            ConnectionKindDescription = ConnectionKind switch
+            {
+                ConnectionKind.BLE => _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionStatusCardBluetoothDescription,
+                ConnectionKind.WebSocket => _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionStatusCardWebSocketDescription,
+                _ or ConnectionKind.Unknown => string.Empty,
+            };
         });
-    }
-
-    protected void UpdateConnectionMessage(bool isConnected)
-    {
-        ConnectionMessage = isConnected
-            ? _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectedStateText
-            : _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.DisconnectedStateText;
-    }
-
-    partial void OnNameChanged(string value)
-    {
-        _coyoteBLE?.DeviceName = value;
-        _coyoteWS?.DeviceName = value;
     }
 
     partial void OnIsEnabledChanged(bool value)
     {
-        _coyoteBLE?.IsEnabled = value;
-        _coyoteWS?.IsEnabled = value;
+        _deviceInfo.IsEnabled = value;
+    }
+
+    protected enum ConnectionState
+    {
+        Disconnected, Searching, Connecting, Connected, ConnectionFailed, ConnectionSuccessful, ConnectionCanceled
     }
 }
 
-public partial class CoyoteBleItem : CoyoteItem
+public sealed partial class CoyoteBleItem : CoyoteItemBase
 {
-    public CoyoteBleItem(CoyoteBLE coyote, IQueueService queueService, ICoyoteListService coyoteListService,
-        ICoyoteBleDetector coyoteBleDetector, ILocalizationService localizationService)
-        : base(coyote, queueService, coyoteListService, localizationService)
+    private readonly IStrengthInfo _strengthInfo;
+    private readonly IOutputParameterConfig _outputParameterConfig;
+    private readonly IBatteryInfo _batteryInfo;
+    private readonly IDeviceConnectionService _deviceConnectionService;
+    private readonly Timer _outputParameterConfigTimer;
+    private const int ParameterConfigCooldownTime = 1500;
+    private readonly bool _isConstructed;
+    private ConnectionState _connectionState;
+    private int _connectionSwitchCount;
+    private bool _isDisposed;
+
+    public CoyoteBleItem(
+        IDeviceInfo deviceInfo,
+        IStrengthInfo strengthInfo,
+        IOutputParameterConfig outputParameterConfig,
+        IBatteryInfo batteryInfo,
+        IDeviceConnectionService deviceConnectionService,
+        IQueueService queueService,
+        ILocalizationService localizationService)
+        : base(deviceInfo, queueService, localizationService)
     {
-        _coyoteBleDetector = coyoteBleDetector;
-        _bfCommandTimer = new Timer(SendBfCommand, null, Timeout.Infinite, Timeout.Infinite);
-        MaxStrengthA = coyote.MaxStrengthA;
-        MaxStrengthB = coyote.MaxStrengthB;
-        IsGentle = coyote.IsGentle;
-        BfFrequencyParamA = coyote.BfFrequencyParamA;
-        BfFrequencyParamB = coyote.BfFrequencyParamB;
-        BfStrengthParamA = coyote.BfStrengthParamA;
-        BfStrengthParamB = coyote.BfStrengthParamB;
-        BatteryLevel = coyote.BatteryLevel;
-        CurrentStrengthA = coyote.CurrentStrengthA;
-        CurrentStrengthB = coyote.CurrentStrengthB;
-        IsConnectingOrConnected = coyote.IsConnected;
-        coyote.ConnectionStatusChanged += OnConnectionStatusChanged;
-        coyote.StrengthChanged += OnStrengthChanged;
-        coyote.BatteryLevelChanged += OnBatteryLevelChanged;
+        _strengthInfo = strengthInfo;
+        _outputParameterConfig = outputParameterConfig;
+        _batteryInfo = batteryInfo;
+        _deviceConnectionService = deviceConnectionService;
+
+        _outputParameterConfigTimer = new Timer(SetOutputParameter, null, Timeout.Infinite, Timeout.Infinite);
+        IsGentle = _outputParameterConfig.IsGentle;
+        StrengthLimitA = _strengthInfo.StrengthLimitA;
+        StrengthLimitB = _strengthInfo.StrengthLimitB;
+        FrequencyBalanceA = _outputParameterConfig.CurrentParameter.FrequencyBalanceA;
+        FrequencyBalanceB = _outputParameterConfig.CurrentParameter.FrequencyBalanceB;
+        IntensityBalanceA = _outputParameterConfig.CurrentParameter.IntensityBalanceA;
+        IntensityBalanceB = _outputParameterConfig.CurrentParameter.IntensityBalanceB;
+        BatteryLevel = _batteryInfo.BatteryLevel;
+        CurrentStrengthA = _strengthInfo.CurrentStrengthA;
+        CurrentStrengthB = _strengthInfo.CurrentStrengthB;
+        IsConnecting = _deviceInfo.ConnectionStatus is ConnectionStatus.Searching or ConnectionStatus.Connecting;
+        ConnectionSwitchValue = _deviceInfo.ConnectionStatus != ConnectionStatus.Disconnected;
+
+        _strengthInfo.StrengthChanged += OnCurrentStrengthChanged;
+        _batteryInfo.BatteryLevelChanged += OnBatteryLevelChanged;
+
+        _isConstructed = true;
     }
 
-    private readonly ICoyoteBleDetector _coyoteBleDetector;
-    private readonly Timer _bfCommandTimer;
-    private const int BfCommandCooldownTime = 1500;
-    private CancellationTokenSource? _cts;
-    private int _reconnectingCount;
-
-    private string ConnectingStateText =>
-        _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectingStateText;
+    private string DisconnectedStateText =>
+        _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.DisconnectedStateText;
+    private string BluetoothSearchingStateText =>
+        _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.BluetoothSearchingStateText;
+    private string BluetoothConnectingStateText =>
+        _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.BluetoothConnectingStateText;
+    private string ConnectedStateText =>
+        _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectedStateText;
     private string ConnectionFailedStateText =>
         _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionFailedStateText;
     private string ConnectionSuccessfulStateText =>
@@ -158,28 +170,26 @@ public partial class CoyoteBleItem : CoyoteItem
     private string ConnectionCanceledStateText =>
         _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionCanceledStateText;
 
-    public CoyoteBLE Coyote => _coyoteBLE!;
-
-    [ObservableProperty]
-    public partial double MaxStrengthA { get; set; }
-
-    [ObservableProperty]
-    public partial double MaxStrengthB { get; set; }
-
     [ObservableProperty]
     public partial bool IsGentle { get; set; }
 
     [ObservableProperty]
-    public partial double BfFrequencyParamA { get; set; }
+    public partial double StrengthLimitA { get; set; }
 
     [ObservableProperty]
-    public partial double BfFrequencyParamB { get; set; }
+    public partial double StrengthLimitB { get; set; }
 
     [ObservableProperty]
-    public partial double BfStrengthParamA { get; set; }
+    public partial double FrequencyBalanceA { get; set; }
 
     [ObservableProperty]
-    public partial double BfStrengthParamB { get; set; }
+    public partial double FrequencyBalanceB { get; set; }
+
+    [ObservableProperty]
+    public partial double IntensityBalanceA { get; set; }
+
+    [ObservableProperty]
+    public partial double IntensityBalanceB { get; set; }
 
     [ObservableProperty]
     public partial int BatteryLevel { get; private set; }
@@ -194,67 +204,64 @@ public partial class CoyoteBleItem : CoyoteItem
     public partial bool IsConnecting { get; private set; }
 
     [ObservableProperty]
-    public partial bool IsConnectingOrConnected { get; set; }
+    public partial bool ConnectionSwitchValue { get; set; }
 
-    private async void Reconnecting()
+    private void SetOutputParameter(object? state)
     {
-        Debug.Assert(_coyoteBLE is not null);
-        if (IsConnecting || _coyoteBLE.IsConnected)
-            return;
-        IsConnecting = true;
+        var parameter = new OutputParameter(
+            (byte)StrengthLimitA, (byte)StrengthLimitB,
+            (byte)FrequencyBalanceA, (byte)FrequencyBalanceB,
+            (byte)IntensityBalanceA, (byte)IntensityBalanceB);
+        _outputParameterConfig.SetOutputParameterAsync(parameter);
+    }
 
-        _reconnectingCount++;
-        var count = _reconnectingCount;
-        ConnectionMessage = ConnectingStateText;
-        string? connectionMessage = null;
-        _cts = new CancellationTokenSource();
-        try
+    protected override void UpdateConnectionState(ConnectionStatus status)
+    {
+        switch (status)
         {
-            if (await _coyoteBLE.ReconnectingAsync(_coyoteBleDetector, _cts.Token))
-                connectionMessage = ConnectionSuccessfulStateText;
-        }
-        catch (OperationCanceledException)
-        {
-            connectionMessage = ConnectionCanceledStateText;
-        }
-        catch { }
-        finally
-        {
-            if (!_coyoteBLE.IsConnected)
-                _queueService.TryEnqueue(() => IsConnectingOrConnected = false);
-            _cts.Cancel();
-            _cts.Dispose();
-            _cts = null;
-            _queueService.TryEnqueue(() =>
-            {
-                ConnectionMessage = connectionMessage ?? ConnectionFailedStateText;
-                IsConnecting = false;
-            });
-
-            await Task.Delay(3000);
-            if (count == _reconnectingCount)
-                _queueService.TryEnqueue(() => UpdateConnectionMessage(_coyoteBLE.IsConnected));
+            case ConnectionStatus.Disconnected:
+                if (!IsConnecting)
+                    _connectionState = ConnectionState.Disconnected;
+                break;
+            case ConnectionStatus.Searching:
+                _connectionState = ConnectionState.Searching;
+                break;
+            case ConnectionStatus.Connecting:
+                _connectionState = ConnectionState.Connecting;
+                break;
+            case ConnectionStatus.Connected:
+                _connectionState = IsConnecting ? ConnectionState.ConnectionSuccessful : ConnectionState.Connected;
+                break;
+            default:
+                break;
         }
     }
 
-    private void SendBfCommand(object? state)
-    {
-        Debug.Assert(_coyoteBLE is not null);
-        if (_coyoteBLE.IsConnected)
-            _ = _coyoteBLE.SendBfCommandAsync();
-    }
-
-    private void OnConnectionStatusChanged(object? sender, ConnectionStatusChangedEventArgs e)
+    protected override void UpdateConnectionMessage()
     {
         _queueService.TryEnqueue(() =>
         {
-            IsConnectingOrConnected = e.IsConnected;
-            if (!e.IsConnected)
-                UpdateConnectionMessage(false);
+            ConnectionMessage = _connectionState switch
+            {
+                ConnectionState.Disconnected => DisconnectedStateText,
+                ConnectionState.Searching => BluetoothSearchingStateText,
+                ConnectionState.Connecting => BluetoothConnectingStateText,
+                ConnectionState.Connected => ConnectedStateText,
+                ConnectionState.ConnectionFailed => ConnectionFailedStateText,
+                ConnectionState.ConnectionSuccessful => ConnectionSuccessfulStateText,
+                ConnectionState.ConnectionCanceled => ConnectionCanceledStateText,
+                _ => string.Empty,
+            };
         });
     }
 
-    private void OnStrengthChanged(object? sender, CoyoteBLE.StrengthChangedEventArgs e)
+    protected override void OnConnectionStatusChanged(object? sender, ConnectionStatusChangedEventArgs e)
+    {
+        base.OnConnectionStatusChanged(sender, e);
+        _queueService.TryEnqueue(() => ConnectionSwitchValue = e.ConnectionStatus != ConnectionStatus.Disconnected);
+    }
+
+    private void OnCurrentStrengthChanged(object? sender, StrengthChangedEventArgs e)
     {
         _queueService.TryEnqueue(() =>
         {
@@ -263,135 +270,157 @@ public partial class CoyoteBleItem : CoyoteItem
         });
     }
 
-    private void OnBatteryLevelChanged(object? sender, CoyoteBLE.BatteryLevelChangedEventArgs e)
+    private void OnBatteryLevelChanged(object? sender, BatteryLevelChangedEventArgs e)
     {
         _queueService.TryEnqueue(() => BatteryLevel = e.BatteryLevel);
     }
 
-    partial void OnIsConnectingOrConnectedChanged(bool value)
+    async partial void OnConnectionSwitchValueChanged(bool value)
     {
-        Debug.Assert(_coyoteBLE is not null);
+        if (!_isConstructed)
+            return;
+
         if (value)
         {
-            Reconnecting();
+            _connectionSwitchCount++;
+            var count = _connectionSwitchCount;
+            IsConnecting = true;
+            try
+            {
+                if (!await _deviceConnectionService.ConnectAsync(Id, CancellationToken.None))
+                    throw new Exception();
+            }
+            catch (OperationCanceledException)
+            {
+                _connectionState = ConnectionState.ConnectionCanceled;
+            }
+            catch
+            {
+                _connectionState = ConnectionState.ConnectionFailed;
+            }
+            finally
+            {
+                UpdateConnectionMessage();
+                IsConnecting = false;
+
+                await Task.Delay(3000);
+                if (count == _connectionSwitchCount)
+                {
+                    UpdateConnectionState(_deviceInfo.ConnectionStatus);
+                    UpdateConnectionMessage();
+                }
+            }
         }
         else
         {
-            _cts?.Cancel();
-            if (_coyoteBLE.IsConnected)
-                _coyoteBLE.Disconnect();
+            await _deviceConnectionService.DisconnectAsync(Id, CancellationToken.None).ConfigureAwait(false);
         }
-    }
-
-    partial void OnMaxStrengthAChanged(double value)
-    {
-        Debug.Assert(_coyoteBLE is not null);
-        _coyoteBLE.MaxStrengthA = (byte)value;
-        _bfCommandTimer.Change(BfCommandCooldownTime, Timeout.Infinite);
-    }
-
-    partial void OnMaxStrengthBChanged(double value)
-    {
-        Debug.Assert(_coyoteBLE is not null);
-        _coyoteBLE.MaxStrengthB = (byte)value;
-        _bfCommandTimer.Change(BfCommandCooldownTime, Timeout.Infinite);
-    }
-
-    partial void OnIsGentleChanged(bool value)
-    {
-        Debug.Assert(_coyoteBLE is not null);
-        _coyoteBLE.IsGentle = value;
-    }
-
-    partial void OnBfFrequencyParamAChanged(double value)
-    {
-        Debug.Assert(_coyoteBLE is not null);
-        _coyoteBLE.BfFrequencyParamA = (byte)value;
-        _bfCommandTimer.Change(BfCommandCooldownTime, Timeout.Infinite);
-    }
-
-    partial void OnBfFrequencyParamBChanged(double value)
-    {
-        Debug.Assert(_coyoteBLE is not null);
-        _coyoteBLE.BfFrequencyParamB = (byte)value;
-        _bfCommandTimer.Change(BfCommandCooldownTime, Timeout.Infinite);
-    }
-
-    partial void OnBfStrengthParamAChanged(double value)
-    {
-        Debug.Assert(_coyoteBLE is not null);
-        _coyoteBLE.BfStrengthParamA = (byte)value;
-        _bfCommandTimer.Change(BfCommandCooldownTime, Timeout.Infinite);
-    }
-
-    partial void OnBfStrengthParamBChanged(double value)
-    {
-        Debug.Assert(_coyoteBLE is not null);
-        _coyoteBLE.BfStrengthParamB = (byte)value;
-        _bfCommandTimer.Change(BfCommandCooldownTime, Timeout.Infinite);
     }
 
     protected override void Dispose(bool disposing)
     {
-        Debug.Assert(_coyoteBLE is not null);
         base.Dispose(disposing);
+        if (_isDisposed)
+            return;
+
         if (disposing)
         {
-            _coyoteBLE.ConnectionStatusChanged -= OnConnectionStatusChanged;
-            _coyoteBLE.StrengthChanged -= OnStrengthChanged;
-            _coyoteBLE.BatteryLevelChanged -= OnBatteryLevelChanged;
-            _bfCommandTimer.Dispose();
+            _strengthInfo.StrengthChanged -= OnCurrentStrengthChanged;
+            _batteryInfo.BatteryLevelChanged -= OnBatteryLevelChanged;
+            _outputParameterConfigTimer.Dispose();
         }
+
+        _isDisposed = true;
     }
 
-    protected override void OnCurrentLanguageFileNameChanged(object? sender, CurrentLanguageFileNameChangedEventArgs e)
+    partial void OnStrengthLimitAChanged(double value)
     {
-        Debug.Assert(_coyoteBLE is not null);
-        base.OnCurrentLanguageFileNameChanged(sender, e);
-        _queueService.TryEnqueue(() =>
-        {
-            if (!IsConnecting)
-            {
-                UpdateConnectionMessage(_coyoteBLE.IsConnected);
-            }
-        });
+        _outputParameterConfigTimer.Change(ParameterConfigCooldownTime, Timeout.Infinite);
+    }
+
+    partial void OnStrengthLimitBChanged(double value)
+    {
+        _outputParameterConfigTimer.Change(ParameterConfigCooldownTime, Timeout.Infinite);
+    }
+
+    partial void OnIsGentleChanged(bool value)
+    {
+        _outputParameterConfig.IsGentle = value;
+    }
+
+    partial void OnFrequencyBalanceAChanged(double value)
+    {
+        _outputParameterConfigTimer.Change(ParameterConfigCooldownTime, Timeout.Infinite);
+    }
+
+    partial void OnFrequencyBalanceBChanged(double value)
+    {
+        _outputParameterConfigTimer.Change(ParameterConfigCooldownTime, Timeout.Infinite);
+    }
+
+    partial void OnIntensityBalanceAChanged(double value)
+    {
+        _outputParameterConfigTimer.Change(ParameterConfigCooldownTime, Timeout.Infinite);
+    }
+
+    partial void OnIntensityBalanceBChanged(double value)
+    {
+        _outputParameterConfigTimer.Change(ParameterConfigCooldownTime, Timeout.Infinite);
     }
 }
 
-public partial class CoyoteWsItem : CoyoteItem
+public sealed partial class CoyoteWsItem : CoyoteItemBase
 {
-    public CoyoteWsItem(CoyoteWS coyote, IQueueService queueService, ICoyoteListService coyoteListService,
+    private readonly IStrengthInfo _strengthInfo;
+    private readonly IClientInfo _clientInfo;
+    private readonly IDeviceConnectionService _deviceConnectionService;
+    private readonly bool _isConstructed;
+    private ConnectionState _connectionState;
+    private int _connectionSwitchCount;
+    private bool _isDisposed;
+
+    public CoyoteWsItem(
+        IDeviceInfo deviceInfo,
+        IStrengthInfo strengthInfo,
+        IClientInfo clientInfo,
+        IDeviceConnectionService deviceConnectionService,
+        IQueueService queueService,
         ILocalizationService localizationService)
-        : base(coyote, queueService, coyoteListService, localizationService)
+        : base(deviceInfo, queueService, localizationService)
     {
-        CurrentStrengthA = coyote.CurrentStrengthA;
-        CurrentStrengthB = coyote.CurrentStrengthB;
-        StrengthCapA = coyote.StrengthCapA;
-        StrengthCapB = coyote.StrengthCapB;
-        IsConnectingOrConnected = coyote.IsBound;
-        coyote.ConnectionStatusChanged += OnConnectionStatusChanged;
-        coyote.ClientIdChanged += OnClientIdChanged;
-        coyote.BindingStatusChanged += OnBindingStatusChanged;
-        coyote.StrengthChanged += OnStrengthChanged;
+        _strengthInfo = strengthInfo;
+        _clientInfo = clientInfo;
+        _deviceConnectionService = deviceConnectionService;
+
+        CurrentStrengthA = _strengthInfo.CurrentStrengthA;
+        CurrentStrengthB = _strengthInfo.CurrentStrengthB;
+        StrengthLimitA = _strengthInfo.StrengthLimitA;
+        StrengthLimitB = _strengthInfo.StrengthLimitB;
+        IsConnecting = _deviceInfo.ConnectionStatus is ConnectionStatus.Searching or ConnectionStatus.Connecting;
+        QrCodeSvgPath = _deviceInfo.ConnectionStatus == ConnectionStatus.Connecting ? _clientInfo.ClientId : string.Empty;
+        CanShowQrCode = _deviceInfo.ConnectionStatus == ConnectionStatus.Connecting;
+        ConnectionSwitchValue = _deviceInfo.ConnectionStatus != ConnectionStatus.Disconnected;
+
+        _strengthInfo.StrengthChanged += OnStrengthInfoChanged;
+        _clientInfo.FeedbackReceived += OnClientFeedbackReceived;
+
+        _isConstructed = true;
     }
 
-    private TaskCompletionSource? _getClientIdTcs;
-    private TaskCompletionSource? _bindingTcs;
-    private CancellationTokenSource? _cts;
-    private int _reconnectingCount;
-
-    private string WaitingSocketServerStateText =>
-        _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.WaitingSocketServerStateText;
-    private string WaitingScanQrCodeStateText =>
-        _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.WaitingScanQrCodeStateText;
+    private string DisconnectedStateText =>
+        _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.DisconnectedStateText;
+    private string WebSocketSearchingStateText =>
+        _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.WebSocketSearchingStateText;
+    private string WebSocketConnectingStateText =>
+        _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.WebSocketConnectingStateText;
+    private string ConnectedStateText =>
+        _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectedStateText;
     private string ConnectionFailedStateText =>
         _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionFailedStateText;
     private string ConnectionSuccessfulStateText =>
         _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionSuccessfulStateText;
     private string ConnectionCanceledStateText =>
         _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionCanceledStateText;
-
-    public CoyoteWS Coyote => _coyoteWS!;
 
     [ObservableProperty]
     public partial int CurrentStrengthA { get; private set; }
@@ -400,16 +429,19 @@ public partial class CoyoteWsItem : CoyoteItem
     public partial int CurrentStrengthB { get; private set; }
 
     [ObservableProperty]
-    public partial int StrengthCapA { get; private set; }
+    public partial int StrengthLimitA { get; private set; }
 
     [ObservableProperty]
-    public partial int StrengthCapB { get; private set; }
+    public partial int StrengthLimitB { get; private set; }
+
+    [ObservableProperty]
+    public partial string Feedback { get; private set; } = string.Empty;
 
     [ObservableProperty]
     public partial bool IsConnecting { get; private set; }
 
     [ObservableProperty]
-    public partial string QrCodeSvgPath { get; private set; } = string.Empty;
+    public partial string QrCodeSvgPath { get; private set; }
 
     [ObservableProperty]
     public partial bool CanShowQrCode { get; private set; }
@@ -418,150 +450,149 @@ public partial class CoyoteWsItem : CoyoteItem
     public partial bool IsQrCodeDisplayed { get; private set; }
 
     [ObservableProperty]
-    public partial bool IsConnectingOrConnected { get; set; }
+    public partial bool ConnectionSwitchValue { get; set; }
 
-    private async void Reconnecting()
+    async partial void OnConnectionSwitchValueChanged(bool value)
     {
-        Debug.Assert(_coyoteWS is not null);
-        if (IsConnecting || _coyoteWS.IsConnected)
+        if (!_isConstructed)
             return;
-        IsConnecting = true;
 
-        _reconnectingCount++;
-        var count = _reconnectingCount;
-        ConnectionMessage = WaitingSocketServerStateText;
-        string? connectionMessage = null;
-        _cts = new CancellationTokenSource();
-        try
-        {
-            _getClientIdTcs = new TaskCompletionSource();
-            if (!await _coyoteWS.ConnectAsync(_cts.Token))
-                return;
-            await _getClientIdTcs.Task.WaitAsync(_cts.Token);
-            _bindingTcs = new TaskCompletionSource();
-            var qrCodeSvgPath = await Task.Run(() => CoyoteHelper.CreateQrCodeSvgPathString(_coyoteWS)).WaitAsync(_cts.Token);
-            _queueService.TryEnqueue(() =>
-            {
-                ConnectionMessage = WaitingScanQrCodeStateText;
-                QrCodeSvgPath = qrCodeSvgPath;
-                CanShowQrCode = true;
-                IsQrCodeDisplayed = true;
-            });
-            await _bindingTcs.Task.WaitAsync(_cts.Token);
-            connectionMessage = ConnectionSuccessfulStateText;
-        }
-        catch (OperationCanceledException)
-        {
-            connectionMessage = ConnectionCanceledStateText;
-        }
-        catch { }
-        finally
-        {
-            if (!_coyoteWS.IsBound)
-            {
-                await _coyoteWS.DisconnectAsync();
-                _queueService.TryEnqueue(() => IsConnectingOrConnected = false);
-            }
-            _cts.Cancel();
-            _cts.Dispose();
-            _cts = null;
-            _getClientIdTcs?.TrySetResult();
-            _getClientIdTcs = null;
-            _bindingTcs?.TrySetResult();
-            _bindingTcs = null;
-            _queueService.TryEnqueue(DispatcherQueuePriority.Low, () =>
-            {
-                IsQrCodeDisplayed = false;
-                CanShowQrCode = false;
-                ConnectionMessage = connectionMessage ?? ConnectionFailedStateText;
-                IsConnecting = false;
-            });
-
-            await Task.Delay(3000);
-            if (count == _reconnectingCount)
-            {
-                _queueService.TryEnqueue(() =>
-                {
-                    QrCodeSvgPath = string.Empty;
-                    UpdateConnectionMessage(_coyoteWS.IsBound);
-                });
-            }
-        }
-    }
-
-    partial void OnIsConnectingOrConnectedChanged(bool value)
-    {
-        Debug.Assert(_coyoteWS is not null);
         if (value)
         {
-            Reconnecting();
+            _connectionSwitchCount++;
+            var count = _connectionSwitchCount;
+            IsConnecting = true;
+            try
+            {
+                if (!await _deviceConnectionService.ConnectAsync(Id, CancellationToken.None))
+                    throw new Exception();
+            }
+            catch (OperationCanceledException)
+            {
+                _connectionState = ConnectionState.ConnectionCanceled;
+            }
+            catch
+            {
+                _connectionState = ConnectionState.ConnectionFailed;
+            }
+            finally
+            {
+                UpdateConnectionMessage();
+                IsQrCodeDisplayed = false;
+                CanShowQrCode = false;
+                IsConnecting = false;
+
+                await Task.Delay(3000);
+                if (count == _connectionSwitchCount)
+                {
+                    QrCodeSvgPath = string.Empty;
+                    UpdateConnectionState(_deviceInfo.ConnectionStatus);
+                    UpdateConnectionMessage();
+                }
+            }
         }
         else
         {
-            _cts?.Cancel();
-            if (_coyoteWS.IsConnected)
-                _ = _coyoteWS.DisconnectAsync();
+            await _deviceConnectionService.DisconnectAsync(Id, CancellationToken.None).ConfigureAwait(false);
         }
     }
 
-    private void OnConnectionStatusChanged(object? sender, ConnectionStatusChangedEventArgs e)
+    protected override void UpdateConnectionState(ConnectionStatus status)
     {
-        if (!e.IsConnected)
+        switch (status)
         {
-            _getClientIdTcs?.TrySetException(new Exception());
-            _bindingTcs?.TrySetException(new Exception());
+            case ConnectionStatus.Disconnected:
+                if (!IsConnecting)
+                    _connectionState = ConnectionState.Disconnected;
+                break;
+            case ConnectionStatus.Searching:
+                _connectionState = ConnectionState.Searching;
+                break;
+            case ConnectionStatus.Connecting:
+                _connectionState = ConnectionState.Connecting;
+                _queueService.TryEnqueue(async () =>
+                {
+                    var qrCodeSvgPath = await Task.Run(() => CoyoteHelper.CreateQrCodeSvgPathString(_clientInfo));
+                    if (_deviceInfo.ConnectionStatus == ConnectionStatus.Connecting)
+                    {
+                        ConnectionMessage = WebSocketConnectingStateText;
+                        QrCodeSvgPath = qrCodeSvgPath;
+                        CanShowQrCode = true;
+                        IsQrCodeDisplayed = true;
+                    }
+                });
+                break;
+            case ConnectionStatus.Connected:
+                _connectionState = IsConnecting ? ConnectionState.ConnectionSuccessful : ConnectionState.Connected;
+                break;
+            default:
+                break;
         }
-        _queueService.TryEnqueue(() => IsConnectingOrConnected = e.IsConnected);
     }
 
-    private void OnClientIdChanged(object? sender, CoyoteWS.ClientIdChangedEventArgs e)
+    protected override void UpdateConnectionMessage()
     {
-        if (e.ClientId.Length != 0)
-            _getClientIdTcs?.TrySetResult();
+        _queueService.TryEnqueue(() =>
+        {
+            ConnectionMessage = _connectionState switch
+            {
+                ConnectionState.Disconnected => DisconnectedStateText,
+                ConnectionState.Searching => WebSocketSearchingStateText,
+                ConnectionState.Connecting => WebSocketConnectingStateText,
+                ConnectionState.Connected => ConnectedStateText,
+                ConnectionState.ConnectionFailed => ConnectionFailedStateText,
+                ConnectionState.ConnectionSuccessful => ConnectionSuccessfulStateText,
+                ConnectionState.ConnectionCanceled => ConnectionCanceledStateText,
+                _ => string.Empty,
+            };
+        });
     }
 
-    private void OnBindingStatusChanged(object? sender, CoyoteWS.BindingStatusChangedEventArgs e)
+    protected override void OnConnectionStatusChanged(object? sender, ConnectionStatusChangedEventArgs e)
     {
-        if (e.IsBound)
-            _bindingTcs?.TrySetResult();
-        else
-            _queueService.TryEnqueue(() => UpdateConnectionMessage(false));
+        base.OnConnectionStatusChanged(sender, e);
+        _queueService.TryEnqueue(() => ConnectionSwitchValue = e.ConnectionStatus != ConnectionStatus.Disconnected);
     }
 
-    private void OnStrengthChanged(object? sender, CoyoteWS.StrengthChangedEventArgs e)
+    private void UpdateFeedback(int feedback)
+    {
+        _queueService.TryEnqueue(() =>
+        {
+            Feedback = feedback switch
+            {
+                _ => "不知所措",
+            };
+        });
+    }
+
+    private void OnStrengthInfoChanged(object? sender, StrengthChangedEventArgs e)
     {
         _queueService.TryEnqueue(() =>
         {
             CurrentStrengthA = e.CurrentStrengthA;
             CurrentStrengthB = e.CurrentStrengthB;
-            StrengthCapA = e.StrengthCapA;
-            StrengthCapB = e.StrengthCapB;
+            StrengthLimitA = e.StrengthLimitA;
+            StrengthLimitB = e.StrengthLimitB;
         });
+    }
+
+    private void OnClientFeedbackReceived(object? sender, FeedbackReceivedEventArgs e)
+    {
+        UpdateFeedback(e.Feedback);
     }
 
     protected override void Dispose(bool disposing)
     {
-        Debug.Assert(_coyoteWS is not null);
         base.Dispose(disposing);
+        if (_isDisposed)
+            return;
+
         if (disposing)
         {
-            _coyoteWS.ConnectionStatusChanged -= OnConnectionStatusChanged;
-            _coyoteWS.ClientIdChanged -= OnClientIdChanged;
-            _coyoteWS.BindingStatusChanged -= OnBindingStatusChanged;
-            _coyoteWS.StrengthChanged -= OnStrengthChanged;
+            _strengthInfo.StrengthChanged -= OnStrengthInfoChanged;
+            _clientInfo.FeedbackReceived -= OnClientFeedbackReceived;
         }
-    }
 
-    protected override void OnCurrentLanguageFileNameChanged(object? sender, CurrentLanguageFileNameChangedEventArgs e)
-    {
-        Debug.Assert(_coyoteWS is not null);
-        base.OnCurrentLanguageFileNameChanged(sender, e);
-        _queueService.TryEnqueue(() =>
-        {
-            if (!IsConnecting)
-            {
-                UpdateConnectionMessage(_coyoteWS.IsBound);
-            }
-        });
+        _isDisposed = true;
     }
 }

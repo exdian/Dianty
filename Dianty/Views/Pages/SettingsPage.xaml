@@ -73,10 +73,7 @@
                 <TextBlock
                     Style="{StaticResource BodyStrongTextBlockStyle}" Margin="1,14,0,4"
                     Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.SettingsPageText.AboutItemsHeader, Mode=OneWay}"/>
-                <toolkit:SettingsExpander Header="Dianty">
-                    <toolkit:SettingsExpander.HeaderIcon>
-                        <BitmapIcon ShowAsMonochrome="False" UriSource="Assets/AppIcon-48.png"/>
-                    </toolkit:SettingsExpander.HeaderIcon>
+                <toolkit:SettingsExpander Header="Dianty" Loaded="OnAppInfoExpanderLoaded">
                     <TextBlock Text="{x:Bind ViewModel.Version}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                     <toolkit:SettingsExpander.Items>
                         <toolkit:SettingsCard
@@ -160,7 +157,6 @@
                         <AdaptiveTrigger MinWindowWidth="{StaticResource MinimalModeThresholdWidth}" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <!-- NavigationView.DisplayMode != Minimal -->
                         <Setter Target="PageHeader.Margin" Value="24,12"/>
                         <Setter Target="PageContent.Padding" Value="24,0"/>
                     </VisualState.Setters>

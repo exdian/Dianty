@@ -1,21 +1,33 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
-using Dianty.Models;
+using Dianty.EventArguments;
 using Dianty.Services;
-using Dianty.Utils.Messages;
+using Dianty.Services.Messages;
+using DungeonToolkit.Coyote;
 using System;
 using System.Linq;
-using static Dianty.Models.AutomaticStrength;
-using static Dianty.Services.ILocalizationService;
-using static DungeonToolkit.Coyote.CoyoteManager;
 
 namespace Dianty.ViewModels;
 
-public partial class GamesPageViewModel : ObservableObject, IDisposable
+public sealed partial class GamesPageViewModel : ObservableObject, IDisposable
 {
-    public GamesPageViewModel(GameManager gameManager, IQueueService queueService, ILocalizationService localizationService)
+    private readonly IGameIntegrationManager _gameIntegrationManager;
+    private readonly IWaveformPusherControl _waveformPusherControl;
+    private readonly IWaveformPusherStatus _waveformPusherStatus;
+    private readonly IQueueService _queueService;
+    private readonly ILocalizationService _localizationService;
+    private bool _isDisposed;
+
+    public GamesPageViewModel(
+        IGameIntegrationManager gameIntegrationManager,
+        IWaveformPusherControl waveformPusherControl,
+        IWaveformPusherStatus waveformPusherStatus,
+        IQueueService queueService,
+        ILocalizationService localizationService)
     {
-        _gameManager = gameManager;
+        _gameIntegrationManager = gameIntegrationManager;
+        _waveformPusherControl = waveformPusherControl;
+        _waveformPusherStatus = waveformPusherStatus;
         _queueService = queueService;
         _localizationService = localizationService;
 
@@ -25,18 +37,11 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
         StrengthModeSelectionItems = StrengthModeSelectionItem.GetSelectionItems(_localizationService);
         SelectedStrengthMode = StrengthModeSelectionItems[0];
 
-        _gameManager.EnabledGameCountChanged += OnGameManagerEnabledGameCountChanged;
-        _gameManager.OutputStrengthChanged += GameManager_OutputStrengthChanged;
-        _gameManager.CoyoteManager.OutputStatusChanged += OnCoyoteManagerOutputStatusChanged;
-        _localizationService.CurrentLanguageFileNameChanged += OnCurrentLanguageFileNameChanged;
+        _gameIntegrationManager.EnabledGameIntegrationCountChanged += OnGameIntegrationManagerEnabledGameIntegrationCountChanged;
+        _gameIntegrationManager.OutputStrengthChanged += OnGameIntegrationManagerOutputStrengthChanged;
+        _waveformPusherStatus.PushStatusChanged += OnWaveformPushStatusChanged;
+        _localizationService.CurrentLanguageChanged += OnCurrentLanguageChanged;
     }
-
-    private readonly GameManager _gameManager;
-    private readonly IQueueService _queueService;
-    private readonly ILocalizationService _localizationService;
-    private bool _isDisposed;
-
-    public required GtaVcRuleCardViewModel GtaVcRuleCardViewModel { get; init; }
 
     [ObservableProperty]
     public partial OutputModeSelectionItem[] OutputModeSelectionItems { get; private set; }
@@ -45,7 +50,7 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
     public partial StrengthModeSelectionItem[] StrengthModeSelectionItems { get; private set; }
 
     [ObservableProperty]
-    public partial int EnabledGameCount { get; private set; }
+    public partial int EnabledGameIntegrationCount { get; private set; }
 
     [ObservableProperty]
     public partial int OutputStrength { get; private set; }
@@ -54,7 +59,7 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
     public partial OutputModeSelectionItem? SelectedOutputMode { get; set; }
 
     [ObservableProperty]
-    public partial bool IsAutoStartStop { get; private set; }
+    public partial bool IsAutomaticStartStop { get; private set; }
 
     [ObservableProperty]
     public partial bool IsOutputting { get; set; }
@@ -68,48 +73,48 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
         GC.SuppressFinalize(this);
     }
 
-    protected virtual void Dispose(bool disposing)
+    private void Dispose(bool disposing)
     {
         if (_isDisposed)
             return;
-        _isDisposed = true;
 
         if (disposing)
         {
-            _gameManager.EnabledGameCountChanged -= OnGameManagerEnabledGameCountChanged;
-            _gameManager.OutputStrengthChanged -= GameManager_OutputStrengthChanged;
-            _gameManager.CoyoteManager.OutputStatusChanged -= OnCoyoteManagerOutputStatusChanged;
-            _localizationService.CurrentLanguageFileNameChanged -= OnCurrentLanguageFileNameChanged;
-            _gameManager.Dispose();
+            _gameIntegrationManager.EnabledGameIntegrationCountChanged -= OnGameIntegrationManagerEnabledGameIntegrationCountChanged;
+            _gameIntegrationManager.OutputStrengthChanged -= OnGameIntegrationManagerOutputStrengthChanged;
+            _waveformPusherStatus.PushStatusChanged -= OnWaveformPushStatusChanged;
+            _localizationService.CurrentLanguageChanged -= OnCurrentLanguageChanged;
         }
+
+        _isDisposed = true;
     }
 
-    private void OnGameManagerEnabledGameCountChanged(object? sender, GameManager.EnabledGameCountChangedEventArgs e)
+    private void OnGameIntegrationManagerEnabledGameIntegrationCountChanged(object? sender, EnabledGameIntegrationCountChangedEventArgs e)
     {
-        _queueService.TryEnqueue(() => EnabledGameCount = e.Count);
+        _queueService.TryEnqueue(() => EnabledGameIntegrationCount = e.Count);
     }
 
-    private void GameManager_OutputStrengthChanged(object? sender, EventArgs e)
+    private void OnGameIntegrationManagerOutputStrengthChanged(object? sender, OutputStrengthChangedEventArgs e)
     {
-        var outputStrength = _gameManager.OutputStrength;
+        var outputStrength = e.Strength;
         _queueService.TryEnqueue(() => OutputStrength = outputStrength);
         WeakReferenceMessenger.Default.Send(new Log($"总强度发生变化：{outputStrength}"));
     }
 
-    private void OnCoyoteManagerOutputStatusChanged(object? sender, OutputStatusChangedEventArgs e)
+    private void OnWaveformPushStatusChanged(object? sender, PushStatusChangedEventArgs e)
     {
-        if (IsAutoStartStop)
-            _queueService.TryEnqueue(() => IsOutputting = e.IsOutputting);
+        if (IsAutomaticStartStop)
+            _queueService.TryEnqueue(() => IsOutputting = e.IsPushing);
     }
 
-    private void OnCurrentLanguageFileNameChanged(object? sender, CurrentLanguageFileNameChangedEventArgs e)
+    private void OnCurrentLanguageChanged(object? sender, CurrentLanguageChangedEventArgs e)
     {
         var outputModeSelectionItems = OutputModeSelectionItem.GetSelectionItems(_localizationService);
         var selectedOutputMode = SelectedOutputMode;
         if (selectedOutputMode is not null)
         {
-            var isAutoStartStop = selectedOutputMode.IsAutoStartStop;
-            selectedOutputMode = outputModeSelectionItems.FirstOrDefault(i => i.IsAutoStartStop == isAutoStartStop);
+            var isAutomaticStartStop = selectedOutputMode.IsAutomaticStartStop;
+            selectedOutputMode = outputModeSelectionItems.FirstOrDefault(i => i.IsAutomaticStartStop == isAutomaticStartStop);
         }
         _queueService.TryEnqueue(() =>
         {
@@ -135,32 +140,37 @@ public partial class GamesPageViewModel : ObservableObject, IDisposable
     {
         if (value is null)
             return;
-        var isAutoStartStop = value.IsAutoStartStop;
-        IsAutoStartStop = isAutoStartStop;
-        _gameManager.CoyoteManager.IsAutoStartStop = isAutoStartStop;
-        if (!isAutoStartStop)
-            _gameManager.CoyoteManager.StopOutput();
+
+        var isAutomaticStartStop = value.IsAutomaticStartStop;
+        if (_waveformPusherControl.IsAutomaticStartStop == isAutomaticStartStop)
+            return;
+
+        IsOutputting = false;
+        IsAutomaticStartStop = isAutomaticStartStop;
+        _waveformPusherControl.IsAutomaticStartStop = isAutomaticStartStop;
+        if (!isAutomaticStartStop)
+            _waveformPusherControl.Stop();
     }
 
     partial void OnIsOutputtingChanged(bool value)
     {
-        if (IsAutoStartStop)
+        if (IsAutomaticStartStop)
             return;
         if (value)
-            _gameManager.CoyoteManager.StartOutput();
+            _waveformPusherControl.Start();
         else
-            _gameManager.CoyoteManager.StopOutput();
+            _waveformPusherControl.Stop();
     }
 
     partial void OnSelectedStrengthModeChanged(StrengthModeSelectionItem? value)
     {
         if (value is null)
             return;
-        _gameManager.StrengthMode = value.Mode;
+        _gameIntegrationManager.StrengthMode = value.Mode;
     }
 }
 
-public record class OutputModeSelectionItem(bool IsAutoStartStop, string Description)
+public sealed record class OutputModeSelectionItem(bool IsAutomaticStartStop, string Description)
 {
     private static OutputModeSelectionItem[]? s_SelectionItems;
 
@@ -180,7 +190,7 @@ public record class OutputModeSelectionItem(bool IsAutoStartStop, string Descrip
     }
 }
 
-public record class StrengthModeSelectionItem(Mode Mode, string Description)
+public sealed record class StrengthModeSelectionItem(StrengthCalculationMode Mode, string Description)
 {
     private static StrengthModeSelectionItem[]? s_SelectionItems;
 
@@ -193,8 +203,8 @@ public record class StrengthModeSelectionItem(Mode Mode, string Description)
             || !ReferenceEquals(s_SelectionItems[1].Description, text.SumModeItemText))
         {
             s_SelectionItems =
-                [new StrengthModeSelectionItem(Mode.Max, text.MaximumModeItemText),
-                new StrengthModeSelectionItem(Mode.Sum, text.SumModeItemText)];
+                [new StrengthModeSelectionItem(StrengthCalculationMode.Max, text.MaximumModeItemText),
+                new StrengthModeSelectionItem(StrengthCalculationMode.Sum, text.SumModeItemText)];
         }
         return s_SelectionItems;
     }

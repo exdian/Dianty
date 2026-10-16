@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:format="using:Windows.Globalization.NumberFormatting"
     xmlns:converters="using:CommunityToolkit.WinUI.Converters"
-    xmlns:utils="using:Dianty.Utils">
+    xmlns:cvt="using:Dianty.Utils.Converters">
 
     <x:Double x:Key="MinimalModeThresholdWidth">500</x:Double>
     <x:Double x:Key="CommonCardSpacing">4</x:Double>
@@ -17,13 +17,13 @@
     </format:DecimalFormatter>
 
     <converters:BoolNegationConverter x:Key="BoolNegationConverter"/>
-    <converters:BoolToObjectConverter x:Key="CoyoteTypeIconConverter" TrueValue="&#xE702;" FalseValue="&#xE753;"/>
     <converters:BoolToVisibilityConverter x:Key="VisibleIfTrueConverter" TrueValue="Visible" FalseValue="Collapsed"/>
     <converters:BoolToVisibilityConverter x:Key="VisibleIfFalseConverter" TrueValue="Collapsed" FalseValue="Visible"/>
-    <utils:IntToBatteryIconConverter x:Key="IntToBatteryIconConverter"/>
-    <utils:IntToBatteryPercentageConverter x:Key="IntToBatteryPercentageConverter"/>
-    <utils:QrCodeSvgPathConverter x:Key="QrCodeSvgPathConverter"/>
-    <utils:WaveIntervalConverter x:Key="WaveIntervalConverter"/>
+    <cvt:ConnectionKindConverter x:Key="ConnectionKindConverter"/>
+    <cvt:IntToBatteryIconConverter x:Key="IntToBatteryIconConverter"/>
+    <cvt:IntToBatteryPercentageConverter x:Key="IntToBatteryPercentageConverter"/>
+    <cvt:SvgPathConverter x:Key="SvgPathConverter"/>
+    <cvt:WaveformIntervalConverter x:Key="WaveformIntervalConverter"/>
 
     <Style x:Key="StretchListViewItemStyle" TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
         <Setter Property="Padding" Value="0"/>

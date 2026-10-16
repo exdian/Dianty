@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Dianty.Models;
 
-internal class MemoryService : IMemoryService
+internal sealed class MemoryService : IMemoryService
 {
     private Memory? _mem;
 
@@ -24,7 +24,7 @@ internal class MemoryService : IMemoryService
         }
     }
 
-    public nint BaseAddress { get; private protected set; }
+    public nint BaseAddress { get; private set; }
 
     public bool TryAccessProcess(string processName, string moduleName, out int pid)
     {

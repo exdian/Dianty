@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using Windows.System;
 using System.Linq;
+using Windows.System;
 
 namespace Dianty.Utils;
 
-public class KeySequenceTrigger
+public sealed class KeySequenceTrigger
 {
     private int _maxCachedKeys; // 缓存区大小
     private int _cachedKeyIndex; // 缓存写入位置指针
@@ -150,7 +150,7 @@ public class KeySequenceTrigger
         }
     }
 
-    private class TrieNode
+    private sealed class TrieNode
     {
         public Dictionary<VirtualKey, TrieNode> Children { get; } = [];
         public Action? Action { get; set; }

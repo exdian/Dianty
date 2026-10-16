@@ -1,0 +1,15 @@
+﻿using System.Diagnostics;
+
+namespace DungeonToolkit.Coyote;
+
+public sealed class WaveformDecoder : IWaveformDecoder 
+{
+    public WaveformDecoder(WaveformDecoderId id, IWaveform waveform);
+    public WaveformId WaveformId { get; }
+    public WaveformDecoderId WaveformDecoderId { get; }
+    public int Speed { get; }
+    public PulseData CurrentPulseData { get; }
+    public PulseData NextPulseData();
+    public int SetSpeed(int speed);
+}
+

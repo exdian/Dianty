@@ -1,0 +1,37 @@
+﻿using static GameMonitor.GtaVcMonitor;
+
+namespace GameMonitor;
+
+public interface IGtaVcMonitor : IMonitorState 
+{
+    event EventHandler<PlayerTookDamageEventArgs>? PlayerTookDamage;
+    event EventHandler<PlayerBustedEventArgs>? PlayerBusted;
+    event EventHandler<PlayerWastedEventArgs>? PlayerWasted;
+    event EventHandler<PlayerWantedLevelChangedEventArgs>? PlayerWantedLevelChanged;
+    event EventHandler<PlayerFellOffBikeEventArgs>? PlayerFellOffBike;
+    void Start();
+    void Stop();
+    sealed class PlayerTookDamageEventArgs(float damage) : EventArgs 
+    {
+        public float Damage { get; }
+    }
+    sealed class PlayerBustedEventArgs(int wantedLevel) : EventArgs 
+    {
+        public int WantedLevel { get; }
+    }
+    sealed class PlayerWastedEventArgs(bool isMiTang) : EventArgs 
+    {
+        public bool IsMiTang { get; }
+    }
+    sealed class PlayerWantedLevelChangedEventArgs(int diff) : EventArgs 
+    {
+        public int Diff { get; }
+    }
+    sealed class PlayerFellOffBikeEventArgs(VehicleId vehicleId, VehicleType vehicleType, string vehicleName) : EventArgs 
+    {
+        public VehicleId VehicleId { get; }
+        public VehicleType VehicleType { get; }
+        public string VehicleName { get; }
+    }
+}
+

@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Dianty.Localization;
-using Dianty.Utils.Messages;
+using Dianty.Services.Messages;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -14,6 +14,19 @@ namespace Dianty.Views.Controls;
 
 public sealed partial class CoyoteDeletionCard : UserControl
 {
+    public DeviceDeletionConfirmationDialogText LocalizedText
+    {
+        get => (DeviceDeletionConfirmationDialogText)GetValue(LocalizedTextProperty);
+        set => SetValue(LocalizedTextProperty, value);
+    }
+
+    public static readonly DependencyProperty LocalizedTextProperty
+        = DependencyProperty.Register(
+            nameof(LocalizedText),
+            typeof(DeviceDeletionConfirmationDialogText),
+            typeof(CoyoteDeletionCard),
+            new PropertyMetadata(null));
+
     public string TargetName
     {
         get => (string)GetValue(TargetNameProperty);
@@ -37,6 +50,19 @@ public sealed partial class CoyoteDeletionCard : UserControl
         = DependencyProperty.Register(
             nameof(DeleteCommand),
             typeof(ICommand),
+            typeof(CoyoteDeletionCard),
+            new PropertyMetadata(null));
+
+    public object CommandParameter
+    {
+        get => GetValue(CommandParameterProperty);
+        set => SetValue(CommandParameterProperty, value);
+    }
+
+    public static readonly DependencyProperty CommandParameterProperty
+        = DependencyProperty.Register(
+            nameof(CommandParameter),
+            typeof(object),
             typeof(CoyoteDeletionCard),
             new PropertyMetadata(null));
 
@@ -70,24 +96,26 @@ public sealed partial class CoyoteDeletionCard : UserControl
         {
             _deletionSlider.Value = 100;
 
-            var dialogText = Localizer.Instance.AppText.MainWindowText.DeviceDeletionCardText.ConfirmationDialogText;
+            var dialogText = LocalizedText;
             var dialog = new ContentDialog
             {
                 XamlRoot = XamlRoot,
-                Title = dialogText.Title,
-                PrimaryButtonText = dialogText.PrimaryButtonText,
-                CloseButtonText = dialogText.CloseButtonText,
+                Title = dialogText?.Title ?? "Delete?",
+                PrimaryButtonText = dialogText?.PrimaryButtonText ?? "Confirm Delete",
+                CloseButtonText = dialogText?.CloseButtonText ?? "Cancel",
                 IsSecondaryButtonEnabled = false,
                 DefaultButton = ContentDialogButton.None,
-                Content = string.Format(dialogText.ContentFormat, TargetName),
+                Content = string.Format(dialogText?.ContentFormat ?? "Remove \"{0}\" from the list", TargetName),
                 RequestedTheme = ActualTheme
             };
 
             if (await dialog.ShowAsync() == ContentDialogResult.Primary)
             {
-                if (DeleteCommand is not null && DeleteCommand.CanExecute(null))
+                var command = DeleteCommand;
+                var parameter = CommandParameter;
+                if (command is not null && command.CanExecute(parameter))
                 {
-                    DeleteCommand.Execute(null);
+                    command.Execute(parameter);
 
                     var navigationOptions = new FrameNavigationOptions
                     {

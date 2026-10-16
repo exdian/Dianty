@@ -1,4 +1,5 @@
-﻿using Dianty.Localization;
+﻿using Dianty.EventArguments;
+using Dianty.Localization;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,13 +12,8 @@ public interface ILocalizationService
     string TextDirectory { get; set; }
     string CurrentLanguageFileName { get; }
 
-    event EventHandler<CurrentLanguageFileNameChangedEventArgs>? CurrentLanguageFileNameChanged;
+    event EventHandler<CurrentLanguageChangedEventArgs>? CurrentLanguageChanged;
 
     Task<IEnumerable<KeyValuePair<string, string>>> GetAvailableLanguagesAsync();
     Task SetLanguageAsync(string fileName);
-
-    public class CurrentLanguageFileNameChangedEventArgs(string currentLanguageFileName) : EventArgs
-    {
-        public string CurrentLanguageFileName { get; } = currentLanguageFileName;
-    }
 }

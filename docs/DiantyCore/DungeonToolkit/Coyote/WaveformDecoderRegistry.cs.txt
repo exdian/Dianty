@@ -1,0 +1,15 @@
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace DungeonToolkit.Coyote;
+
+public sealed class WaveformDecoderRegistry : RegistryBase<WaveformDecoderId, IWaveformDecoder>,
+    IRegistryReader<WaveformDecoderId, IWaveformDecoderConfig>,
+    IDataSource<IWaveformDecoderInfo>,
+    IDataSource<IWaveformDecoderConfig> 
+{
+    IReadOnlyList<IWaveformDecoderInfo> IDataSource<IWaveformDecoderInfo>.GetSnapshot();
+    IReadOnlyList<IWaveformDecoderConfig> IDataSource<IWaveformDecoderConfig>.GetSnapshot();
+    bool IRegistryReader<WaveformDecoderId, IWaveformDecoderConfig>.TryGetValue(
+        WaveformDecoderId key, [MaybeNullWhen(false)] out IWaveformDecoderConfig value);
+}
+

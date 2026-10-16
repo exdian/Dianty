@@ -3,7 +3,7 @@
     x:Class="Dianty.Views.Pages.DebugPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:msg="using:Dianty.Utils.Messages"
+    xmlns:msg="using:Dianty.Services.Messages"
     xmlns:txt="using:Dianty.Localization"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -42,7 +42,6 @@
                         <AdaptiveTrigger MinWindowWidth="{StaticResource MinimalModeThresholdWidth}" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <!-- NavigationView.DisplayMode != Minimal -->
                         <Setter Target="ClearButton.Margin" Value="24,24,24,0"/>
                         <Setter Target="_logListView.Padding" Value="21,0"/>
                     </VisualState.Setters>

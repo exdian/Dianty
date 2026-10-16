@@ -1,0 +1,8 @@
+﻿namespace DungeonToolkit;
+
+public sealed class MemoryOrderStore<T> : IOrderStore<T> 
+{
+    public IReadOnlyList<T> Load();
+    public void Save(IEnumerable<T> items);
+}
+

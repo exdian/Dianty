@@ -1,0 +1,7 @@
+﻿namespace DungeonToolkit.Coyote;
+
+public sealed class WaveformRegistry : RegistryBase<WaveformId, IWaveform>, IDataSource<IWaveformInfo> 
+{
+    IReadOnlyList<IWaveformInfo> IDataSource<IWaveformInfo>.GetSnapshot();
+}
+

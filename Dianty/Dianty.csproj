@@ -12,36 +12,37 @@
     <EnableMsixTooling>true</EnableMsixTooling>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+  	<Content Include="Localization\Text\*.json">
+  	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  	</Content>
+  </ItemGroup>
   <ItemGroup>
     <None Remove="LoadView.xaml" />
     <None Remove="MainView.xaml" />
     <None Remove="Resources\AppResourceDictionary.xaml" />
-    <None Remove="Views\Controls\CoyoteBleDetailCard.xaml" />
+    <None Remove="Views\Controls\AppIcon.xaml" />
+    <None Remove="Views\Controls\CoyoteBleDetailCards.xaml" />
     <None Remove="Views\Controls\CoyoteDeletionCard.xaml" />
-    <None Remove="Views\Controls\CoyoteWsDetailCard.xaml" />
-    <None Remove="Views\Controls\GtaVcRuleCard.xaml" />
+    <None Remove="Views\Controls\CoyoteWsDetailCards.xaml" />
+    <None Remove="Views\Controls\GamesPageContent.xaml" />
+    <None Remove="Views\Controls\GtaVcRuleCards.xaml" />
+    <None Remove="Views\Controls\PathBar.xaml" />
     <None Remove="Views\Controls\QrCodeButton.xaml" />
-    <None Remove="Views\Controls\WavePlayQueueListView.xaml" />
+    <None Remove="Views\Controls\WaveformPlaylistControl.xaml" />
+    <None Remove="Views\Controls\WaveformPlaylistPageContent.xaml" />
     <None Remove="Views\Pages\CoyoteDetailPage.xaml" />
     <None Remove="Views\Pages\DebugPage.xaml" />
     <None Remove="Views\Pages\DevicesPage.xaml" />
+    <None Remove="Views\Pages\GameIntegrationDetailPage.xaml" />
     <None Remove="Views\Pages\GamesPage.xaml" />
     <None Remove="Views\Pages\HomePage.xaml" />
     <None Remove="Views\Pages\SafetyPage.xaml" />
     <None Remove="Views\Pages\SettingsPage.xaml" />
-    <None Remove="Views\Pages\WavePlayQueuePage.xaml" />
-    <None Remove="Views\Pages\WaveSettingsPage.xaml" />
-    <None Remove="Views\Pages\WavesPage.xaml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Assets\SplashScreen.scale-200.png" />
-    <Content Include="Assets\LockScreenLogo.scale-200.png" />
-    <Content Include="Assets\Square150x150Logo.scale-200.png" />
-    <Content Include="Assets\Square44x44Logo.scale-200.png" />
-    <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
-    <Content Include="Assets\StoreLogo.png" />
-    <Content Include="Assets\Wide310x150Logo.scale-200.png" />
+    <None Remove="Views\Pages\WaveformPlaylistPage.xaml" />
+    <None Remove="Views\Pages\WaveformSettingsPage.xaml" />
+    <None Remove="Views\Pages\WaveformsPage.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -81,17 +82,52 @@
     <ProjectReference Include="..\..\DiantyCore\GameMonitor\GameMonitor.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Pages\WaveSettingsPage.xaml">
+    <Page Update="Views\Controls\AppIcon.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Controls\WavePlayQueueListView.xaml">
+    <Page Update="Views\Controls\WaveformPlaylistControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Pages\WavePlayQueuePage.xaml">
+    <Page Update="Views\Controls\WaveformPlaylistPageContent.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Pages\WaveformPlaylistPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Pages\WaveformSettingsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Pages\WaveformsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Pages\GameIntegrationDetailPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Controls\GtaVcRuleCards.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Controls\GamesPageContent.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Controls\PathBar.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
@@ -111,12 +147,12 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Controls\CoyoteWsDetailCard.xaml">
+    <Page Update="Views\Controls\CoyoteWsDetailCards.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Controls\CoyoteBleDetailCard.xaml">
+    <Page Update="Views\Controls\CoyoteBleDetailCards.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
@@ -131,22 +167,12 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Controls\GtaVcRuleCard.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
     <Page Update="Views\Pages\SafetyPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\Pages\GamesPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Views\Pages\WavesPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
@@ -183,10 +209,4 @@
     <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
     <PublishAot>True</PublishAot>
   </PropertyGroup>
-
-  <ItemGroup>
-  	<Content Include="Localization\Text\*.json">
-  	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-  	</Content>
-  </ItemGroup>
 </Project>

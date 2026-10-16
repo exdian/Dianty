@@ -1,0 +1,28 @@
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace DungeonToolkit.Coyote;
+
+public sealed class DeviceRegistry : RegistryBase<DeviceId, IRegisterableDevice>,
+    IRegistryReader<DeviceId, IConnectableDevice>,
+    IRegistryReader<DeviceId, IStrengthInfo>,
+    IRegistryReader<DeviceId, IOutputParameterConfig>,
+    IRegistryReader<DeviceId, IBatteryInfo>,
+    IDataSource<IDeviceInfo>,
+    IDataSource<IWaveformOutputDevice>,
+    IDataSource<IConnectableDevice>,
+    IDataSource<IBatteryInfo> 
+{
+    IReadOnlyList<IDeviceInfo> IDataSource<IDeviceInfo>.GetSnapshot();
+    IReadOnlyList<IWaveformOutputDevice> IDataSource<IWaveformOutputDevice>.GetSnapshot();
+    IReadOnlyList<IConnectableDevice> IDataSource<IConnectableDevice>.GetSnapshot();
+    IReadOnlyList<IBatteryInfo> IDataSource<IBatteryInfo>.GetSnapshot();
+    bool IRegistryReader<DeviceId, IConnectableDevice>.TryGetValue(
+        DeviceId key, [MaybeNullWhen(false)] out IConnectableDevice value);
+    bool IRegistryReader<DeviceId, IStrengthInfo>.TryGetValue(
+        DeviceId key, [MaybeNullWhen(false)] out IStrengthInfo value);
+    bool IRegistryReader<DeviceId, IOutputParameterConfig>.TryGetValue(
+        DeviceId key, [MaybeNullWhen(false)] out IOutputParameterConfig value);
+    bool IRegistryReader<DeviceId, IBatteryInfo>.TryGetValue(
+        DeviceId key, [MaybeNullWhen(false)] out IBatteryInfo value);
+}
+

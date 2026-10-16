@@ -1,0 +1,10 @@
+﻿namespace DungeonToolkit.Coyote;
+
+public sealed class Factory : IRegisterableDeviceFactory, IWaveformFactory, IWaveformDecoderFactory 
+{
+    public Factory(ICoyoteBleDetector coyoteBleDetector);
+    IRegisterableDevice IRegisterableDeviceFactory.Create(DeviceId id, ConnectionKind connectionKind);
+    IWaveform IWaveformFactory.Create(WaveformId id, string waveform);
+    IWaveformDecoder IWaveformDecoderFactory.Create(WaveformDecoderId id, IWaveform waveform);
+}
+

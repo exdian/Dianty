@@ -1,13 +1,13 @@
 ﻿namespace Dianty.Localization;
 
-public class AppText
+public sealed class AppText
 {
     public string LanguageLabel { get; set; } = string.Empty;
 
     public MainWindowText MainWindowText { get; set; } = new();
 }
 
-public class MainWindowText
+public sealed class MainWindowText
 {
     public CrashDialogText CrashDialogText { get; set; } = new();
     public MainViewText MainViewText { get; set; } = new();
@@ -16,17 +16,17 @@ public class MainWindowText
     public DeviceDeletionCardText DeviceDeletionCardText { get; set; } = new();
 }
 
-public class CrashDialogText
+public sealed class CrashDialogText
 {
     public string Title { get; set; } = "出错了";
     public string CloseButtonText { get; set; } = "结束运行";
 }
 
-public class MainViewText
+public sealed class MainViewText
 {
     public string MenuHome { get; set; } = "主页";
     public string MenuDevices { get; set; } = "设备";
-    public string MenuWaves { get; set; } = "波形";
+    public string MenuWaveforms { get; set; } = "波形";
     public string MenuGames { get; set; } = "玩法";
     public string MenuSafety { get; set; } = "安全";
     public string MenuDebug { get; set; } = "调试";
@@ -34,14 +34,14 @@ public class MainViewText
 
     public HomePageText HomePageText { get; set; } = new();
     public DevicesPageText DevicesPageText { get; set; } = new();
-    public WavesPageText WavesPageText { get; set; } = new();
+    public WaveformsPageText WaveformsPageText { get; set; } = new();
     public GamesPageText GamesPageText { get; set; } = new();
     public SafetyPageText SafetyPageText { get; set; } = new();
     public DebugPageText DebugPageText { get; set; } = new();
     public SettingsPageText SettingsPageText { get; set; } = new();
 }
 
-public class HomePageText
+public sealed class HomePageText
 {
     public string DeviceManagementCardHeader { get; set; } = "设备管理";
     public string ConnectedCountFormat { get; set; } = "已连接 {0}";
@@ -54,16 +54,17 @@ public class HomePageText
     public string NoneLabel { get; set; } = "无";
 }
 
-public class DevicesPageText
+public sealed class DevicesPageText
 {
     public string AddDeviceButtonText { get; set; } = "添加设备";
     public string BluetoothLabel { get; set; } = "蓝牙";
     public string SocketLabel { get; set; } = "Socket";
     public string CancelButtonText { get; set; } = "取消";
     public string SortButtonText { get; set; } = "排序";
-    public string WaitingBluetoothConnectionStateText { get; set; } = "正在搜索并连接";
-    public string WaitingSocketServerStateText { get; set; } = "正在连接服务器获取二维码";
-    public string WaitingScanQrCodeStateText { get; set; } = "已获取二维码";
+    public string BluetoothSearchingStateText { get; set; } = "正在搜索设备";
+    public string BluetoothConnectingStateText { get; set; } = "已找到设备，正在连接";
+    public string WebSocketSearchingStateText { get; set; } = "正在连接服务器获取二维码";
+    public string WebSocketConnectingStateText { get; set; } = "已获取二维码";
     public string ConnectionFailedStateText { get; set; } = "连接失败";
     public string ConnectionSuccessfulStateText { get; set; } = "连接成功";
     public string ConnectionCanceledStateText { get; set; } = "已取消连接";
@@ -72,8 +73,7 @@ public class DevicesPageText
     public string DeviceNameCardHeader { get; set; } = "设备名称";
     public string ConnectionStatusCardHeader { get; set; } = "连接状态";
     public string ConnectionStatusCardBluetoothDescription { get; set; } = "此设备通过蓝牙连接";
-    public string ConnectionStatusCardSocketDescription { get; set; } = "此设备通过WebSocket连接";
-    public string ConnectingStateText { get; set; } = "正在连接";
+    public string ConnectionStatusCardWebSocketDescription { get; set; } = "此设备通过WebSocket连接";
     public string ConnectedStateText { get; set; } = "已连接";
     public string DisconnectedStateText { get; set; } = "已断开连接";
     public string OutputSwitchCardHeader { get; set; } = "是否允许输出";
@@ -82,9 +82,9 @@ public class DevicesPageText
     public string OutputParametersCardDescription { get; set; } = "轻柔模式、频率与强度平衡参数";
     public string GentleModeCardHeader { get; set; } = "轻柔模式";
     public string ChannelAFrequencyBalanceSliderHeader { get; set; } = "A通道频率平衡参数";
-    public string ChannelAStrengthBalanceSliderHeader { get; set; } = "A通道强度平衡参数";
+    public string ChannelAIntensityBalanceSliderHeader { get; set; } = "A通道强度平衡参数";
     public string ChannelBFrequencyBalanceSliderHeader { get; set; } = "B通道频率平衡参数";
-    public string ChannelBStrengthBalanceSliderHeader { get; set; } = "B通道强度平衡参数";
+    public string ChannelBIntensityBalanceSliderHeader { get; set; } = "B通道强度平衡参数";
     public string MoreInfoCardHeader { get; set; } = "更多";
     public string CurrentChannelAStrengthCardHeader { get; set; } = "当前A通道强度";
     public string CurrentChannelBStrengthCardHeader { get; set; } = "当前B通道强度";
@@ -93,37 +93,37 @@ public class DevicesPageText
     public string ChannelBStrengthLimitCardHeader { get; set; } = "B通道强度上限";
 }
 
-public class WavesPageText
+public sealed class WaveformsPageText
 {
-    public string ChannelAQueueSwitchHeader { get; set; } = "A通道队列";
-    public string ChannelBQueueSwitchHeader { get; set; } = "B通道队列";
-    public string ImportWaveButtonText { get; set; } = "导入波形";
+    public string ChannelAPlaylistSwitchHeader { get; set; } = "A通道开关";
+    public string ChannelBPlaylistSwitchHeader { get; set; } = "B通道开关";
+    public string ImportWaveformButtonText { get; set; } = "导入波形";
     public string DeleteButtonText { get; set; } = "删除";
     public string SortButtonText { get; set; } = "排序";
-    public string QueueButtonText { get; set; } = "播放队列";
-    public string WaveFilePickerTitle { get; set; } = "打开";
-    public string WaveFilesLabel { get; set; } = "波形文件";
+    public string PlaylistButtonText { get; set; } = "播放列表";
+    public string WaveformFilePickerTitle { get; set; } = "打开";
+    public string WaveformFilesLabel { get; set; } = "波形文件";
     public string AllFilesLabel { get; set; } = "所有文件";
-    public string DefaultWaveNameLabel { get; set; } = "新波形";
+    public string DefaultWaveformNameLabel { get; set; } = "新波形";
     public string ChannelALabel { get; set; } = "A通道";
     public string ChannelBLabel { get; set; } = "B通道";
-    public string QueueMenuPath { get; set; } = "播放队列";
+    public string PlaylistMenuPath { get; set; } = "播放列表";
     public string ClearButtonText { get; set; } = "清空";
-    public string QueueModePlaceholderText { get; set; } = "播放模式";
-    public string QueueIntervalPlaceholderText { get; set; } = "切换间隔";
-    public string QueueIntervalUnitText { get; set; } = "秒";
+    public string PlaylistModePlaceholderText { get; set; } = "播放模式";
+    public string PlaylistIntervalPlaceholderText { get; set; } = "切换间隔";
+    public string PlaylistIntervalUnitText { get; set; } = "秒";
     public string DetailsMenuPath { get; set; } = "详细信息";
-    public string WaveNameCardHeader { get; set; } = "名称";
-    public string WaveDescriptionCardHeader { get; set; } = "备注";
-    public string WaveQueueSwitchCardHeader { get; set; } = "将波形加入到播放队列";
-    public string ChannelAQueueCardHeader { get; set; } = "A通道播放队列";
-    public string ChannelBQueueCardHeader { get; set; } = "B通道播放队列";
+    public string WaveformNameCardHeader { get; set; } = "名称";
+    public string WaveformDescriptionCardHeader { get; set; } = "备注";
+    public string WaveformPlaylistSwitchCardHeader { get; set; } = "将波形加入到播放列表";
+    public string ChannelAPlaylistCardHeader { get; set; } = "A通道播放列表";
+    public string ChannelBPlaylistCardHeader { get; set; } = "B通道播放列表";
 
     public ErrorProcessingFileDialogText ErrorProcessingFileDialogText { get; set; } = new();
-    public ClassicWavesNameLabel ClassicWavesNameLabel { get; set; } = new();
+    public ClassicWaveformsNameLabel ClassicWaveformsNameLabel { get; set; } = new();
 }
 
-public class ErrorProcessingFileDialogText
+public sealed class ErrorProcessingFileDialogText
 {
     public string AllFailedTitle { get; set; } = "发生错误";
     public string PartiallyFailedTitle { get; set; } = "处理部分文件时发生错误";
@@ -132,7 +132,7 @@ public class ErrorProcessingFileDialogText
     public string FailureCountFormat { get; set; } = "（{0}个）：";
 }
 
-public class ClassicWavesNameLabel
+public sealed class ClassicWaveformsNameLabel
 {
     public string Breathing { get; set; } = "呼吸";
     public string Tide { get; set; } = "潮汐";
@@ -152,10 +152,10 @@ public class ClassicWavesNameLabel
     public string Tease2 { get; set; } = "挑逗2";
 }
 
-public class GamesPageText
+public sealed class GamesPageText
 {
     public string OverviewItemsHeader { get; set; } = "概况";
-    public string EnabledGameCountLabel { get; set; } = "生效玩法";
+    public string EnabledGameIntegrationCountLabel { get; set; } = "生效玩法";
     public string OutputStrengthLabel { get; set; } = "输出强度";
     public string OutputModeCardHeader { get; set; } = "输出模式";
     public string OutputModeCardDescription { get; set; } = "自动模式下强度为0时自动暂停输出";
@@ -168,18 +168,19 @@ public class GamesPageText
     public string StrengthModePlaceholderText { get; set; } = "选择处理模式";
     public string MaximumModeItemText { get; set; } = "取最大值";
     public string SumModeItemText { get; set; } = "叠加强度";
-    public string RuleItemsHeader { get; set; } = "规则";
-    public string EmptyRuleCardHeader { get; set; } = "敬请期待";
+    public string InternalGameIntegrationItemsHeader { get; set; } = "内置玩法";
+    public string EmptyGameIntegrationCardHeader { get; set; } = "敬请期待";
     public string RepositoryLinkCardHeader { get; set; } = "查看更新";
-    public string GameDisabledStateText { get; set; } = "未接入游戏";
+    public string GameIntegrationSwitchCardHeader { get; set; } = "玩法开关";
+    public string GameIntegrationDisabledStateText { get; set; } = "未接入游戏";
     public string FindTargetProcessStateText { get; set; } = "查找游戏进程";
-    public string GameEnabledStateText { get; set; } = "已接入";
-    public string GameStrengthModeCardHeader { get; set; } = "此玩法的规则强度模式";
-    public string GameStrengthModeCardDescription { get; set; } = "多条规则同时生效时";
+    public string GameIntegrationEnabledStateText { get; set; } = "已接入";
+    public string GameIntegrationStrengthModeCardHeader { get; set; } = "此玩法的规则强度模式";
+    public string GameIntegrationStrengthModeCardDescription { get; set; } = "多条规则同时生效时";
     public string RuleStrengthHeader { get; set; } = "惩罚强度";
     public string RuleDurationHeader { get; set; } = "持续时间（秒）";
-    public string GtaVcRuleCardHeader { get; set; } = "侠盗飞车 罪恶都市";
-    public string GtaVcRuleCardDescription { get; set; } = "包含6条规则";
+    public string GtaVcGameIntegrationHeader { get; set; } = "侠盗飞车 罪恶都市";
+    public string GtaVcGameIntegrationCardDescription { get; set; } = "包含6条规则";
     public string GtaVcDamageRuleCardHeader { get; set; } = "每累计受到伤害";
     public string GtaVcBustedRuleCardHeader { get; set; } = "被捕时，每拥有1枚好市民勋章";
     public string GtaVcWastedRuleCardHeader { get; set; } = "血量为0时";
@@ -188,18 +189,18 @@ public class GamesPageText
     public string GtaVcFellOffBikeRuleCardHeader { get; set; } = "从摩托车上摔下来时";
 }
 
-public class SafetyPageText
+public sealed class SafetyPageText
 {
     public string DisableAllDevicesButtonText { get; set; } = "立即停止所有设备输出";
     public string DisconnectAllDevicesButtonText { get; set; } = "立即断开所有设备连接";
 }
 
-public class DebugPageText
+public sealed class DebugPageText
 {
     public string ClearLogButtonText { get; set; } = "清空日志";
 }
 
-public class SettingsPageText
+public sealed class SettingsPageText
 {
     public string AppearanceItemsHeader { get; set; } = "外观";
     public string AppThemeCardHeader { get; set; } = "应用主题";
@@ -223,25 +224,25 @@ public class SettingsPageText
     public LanguageSwitchFailedDialogText LanguageSwitchFailedDialogText { get; set; } = new();
 }
 
-public class LanguageSwitchFailedDialogText
+public sealed class LanguageSwitchFailedDialogText
 {
     public string Title { get; set; } = "语言切换失败";
     public string CloseButtonText { get; set; } = "关闭";
 }
 
-public class ToggleSwitchText
+public sealed class ToggleSwitchText
 {
     public string OffText { get; set; } = "关";
     public string OnText { get; set; } = "开";
 }
 
-public class QrCodeButtonText
+public sealed class QrCodeButtonText
 {
     public string ToolTip { get; set; } = "查看二维码";
     public string CloseButtonText { get; set; } = "隐藏";
 }
 
-public class DeviceDeletionCardText
+public sealed class DeviceDeletionCardText
 {
     public string Header { get; set; } = "删除此设备";
     public string Description { get; set; } = "滑动到右侧可从列表中移除此设备";
@@ -249,7 +250,7 @@ public class DeviceDeletionCardText
     public DeviceDeletionConfirmationDialogText ConfirmationDialogText { get; set; } = new();
 }
 
-public class DeviceDeletionConfirmationDialogText
+public sealed class DeviceDeletionConfirmationDialogText
 {
     public string Title { get; set; } = "是否删除？";
     public string PrimaryButtonText { get; set; } = "确认删除";

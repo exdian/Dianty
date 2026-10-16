@@ -1,9 +1,7 @@
-using CommunityToolkit.Mvvm.Messaging;
+using Dianty.EventArguments;
 using Dianty.Services;
 using Dianty.Utils;
-using Dianty.Utils.Messages;
 using Dianty.ViewModels;
-using Dianty.Views;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
@@ -18,7 +16,7 @@ using WinRT.Interop;
 
 namespace Dianty;
 
-public sealed partial class MainWindow : Window, ITitleBarService, IWindowService, IQueueService, ITemplateContent
+public sealed partial class MainWindow : Window, ITitleBarService, IWindowService, IQueueService
 {
     public MainWindow()
     {
@@ -30,9 +28,15 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
 
     private readonly Dictionary<Windows.System.VirtualKey, bool> _keyStatus = [];
 
-    private ITemplateContent TemplateContent => this;
-
-    public MainViewModel? ViewModel { get; set; }
+    public MainViewModel? ViewModel
+    {
+        get;
+        set
+        {
+            field = value;
+            Bindings.Update();
+        }
+    }
 
     public ElementTheme ColorTheme
     {
@@ -50,6 +54,8 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
                 rootElement.RequestedTheme = value;
         }
     }
+
+    public event EventHandler<LetterKeyDownWithoutTextInputEventArgs>? LetterKeyDownWithoutTextInput;
 
     public InputNonClientPointerSource? GetInputNonClientPointerSource()
     {
@@ -85,18 +91,6 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
     void IQueueService.TryEnqueue(DispatcherQueuePriority priority, DispatcherQueueHandler callback)
     {
         DispatcherQueue?.TryEnqueue(priority, callback);
-    }
-
-    object? ITemplateContent.CreateContent(object? item)
-    {
-        if (item is bool value && value)
-        {
-            return new MainView(this, this, this, ServiceLocator.GetService<ILocalizationService>());
-        }
-        else
-        {
-            return new LoadView();
-        }
     }
 
     [LibraryImport("user32.dll")]
@@ -155,21 +149,27 @@ public sealed partial class MainWindow : Window, ITitleBarService, IWindowServic
         }
     }
 
+    private void OnLetterKeyDownWithoutTextInput(Windows.System.VirtualKey key)
+    {
+        var args = new LetterKeyDownWithoutTextInputEventArgs(key);
+        LetterKeyDownWithoutTextInput?.Invoke(this, args);
+    }
+
     private void RootElement_KeyDown(object sender, KeyRoutedEventArgs e)
     {
         var key = e.Key;
-        if ((int)key < 65 || (int)key > 90 || FocusManager.GetFocusedElement(Content.XamlRoot) is TextBox)
+        if (key < Windows.System.VirtualKey.A
+            || key > Windows.System.VirtualKey.Z
+            || FocusManager.GetFocusedElement(Content.XamlRoot) is TextBox)
+        {
+            return;
+        }
+
+        if (_keyStatus.TryGetValue(key, out var wasKeyDown) && wasKeyDown)
             return;
 
-        if (_keyStatus.TryGetValue(key, out var wasKeyDown))
-        {
-            if (wasKeyDown)
-            {
-                return;
-            }
-        }
         _keyStatus[key] = true;
-        WeakReferenceMessenger.Default.Send(new KeyDownMessage(key));
+        OnLetterKeyDownWithoutTextInput(key);
     }
 
     private void RootElement_KeyUp(object sender, KeyRoutedEventArgs e)

@@ -1,0 +1,17 @@
+﻿namespace DungeonToolkit.Coyote;
+
+public abstract class IdPoolBase<T> : IIdPool<T> 
+{
+    public T Rent();
+    public void Return(T id);
+}
+public sealed class DeviceIdPool(IEnumerable<DeviceId> free, DeviceId start) : IdPoolBase<DeviceId>(free, start) 
+{
+}
+public sealed class WaveformIdPool(IEnumerable<WaveformId> free, WaveformId start) : IdPoolBase<WaveformId>(free, start) 
+{
+}
+public sealed class WaveformDecoderIdPool(IEnumerable<WaveformDecoderId> free, WaveformDecoderId start) : IdPoolBase<WaveformDecoderId>(free, start) 
+{
+}
+

@@ -2,14 +2,15 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Dianty.Services;
-using Dianty.Utils.Messages;
+using Dianty.Services.Messages;
 using Microsoft.UI.Dispatching;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace Dianty.ViewModels;
 
-public partial class DebugPageViewModel : ObservableObject, IDisposable
+public sealed partial class DebugPageViewModel : ObservableObject, IDisposable
 {
     public DebugPageViewModel(IQueueService queueService)
     {
@@ -38,9 +39,17 @@ public partial class DebugPageViewModel : ObservableObject, IDisposable
             Logs.Add(log);
             if (Logs.Count > 5000)
             {
-                for (int i = 0; i < 2000 && Logs.Count > 0; i++)
+                List<Log> reserve = new(Logs.Count - 2000);
+                for (int i = 2000; i < Logs.Count; i++)
                 {
-                    Logs.RemoveAt(0);
+                    reserve.Add(Logs[i]);
+                }
+
+                Logs.Clear();
+
+                for (int i = 0; i < reserve.Count; i++)
+                {
+                    Logs.Insert(i, reserve[i]);
                 }
             }
 
@@ -61,15 +70,16 @@ public partial class DebugPageViewModel : ObservableObject, IDisposable
         GC.SuppressFinalize(this);
     }
 
-    protected virtual void Dispose(bool disposing)
+    private void Dispose(bool disposing)
     {
         if (_isDisposed)
             return;
-        _isDisposed = true;
 
         if (disposing)
         {
             WeakReferenceMessenger.Default.Unregister<Log>(this);
         }
+
+        _isDisposed = true;
     }
 }

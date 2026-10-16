@@ -1,0 +1,20 @@
+﻿namespace DungeonToolkit.Coyote;
+
+public sealed class WaveformPusher : IWaveformPusher, IDisposable 
+{
+    public WaveformPusher(
+        IDataSource<IWaveformOutputDevice> outputSource,
+        IWaveformPublisher channelA,
+        IWaveformPublisher channelB);
+    public int PulseDataBufferCapacity { get; set; }
+    public int StrengthA { get; set; }
+    public int StrengthB { get; set; }
+    public bool IsAutomaticStartStop { get; set; }
+    public bool IsPushing { get; }
+    public event EventHandler<PushStatusChangedEventArgs>? PushStatusChanged;
+    public void SetPushPeriod(int dueTime, int period);
+    public void Start();
+    public void Stop();
+    public void Dispose();
+}
+

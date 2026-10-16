@@ -5,7 +5,7 @@ using Windows.Graphics;
 
 namespace Dianty.Utils;
 
-public partial class WindowHelper
+public static class WindowHelper
 {
     public static void SetWindowSize(Window window, double width, double height)
     {

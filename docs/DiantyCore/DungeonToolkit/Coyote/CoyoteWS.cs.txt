@@ -1,0 +1,33 @@
+﻿using System.Diagnostics;
+using System.Net.WebSockets;
+using System.Text;
+using System.Text.Json;
+
+namespace DungeonToolkit.Coyote;
+
+public sealed class CoyoteWS : IDisposable, IRegisterableDevice, IStrengthInfo, IClientInfo 
+{
+    public CoyoteWS(DeviceId id, Uri serverUri);
+    public DeviceId Id { get; }
+    public ConnectionKind ConnectionKind { get; }
+    public ConnectionStatus ConnectionStatus { get; }
+    public bool IsEnabled { get; set; }
+    public byte CurrentStrengthA { get; }
+    public byte CurrentStrengthB { get; }
+    public byte StrengthLimitA { get; }
+    public byte StrengthLimitB { get; }
+    public string ClientId { get; }
+    public event EventHandler<ConnectionStatusChangedEventArgs>? ConnectionStatusChanged;
+    public event EventHandler<StrengthChangedEventArgs>? StrengthChanged;
+    public event EventHandler<FeedbackReceivedEventArgs>? FeedbackReceived;
+    public async Task<bool> ConnectAsync(CancellationToken cancellationToken);
+    public async Task DisconnectAsync(CancellationToken cancellationToken);
+    public async Task OutputAsync(
+        IReadOnlyList<PulseData> waveformA, IReadOnlyList<PulseData> waveformB, int strengthA, int strengthB);
+    public async Task CancelOutputAsync();
+    public async Task<bool> SetStrengthAsync(Channel channel, WebSocketStrengthMode mode, int strength);
+    public async Task<bool> SendWaveformAsync(char channel, IReadOnlyList<PulseData> pulseDatas);
+    public async Task<bool> ClearWaveformQueueAsync(Channel channel);
+    public void Dispose();
+}
+

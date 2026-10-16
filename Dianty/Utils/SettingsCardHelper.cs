@@ -4,7 +4,7 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace Dianty.Utils;
 
-internal class SettingsCardHelper
+internal static class SettingsCardHelper
 {
     public static void StretchContent(SettingsCard settingsCard)
     {

@@ -6,9 +6,9 @@ using Windows.Devices.Bluetooth.Advertisement;
 
 namespace Dianty.Models;
 
-internal class CoyoteBleDetector : ICoyoteBleDetector
+internal sealed class CoyoteBleDetector : ICoyoteBleDetector
 {
-    public async Task<ulong?> ScanAsync(Guid uuid, string name, CancellationToken token)
+    public async Task<ulong?> ScanAsync(Guid uuid, string name, CancellationToken cancellationToken)
     {
         var watcher = GetWatcher();
         var tcs = new TaskCompletionSource();
@@ -39,10 +39,10 @@ internal class CoyoteBleDetector : ICoyoteBleDetector
             return null;
         }
 
-        var completedTask = await Task.WhenAny(tcs.Task, Task.Delay(TimeSpan.FromSeconds(30), token)).ConfigureAwait(false);
+        var completedTask = await Task.WhenAny(tcs.Task, Task.Delay(TimeSpan.FromSeconds(30), cancellationToken)).ConfigureAwait(false);
         watcher.Stop();
         watcher.Received -= Watcher_Received;
-        if (token.IsCancellationRequested)
+        if (cancellationToken.IsCancellationRequested)
         {
             tcs.TrySetResult();
             await completedTask.ConfigureAwait(false);
@@ -50,7 +50,7 @@ internal class CoyoteBleDetector : ICoyoteBleDetector
         return result;
     }
 
-    public async Task<bool> ScanAsync(ulong address, CancellationToken token)
+    public async Task<bool> ScanAsync(ulong address, CancellationToken cancellationToken)
     {
         var watcher = GetWatcher();
         var tcs = new TaskCompletionSource();
@@ -77,10 +77,10 @@ internal class CoyoteBleDetector : ICoyoteBleDetector
             return false;
         }
 
-        var completedTask = await Task.WhenAny(tcs.Task, Task.Delay(TimeSpan.FromSeconds(30), token)).ConfigureAwait(false);
+        var completedTask = await Task.WhenAny(tcs.Task, Task.Delay(TimeSpan.FromSeconds(30), cancellationToken)).ConfigureAwait(false);
         watcher.Stop();
         watcher.Received -= Watcher_Received;
-        if (token.IsCancellationRequested)
+        if (cancellationToken.IsCancellationRequested)
         {
             tcs.TrySetResult();
             await completedTask.ConfigureAwait(false);
@@ -88,11 +88,11 @@ internal class CoyoteBleDetector : ICoyoteBleDetector
         return completedTask == tcs.Task;
     }
 
-    public async Task<ICoyoteBleService?> ConnectAsync(ulong address, GattServiceInfo gattServiceInfo, CancellationToken token)
+    public async Task<ICoyoteBleService?> ConnectAsync(ulong address, GattServiceInfo gattServiceInfo, CancellationToken cancellationToken)
     {
         try
         {
-            return await CoyoteBleService.CreateCoyoteBleServiceAsync(address, gattServiceInfo, token).ConfigureAwait(false);
+            return await CoyoteBleService.CreateCoyoteBleServiceAsync(address, gattServiceInfo, cancellationToken).ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {

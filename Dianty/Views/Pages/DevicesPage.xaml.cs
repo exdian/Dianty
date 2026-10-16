@@ -1,11 +1,13 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Dianty.Services;
-using Dianty.Utils.Messages;
+using Dianty.Services.Messages;
 using Dianty.ViewModels;
+using Dianty.Views.Controls;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
+using System;
 
 namespace Dianty.Views.Pages;
 
@@ -32,9 +34,9 @@ public sealed partial class DevicesPage : Page
         }
     }
 
-    private void OnSettingsCardClick(object sender, RoutedEventArgs e)
+    private void OnDeviceItemCardClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not FrameworkElement element || _queueService is null || _localizationService is null)
+        if (sender is not FrameworkElement element || ViewModel is null || _queueService is null || _localizationService is null)
             return;
 
         var options = new FrameNavigationOptions
@@ -45,10 +47,13 @@ public sealed partial class DevicesPage : Page
                 Effect = SlideNavigationTransitionEffect.FromRight
             }
         };
-        if (element.DataContext is CoyoteItem coyoteItem)
+        if (element.DataContext is CoyoteItemBase coyoteItem)
         {
-            var requiredParameter = new CoyoteDetailPage.RequiredParameter(coyoteItem,
-                [s => s.AppText.MainWindowText.MainViewText.MenuDevices], _queueService, _localizationService);
+            Func<ILocalizationService, string>[] pathGetters =
+                [s => s.AppText.MainWindowText.MainViewText.MenuDevices,
+                s => s.AppText.MainWindowText.MainViewText.DevicesPageText.DetailsMenuPath];
+            var pathBarParameter = new PathBar.RequiredParameter(_queueService, _localizationService, pathGetters);
+            var requiredParameter = new CoyoteDetailPage.RequiredParameter(pathBarParameter, ViewModel, coyoteItem, _queueService);
             WeakReferenceMessenger.Default.Send(new NavigationRequest(typeof(CoyoteDetailPage), requiredParameter, options));
         }
     }
@@ -61,5 +66,6 @@ public sealed partial class DevicesPage : Page
             _pageContent.ItemTemplate = (DataTemplate)Resources["NormalCoyoteItemTemplate"];
     }
 
-    public record class RequiredParameter(DevicesPageViewModel ViewModel, IQueueService QueueService, ILocalizationService LocalizationService);
+    public sealed record class RequiredParameter(
+        DevicesPageViewModel ViewModel, IQueueService QueueService, ILocalizationService LocalizationService);
 }

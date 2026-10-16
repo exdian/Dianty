@@ -9,7 +9,7 @@ using Windows.Devices.Bluetooth.GenericAttributeProfile;
 
 namespace Dianty.Models;
 
-internal partial class CoyoteBleService : ICoyoteBleService
+internal sealed partial class CoyoteBleService : ICoyoteBleService
 {
     private CoyoteBleService(
         BluetoothLEDevice bleDevice,
@@ -31,24 +31,24 @@ internal partial class CoyoteBleService : ICoyoteBleService
     private readonly GattCharacteristic _messageCharacteristic;
     private readonly GattCharacteristic? _batteryCharacteristic;
 
-    public event EventHandler<ICoyoteBleService.MessageReceivedEventArgs>? MessageReceived;
+    public event EventHandler<MessageReceivedEventArgs>? MessageReceived;
     public event EventHandler? Disconnected;
 
     public static async Task<CoyoteBleService> CreateCoyoteBleServiceAsync(
-        ulong address, GattServiceInfo gattServiceInfo, CancellationToken token)
+        ulong address, GattServiceInfo gattServiceInfo, CancellationToken cancellationToken)
     {
         BluetoothLEDevice? bleDevice = null;
         CoyoteBleService? result = null;
         try
         {
-            bleDevice = await BluetoothLEDevice.FromBluetoothAddressAsync(address).AsTask(token).ConfigureAwait(false);
-            bleDevice ??= await BluetoothLEDevice.FromBluetoothAddressAsync(address).AsTask(token).ConfigureAwait(false)
+            bleDevice = await BluetoothLEDevice.FromBluetoothAddressAsync(address).AsTask(cancellationToken).ConfigureAwait(false);
+            bleDevice ??= await BluetoothLEDevice.FromBluetoothAddressAsync(address).AsTask(cancellationToken).ConfigureAwait(false)
                 ?? throw new Exception("设备连接失败");
 
             // 获取 GATT 服务
-            var servicesResult = await bleDevice.GetGattServicesAsync().AsTask(token).ConfigureAwait(false);
+            var servicesResult = await bleDevice.GetGattServicesAsync().AsTask(cancellationToken).ConfigureAwait(false);
             if (servicesResult.Status != GattCommunicationStatus.Success)
-                servicesResult = await bleDevice.GetGattServicesAsync().AsTask(token).ConfigureAwait(false);
+                servicesResult = await bleDevice.GetGattServicesAsync().AsTask(cancellationToken).ConfigureAwait(false);
             if (servicesResult.Status != GattCommunicationStatus.Success)
                 throw new Exception($"服务获取失败: {servicesResult.Status}");
             var commandService = servicesResult.Services.FirstOrDefault(s => s.Uuid == gattServiceInfo.CommandServiceUuid)
@@ -56,9 +56,9 @@ internal partial class CoyoteBleService : ICoyoteBleService
             var batteryService = servicesResult.Services.FirstOrDefault(s => s.Uuid == gattServiceInfo.BatteryServiceUuid);
 
             // 获取命令特征和消息特征
-            var characteristicsResult = await commandService.GetCharacteristicsAsync().AsTask(token).ConfigureAwait(false);
+            var characteristicsResult = await commandService.GetCharacteristicsAsync().AsTask(cancellationToken).ConfigureAwait(false);
             if (characteristicsResult.Status != GattCommunicationStatus.Success)
-                characteristicsResult = await commandService.GetCharacteristicsAsync().AsTask(token).ConfigureAwait(false);
+                characteristicsResult = await commandService.GetCharacteristicsAsync().AsTask(cancellationToken).ConfigureAwait(false);
             if (characteristicsResult.Status != GattCommunicationStatus.Success)
                 throw new Exception($"特征获取失败: {characteristicsResult.Status}");
             var commandCharacteristic = characteristicsResult.Characteristics.FirstOrDefault(c => c.Uuid == gattServiceInfo.CommandCharacteristicUuid)
@@ -70,20 +70,20 @@ internal partial class CoyoteBleService : ICoyoteBleService
 
             // 获取电池特征
             GattCharacteristic? batteryCharacteristic = null;
-            if (batteryService is not null)
+            if (batteryService != null)
             {
-                var batteryCharacteristicsResult = await batteryService.GetCharacteristicsAsync().AsTask(token).ConfigureAwait(false);
+                var batteryCharacteristicsResult = await batteryService.GetCharacteristicsAsync().AsTask(cancellationToken).ConfigureAwait(false);
                 batteryCharacteristic = batteryCharacteristicsResult.Characteristics.FirstOrDefault(c => c.Uuid == gattServiceInfo.BatteryCharacteristicUuid);
             }
 
             // 订阅消息通知
             result = new CoyoteBleService(bleDevice, commandCharacteristic, messageCharacteristic, batteryCharacteristic);
             var operationResult = await messageCharacteristic.WriteClientCharacteristicConfigurationDescriptorAsync(
-                GattClientCharacteristicConfigurationDescriptorValue.Notify).AsTask(token).ConfigureAwait(false);
+                GattClientCharacteristicConfigurationDescriptorValue.Notify).AsTask(cancellationToken).ConfigureAwait(false);
             if (operationResult != GattCommunicationStatus.Success)
             {
                 operationResult = await messageCharacteristic.WriteClientCharacteristicConfigurationDescriptorAsync(
-                    GattClientCharacteristicConfigurationDescriptorValue.Notify).AsTask(token).ConfigureAwait(false);
+                    GattClientCharacteristicConfigurationDescriptorValue.Notify).AsTask(cancellationToken).ConfigureAwait(false);
             }
             if (operationResult != GattCommunicationStatus.Success)
             {
@@ -99,7 +99,7 @@ internal partial class CoyoteBleService : ICoyoteBleService
             {
                 result.Dispose();
             }
-            else if (bleDevice is not null)
+            else if (bleDevice != null)
             {
                 try
                 {
@@ -121,11 +121,10 @@ internal partial class CoyoteBleService : ICoyoteBleService
         GC.SuppressFinalize(this);
     }
 
-    protected virtual void Dispose(bool disposing)
+    private void Dispose(bool disposing)
     {
         if (_isDisposed)
             return;
-        _isDisposed = true;
 
         if (disposing)
         {
@@ -141,6 +140,8 @@ internal partial class CoyoteBleService : ICoyoteBleService
             catch { }
             _bleDevice.Dispose();
         }
+
+        _isDisposed = true;
     }
 
     public async Task<bool> SendCommandAsync(byte[] command)
@@ -173,7 +174,7 @@ internal partial class CoyoteBleService : ICoyoteBleService
 
     private void OnMessageReceived(byte[] message)
     {
-        var args = new ICoyoteBleService.MessageReceivedEventArgs(message);
+        var args = new MessageReceivedEventArgs(message);
         MessageReceived?.Invoke(this, args);
     }
 

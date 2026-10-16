@@ -1,0 +1,58 @@
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace DungeonToolkit;
+
+public enum LightColor 
+{
+    None,
+    Yellow,
+    Red,
+    Purple,
+    Blue,
+    Cyan,
+    Green,
+    White,
+}
+public enum RegistryChangedAction 
+{
+    Add,
+    Remove,
+    Clear,
+}
+public interface IRegistryReader<TKey, TValue>  
+{
+    event EventHandler<RegistryChangedEventArgs>? RegistryChanged;
+    bool ContainsKey(TKey key);
+    bool TryGetValue(TKey key, [MaybeNullWhen(false)] out TValue value);
+}
+public interface IRegistryWriter<TKey, TValue>  
+{
+    bool TryAdd(TKey key, TValue value);
+    IReadOnlyList<bool> TryAdd(IReadOnlyList<TValue> values, Func<TValue, TKey> keySelector);
+    bool Remove(TKey key);
+    IReadOnlyList<bool> Remove(IReadOnlyList<TKey> keys);
+    void Clear();
+}
+public interface IRegistry<TKey, TValue> : IRegistryReader<TKey, TValue>, IRegistryWriter<TKey, TValue> 
+{
+}
+public interface IDataSource<out T>  
+{
+    event EventHandler? Changed;
+    IReadOnlyList<T> GetSnapshot();
+}
+public interface IOrderStore<T>  
+{
+    IReadOnlyList<T> Load();
+    void Save(IEnumerable<T> items);
+}
+public interface IIdPool<T>  
+{
+    T Rent();
+    void Return(T id);
+}
+public sealed class RegistryChangedEventArgs(RegistryChangedAction changedAction) : EventArgs 
+{
+    public RegistryChangedAction ChangedAction { get; }
+}
+

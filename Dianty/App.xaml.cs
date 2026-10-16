@@ -3,16 +3,21 @@ using Dianty.Models;
 using Dianty.Services;
 using Dianty.Utils;
 using Dianty.ViewModels;
-using Dianty.Views;
+using Dianty.Views.Controls;
 using Dianty.Views.Pages;
+using DungeonToolkit;
 using DungeonToolkit.Coyote;
 using GameMonitor;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 
 namespace Dianty;
 /// <summary>
@@ -21,6 +26,8 @@ namespace Dianty;
 public partial class App : Application
 {
     private MainWindow? _window;
+    private Dictionary<Type, object>? _viewModelTable;
+    private Action? _disposeAction;
     private bool _isUnhandledExceptionOccurred;
 
     /// <summary>
@@ -62,71 +69,165 @@ public partial class App : Application
     {
         var window = new MainWindow();
         window.AppWindow.Closing += OnAppWindowClosing;
-        ToDoList.Plan += VersionHelper.Init;
-        ToDoList.Plan += Localizer.Init;
-        ToDoList.Plan += RegisterService;
-        ToDoList.UiPlan += MergeDictionaries;
-        ToDoList.UiPlan += SetWindowIcon;
-        TopPageLocator.Init(GetTopPage);
-        window.ViewModel = new MainViewModel(window);
         _window = window;
         _window.Activate();
+        Task.Run(InitializeAsync);
     }
 
     private void OnAppWindowClosing(AppWindow sender, AppWindowClosingEventArgs args)
     {
-        ServiceLocator.Dispose();
+        _disposeAction?.Invoke();
+        _disposeAction = null;
     }
 
-    private void RegisterService()
+    private async Task InitializeAsync()
     {
-        if (_window == null)
-            return;
+        Debug.Assert(_window is not null);
+        Debug.Assert(_window.DispatcherQueue is not null);
+        Debug.Assert(!_window.DispatcherQueue.HasThreadAccess);
+#if DEBUG
+        var stopwatch = Stopwatch.StartNew();
+#endif
 
+        var delayTask = Task.Delay(300); // 最短加载时间
         ITitleBarService titleBarService = _window;
+        IWindowInputService windowInputService = _window;
+        IQueueService queueService = _window;
+        ILocalizationService localizationService = Localizer.Init();
+        var viewFactory = new ViewFactory(titleBarService, windowInputService, queueService, localizationService, GetViewModel, GetTopPageType);
+        var mainViewModel = new MainViewModel(viewFactory);
+        queueService.TryEnqueue(() => _window.ViewModel = mainViewModel);
+
+        queueService.TryEnqueue(MergeDictionaries);
+        queueService.TryEnqueue(SetWindowIcon);
+
+        InitializeService();
+        RegisterDisposableInstance(viewFactory);
+        RegisterDisposableInstance(mainViewModel);
+
+        // 确保总耗时不少于 300ms
+        await delayTask.ConfigureAwait(false);
+        queueService.TryEnqueue(DispatcherQueuePriority.Low, () => mainViewModel.IsLoaded = true);
+
+#if DEBUG
+        Debug.WriteLine($"总加载耗时: {stopwatch.ElapsedMilliseconds} ms");
+#endif
+    }
+
+    private void RegisterDisposableInstance(object instance)
+    {
+        if (instance is IDisposable disposable)
+            _disposeAction += disposable.Dispose;
+    }
+
+    private void RegisterViewModel(Type viewType, object viewModel)
+    {
+        Debug.Assert(viewType is not null);
+        Debug.Assert(viewModel is not null);
+        Debug.Assert(_viewModelTable is not null);
+        _viewModelTable[viewType] = viewModel;
+    }
+
+    private object GetViewModel(Type viewType)
+    {
+        Debug.Assert(_viewModelTable is not null);
+        return _viewModelTable[viewType];
+    }
+
+    private void InitializeService()
+    {
+        Debug.Assert(_window is not null);
+        Debug.Assert(Localizer.Instance is not null);
+
+        _viewModelTable = [];
+
         IWindowService windowService = _window;
         IQueueService queueService = _window;
-        ITemplateContent templateContent = _window;
-        ServiceLocator.Register(titleBarService);
-        ServiceLocator.Register(windowService);
-        ServiceLocator.Register(queueService);
-        ServiceLocator.Register(templateContent);
-        ICoyoteBleDetector coyoteBleDetector = new CoyoteBleDetector();
-        ServiceLocator.Register(coyoteBleDetector);
-        ServiceLocator.Register<IMemoryService>(static () => new MemoryService());
         ILocalizationService localizationService = Localizer.Instance;
-        ServiceLocator.Register(localizationService);
 
-        var coyoteManager = new CoyoteManager();
-        var coyoteItems = new CoyoteCollection(coyoteManager);
-        ServiceLocator.Register<ICoyoteListService>(coyoteItems);
-        var gtaVcGameRule = new GtaVcGameRule(ServiceLocator.GetService<IMemoryService>());
-        var gameManager = new GameManager(coyoteManager)
-        {
-            GtaVcGameRule = gtaVcGameRule
-        };
-        var gtaVcRuleCardViewModel = new GtaVcRuleCardViewModel(gtaVcGameRule, queueService, localizationService);
-        var gamesPageViewModel = new GamesPageViewModel(gameManager, queueService, localizationService)
-        {
-            GtaVcRuleCardViewModel = gtaVcRuleCardViewModel
-        };
-        ServiceLocator.Register(gamesPageViewModel);
-        ServiceLocator.Register(gtaVcRuleCardViewModel);
+        var deviceRegistry = new DeviceRegistry();
+        var waveformRegistry = new WaveformRegistry();
+        var waveformDecoderRegistryA = new WaveformDecoderRegistry();
+        var waveformDecoderRegistryB = new WaveformDecoderRegistry();
+        var batteryLevelUpdateScheduler = new BatteryLevelUpdateScheduler(deviceRegistry, TimeSpan.FromSeconds(60));
+        var deviceIdPool = new DeviceIdPool([], new DeviceId());
+        var waveformIdPool = new WaveformIdPool([], new WaveformId());
+        var waveformDecoderIdPoolA = new WaveformDecoderIdPool([], new WaveformDecoderId());
+        var waveformDecoderIdPoolB = new WaveformDecoderIdPool([], new WaveformDecoderId());
+        var waveformDecoderIdMemoryOrderStoreA = new MemoryOrderStore<WaveformDecoderId>();
+        var waveformDecoderIdMemoryOrderStoreB = new MemoryOrderStore<WaveformDecoderId>();
+        var coyoteBleDetector = new CoyoteBleDetector();
+        var coyoteFunctionFactory = new Factory(coyoteBleDetector);
+        var deviceManager = new DeviceManager(deviceRegistry, coyoteFunctionFactory, deviceIdPool, deviceRegistry);
+        var waveformPlayerA = new WaveformPlayer(waveformDecoderRegistryA, waveformDecoderRegistryA, waveformDecoderIdMemoryOrderStoreA, waveformRegistry, coyoteFunctionFactory, waveformDecoderIdPoolA);
+        var waveformPlayerB = new WaveformPlayer(waveformDecoderRegistryB, waveformDecoderRegistryB, waveformDecoderIdMemoryOrderStoreB, waveformRegistry, coyoteFunctionFactory, waveformDecoderIdPoolB);
+        var waveformPusher = new WaveformPusher(deviceRegistry, waveformPlayerA, waveformPlayerB);
+        var memoryService = new MemoryService();
+        var gtaVcMonitor = new GtaVcMonitor(memoryService);
+        var gtaVcGameIntegration = new GtaVcGameIntegration(gtaVcMonitor);
+        var gameIntegrationManager = new GameIntegrationManager([gtaVcGameIntegration], waveformPusher);
+        var waveformNameRegistry = new NameRegistry<WaveformId>();
+        var viewModelItemFactory = new ViewModelItemFactory(deviceRegistry, deviceRegistry, deviceRegistry, deviceManager, deviceManager, queueService, localizationService, waveformNameRegistry, waveformPlayerA, waveformPlayerB, waveformDecoderRegistryA, waveformDecoderRegistryB, waveformPlayerA, waveformPlayerB);
+        var coyoteCollection = new CoyoteCollection();
 
-        ServiceLocator.RegisterViewModel(typeof(HomePage),
-            new HomePageViewModel(coyoteItems, gameManager, queueService, localizationService));
-        ServiceLocator.RegisterViewModel(typeof(DevicesPage), new DevicesPage.RequiredParameter(
-            new DevicesPageViewModel(coyoteItems, queueService, coyoteBleDetector, localizationService),
-            queueService, localizationService));
-        ServiceLocator.RegisterViewModel(typeof(WavesPage), new WavesPage.RequiredParameter(
-            new WavesPageViewModel(coyoteManager, queueService, windowService, localizationService),
-            queueService, localizationService));
-        ServiceLocator.RegisterViewModel(typeof(GamesPage), new GamesPage.RequiredParameter(
-            gamesPageViewModel, queueService));
-        ServiceLocator.RegisterViewModel(typeof(SafetyPage), new SafetyPageViewModel(coyoteItems));
-        ServiceLocator.RegisterViewModel(typeof(DebugPage), new DebugPageViewModel(queueService));
-        ServiceLocator.RegisterViewModel(typeof(SettingsPage),
-            new SettingsPageViewModel(queueService, windowService, localizationService));
+        var homePageViewModel = new HomePageViewModel(deviceRegistry, deviceManager, waveformPlayerA, waveformPlayerB, waveformNameRegistry, waveformPusher, gameIntegrationManager, queueService, localizationService);
+        var devicesPageViewModel = new DevicesPageViewModel(coyoteCollection, deviceManager, deviceRegistry, deviceManager, deviceManager, viewModelItemFactory, queueService, localizationService);
+        var waveformsPageViewModel = new WaveformsPageViewModel(coyoteFunctionFactory, waveformIdPool, waveformRegistry, viewModelItemFactory, waveformRegistry, waveformNameRegistry, waveformPlayerA, waveformPlayerB, waveformDecoderRegistryA, waveformDecoderRegistryB, waveformDecoderIdMemoryOrderStoreA, waveformDecoderIdMemoryOrderStoreB, windowService, queueService, localizationService);
+        var gamesPageViewModel = new GamesPageViewModel(gameIntegrationManager, waveformPusher, waveformPusher, queueService, localizationService);
+        var safetyPageViewModel = new SafetyPageViewModel(coyoteCollection, deviceRegistry, deviceRegistry);
+        var debugPageViewModel = new DebugPageViewModel(queueService);
+        var settingsPageViewModel = new SettingsPageViewModel(queueService, windowService, windowService, localizationService, VersionHelper.GetVersion());
+
+        var gtaVcGameIntegrationViewModel = new GtaVcGameIntegrationViewModel(gtaVcGameIntegration, gtaVcMonitor, queueService, localizationService);
+        RegisterViewModel(typeof(GtaVcRuleCards), gtaVcGameIntegrationViewModel);
+
+        var devicesPageNavigationParameter = new DevicesPage.RequiredParameter(devicesPageViewModel, queueService, localizationService);
+        var waveformsPageNavigationParameter = new WaveformsPage.RequiredParameter(waveformsPageViewModel, queueService, localizationService);
+        var gamesPageNavigationParameter = new GamesPage.RequiredParameter(gamesPageViewModel, gtaVcGameIntegrationViewModel, GetPageHeaderSelector, GetPageContent, queueService, localizationService);
+
+        RegisterViewModel(typeof(HomePage), homePageViewModel);
+        RegisterViewModel(typeof(DevicesPage), devicesPageNavigationParameter);
+        RegisterViewModel(typeof(WaveformsPage), waveformsPageNavigationParameter);
+        RegisterViewModel(typeof(GamesPage), gamesPageNavigationParameter);
+        RegisterViewModel(typeof(SafetyPage), safetyPageViewModel);
+        RegisterViewModel(typeof(DebugPage), debugPageViewModel);
+        RegisterViewModel(typeof(SettingsPage), settingsPageViewModel);
+
+        RegisterDisposableInstance(deviceRegistry);
+        RegisterDisposableInstance(waveformRegistry);
+        RegisterDisposableInstance(waveformDecoderRegistryA);
+        RegisterDisposableInstance(waveformDecoderRegistryB);
+        RegisterDisposableInstance(batteryLevelUpdateScheduler);
+        RegisterDisposableInstance(deviceIdPool);
+        RegisterDisposableInstance(waveformIdPool);
+        RegisterDisposableInstance(waveformDecoderIdPoolA);
+        RegisterDisposableInstance(waveformDecoderIdPoolB);
+        RegisterDisposableInstance(waveformDecoderIdMemoryOrderStoreA);
+        RegisterDisposableInstance(waveformDecoderIdMemoryOrderStoreB);
+        RegisterDisposableInstance(coyoteBleDetector);
+        RegisterDisposableInstance(coyoteFunctionFactory);
+        RegisterDisposableInstance(deviceManager);
+        RegisterDisposableInstance(waveformPlayerA);
+        RegisterDisposableInstance(waveformPlayerB);
+        RegisterDisposableInstance(waveformPusher);
+        RegisterDisposableInstance(memoryService);
+        RegisterDisposableInstance(gtaVcMonitor);
+        RegisterDisposableInstance(gtaVcGameIntegration);
+        RegisterDisposableInstance(gameIntegrationManager);
+        RegisterDisposableInstance(waveformNameRegistry);
+        RegisterDisposableInstance(viewModelItemFactory);
+        RegisterDisposableInstance(coyoteCollection);
+        RegisterDisposableInstance(homePageViewModel);
+        RegisterDisposableInstance(devicesPageViewModel);
+        RegisterDisposableInstance(waveformsPageViewModel);
+        RegisterDisposableInstance(gamesPageViewModel);
+        RegisterDisposableInstance(safetyPageViewModel);
+        RegisterDisposableInstance(debugPageViewModel);
+        RegisterDisposableInstance(settingsPageViewModel);
+        RegisterDisposableInstance(gtaVcGameIntegrationViewModel);
+        RegisterDisposableInstance(devicesPageNavigationParameter);
+        RegisterDisposableInstance(waveformsPageNavigationParameter);
+        RegisterDisposableInstance(gamesPageNavigationParameter);
     }
 
     private void MergeDictionaries()
@@ -164,17 +265,35 @@ public partial class App : Application
         _window.AppWindow.SetIcon(file);
     }
 
-    private static Type? GetTopPage(string pageName)
+    private static Type? GetTopPageType(string pageName)
     {
         return pageName switch
         {
             nameof(HomePage) => typeof(HomePage),
             nameof(DevicesPage) or nameof(CoyoteDetailPage) => typeof(DevicesPage),
-            nameof(WavesPage) or nameof(WavePlayQueuePage) or nameof(WaveSettingsPage) => typeof(WavesPage),
-            nameof(GamesPage) => typeof(GamesPage),
+            nameof(WaveformsPage) or nameof(WaveformPlaylistPage) or nameof(WaveformSettingsPage) => typeof(WaveformsPage),
+            nameof(GamesPage) or nameof(GameIntegrationDetailPage) => typeof(GamesPage),
             nameof(SafetyPage) => typeof(SafetyPage),
             nameof(DebugPage) => typeof(DebugPage),
             nameof(SettingsPage) => typeof(SettingsPage),
+            _ => null
+        };
+    }
+
+    private static Func<ILocalizationService, string> GetPageHeaderSelector(string contentName)
+    {
+        return contentName switch
+        {
+            nameof(GtaVcRuleCards) => s => s.AppText.MainWindowText.MainViewText.GamesPageText.GtaVcGameIntegrationHeader,
+            _ => _ => "null"
+        };
+    }
+
+    private FrameworkElement? GetPageContent(string contentName)
+    {
+        return contentName switch
+        {
+            nameof(GtaVcRuleCards) => new GtaVcRuleCards((GtaVcGameIntegrationViewModel)GetViewModel(typeof(GtaVcRuleCards))),
             _ => null
         };
     }
