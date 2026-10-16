@@ -37,8 +37,8 @@
                     IsClickEnabled="True" CornerRadius="0,0,8,8" Click="OnMenuCardClick" Tag="{x:Bind DevicesPage}">
                     <toolkit:SettingsCard.HeaderIcon>
                         <PathIcon
-                            Data="M0 20 20 0H84l20 20V146L84 166H20L0 146ZM10 26V52L22 64v38L10 114v26l16 16H78l16-16V
-                            114L82 102V64L94 52V26L78 10H70v6H58V10H46v6H34V10H26ZM10 61v44l6-6V67ZM88 67V99l6 6V61Z"/>
+                            Data="M31 20 51 0h64l20 20V146l-20 20H51L31 146ZM41 26V52L53 64v38L41 114v26l16 16h52l16-16
+                            V114l-12-12V64l12-12V26L109 10h-8v6H89V10H77v6H65V10H57ZM41 61v44l6-6V67ZM119 67V99l6 6V61Z"/>
                     </toolkit:SettingsCard.HeaderIcon>
                 </toolkit:SettingsCard>
             </StackPanel>

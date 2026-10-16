@@ -16,9 +16,7 @@ public sealed partial class IntToBatteryIconConverter : IValueConverter
 
     public object Convert(object value, Type targetType, object parameter, string language)
     {
-        if (value is not int batteryLevel)
-            return Unknown;
-        return batteryLevel switch
+        return value switch
         {
             >= 0 and <= 19 => Level_0_19,
             >= 20 and <= 39 => Level_20_39,
