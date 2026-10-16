@@ -87,6 +87,13 @@
                     </toolkit:SettingsCard.HeaderIcon>
                     <TextBlock Text="{x:Bind ViewModel.StrengthLimitB, Mode=OneWay}"/>
                 </toolkit:SettingsCard>
+                <toolkit:SettingsCard
+                    Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.WebSocketFeedbackCardHeader, Mode=OneWay}">
+                    <toolkit:SettingsCard.HeaderIcon>
+                        <PathIcon Data="{x:Bind ViewModel.FeedbackCode, Mode=OneWay, Converter={StaticResource WebSocketFeedbackConverter}}"/>
+                    </toolkit:SettingsCard.HeaderIcon>
+                    <TextBlock Text="{x:Bind ViewModel.FeedbackText, Mode=OneWay}"/>
+                </toolkit:SettingsCard>
             </toolkit:SettingsExpander.Items>
         </toolkit:SettingsExpander>
         <local:CoyoteDeletionCard

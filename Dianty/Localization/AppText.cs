@@ -91,6 +91,17 @@ public sealed class DevicesPageText
     public string BatteryLevelCardHeader { get; set; } = "电池电量";
     public string ChannelAStrengthLimitCardHeader { get; set; } = "A通道强度上限";
     public string ChannelBStrengthLimitCardHeader { get; set; } = "B通道强度上限";
+    public string WebSocketFeedbackCardHeader { get; set; } = "反馈";
+    public string WebSocketFeedbackCircleA { get; set; } = "A感到很圆";
+    public string WebSocketFeedbackTriangleA { get; set; } = "A觉得很稳";
+    public string WebSocketFeedbackSquareA { get; set; } = "A感觉很方";
+    public string WebSocketFeedbackPentagramA { get; set; } = "A一闪一闪亮晶晶";
+    public string WebSocketFeedbackHexagonA { get; set; } = "A表示很多钝角";
+    public string WebSocketFeedbackCircleB { get; set; } = "B感到很圆";
+    public string WebSocketFeedbackTriangleB { get; set; } = "B觉得很稳";
+    public string WebSocketFeedbackSquareB { get; set; } = "B感觉很方";
+    public string WebSocketFeedbackPentagramB { get; set; } = "B一闪一闪亮晶晶";
+    public string WebSocketFeedbackHexagonB { get; set; } = "B表示很多钝角";
 }
 
 public sealed class WaveformsPageText

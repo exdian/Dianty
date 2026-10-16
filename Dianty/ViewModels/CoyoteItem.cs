@@ -377,6 +377,7 @@ public sealed partial class CoyoteWsItem : CoyoteItemBase
     private readonly bool _isConstructed;
     private ConnectionState _connectionState;
     private int _connectionSwitchCount;
+    private int _feedbackCount;
     private bool _isDisposed;
 
     public CoyoteWsItem(
@@ -435,7 +436,10 @@ public sealed partial class CoyoteWsItem : CoyoteItemBase
     public partial int StrengthLimitB { get; private set; }
 
     [ObservableProperty]
-    public partial string Feedback { get; private set; } = string.Empty;
+    public partial int FeedbackCode { get; private set; } = -1;
+
+    [ObservableProperty]
+    public partial string FeedbackText { get; private set; } = string.Empty;
 
     [ObservableProperty]
     public partial bool IsConnecting { get; private set; }
@@ -554,14 +558,32 @@ public sealed partial class CoyoteWsItem : CoyoteItemBase
         _queueService.TryEnqueue(() => ConnectionSwitchValue = e.ConnectionStatus != ConnectionStatus.Disconnected);
     }
 
-    private void UpdateFeedback(int feedback)
+    private void UpdateFeedback()
     {
-        _queueService.TryEnqueue(() =>
+        _queueService.TryEnqueue(async () =>
         {
-            Feedback = feedback switch
+            _feedbackCount++;
+            var feedbackCount = _feedbackCount;
+
+            var text = _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText;
+            FeedbackText = FeedbackCode switch
             {
-                _ => "不知所措",
+                0 => text.WebSocketFeedbackCircleA,
+                1 => text.WebSocketFeedbackTriangleA,
+                2 => text.WebSocketFeedbackSquareA,
+                3 => text.WebSocketFeedbackPentagramA,
+                4 => text.WebSocketFeedbackHexagonA,
+                5 => text.WebSocketFeedbackCircleB,
+                6 => text.WebSocketFeedbackTriangleB,
+                7 => text.WebSocketFeedbackSquareB,
+                8 => text.WebSocketFeedbackPentagramB,
+                9 => text.WebSocketFeedbackHexagonB,
+                _ => string.Empty,
             };
+
+            await Task.Delay(5000);
+            if (feedbackCount == _feedbackCount)
+                FeedbackText = string.Empty;
         });
     }
 
@@ -578,7 +600,15 @@ public sealed partial class CoyoteWsItem : CoyoteItemBase
 
     private void OnClientFeedbackReceived(object? sender, FeedbackReceivedEventArgs e)
     {
-        UpdateFeedback(e.Feedback);
+        FeedbackCode = e.Feedback;
+        UpdateFeedback();
+    }
+
+    protected override void OnCurrentLanguageChanged(object? sender, CurrentLanguageChangedEventArgs e)
+    {
+        base.OnCurrentLanguageChanged(sender, e);
+        if (FeedbackText != string.Empty)
+            UpdateFeedback();
     }
 
     protected override void Dispose(bool disposing)

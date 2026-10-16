@@ -24,6 +24,7 @@
     <cvt:IntToBatteryPercentageConverter x:Key="IntToBatteryPercentageConverter"/>
     <cvt:SvgPathConverter x:Key="SvgPathConverter"/>
     <cvt:WaveformIntervalConverter x:Key="WaveformIntervalConverter"/>
+    <cvt:WebSocketFeedbackConverter x:Key="WebSocketFeedbackConverter"/>
 
     <Style x:Key="StretchListViewItemStyle" TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
         <Setter Property="Padding" Value="0"/>
