@@ -2,6 +2,7 @@
 using Dianty.EventArguments;
 using Dianty.Services;
 using Dianty.Utils;
+using DungeonToolkit;
 using DungeonToolkit.Coyote;
 using System;
 using System.Threading;
@@ -112,9 +113,10 @@ public sealed partial class CoyoteBleItem : CoyoteItemBase
     private readonly IStrengthInfo _strengthInfo;
     private readonly IOutputParameterConfig _outputParameterConfig;
     private readonly IBatteryInfo _batteryInfo;
+    private readonly ILightsColorConfig _lightsColorConfig;
     private readonly IDeviceConnectionService _deviceConnectionService;
     private readonly Timer _outputParameterConfigTimer;
-    private const int ParameterConfigCooldownTime = 1500;
+    private readonly int _parameterConfigCooldownTime = Timeout.Infinite;
     private readonly bool _isConstructed;
     private ConnectionState _connectionState;
     private int _connectionSwitchCount;
@@ -125,6 +127,7 @@ public sealed partial class CoyoteBleItem : CoyoteItemBase
         IStrengthInfo strengthInfo,
         IOutputParameterConfig outputParameterConfig,
         IBatteryInfo batteryInfo,
+        ILightsColorConfig lightsColorConfig,
         IDeviceConnectionService deviceConnectionService,
         IQueueService queueService,
         ILocalizationService localizationService)
@@ -133,9 +136,11 @@ public sealed partial class CoyoteBleItem : CoyoteItemBase
         _strengthInfo = strengthInfo;
         _outputParameterConfig = outputParameterConfig;
         _batteryInfo = batteryInfo;
+        _lightsColorConfig = lightsColorConfig;
         _deviceConnectionService = deviceConnectionService;
 
         _outputParameterConfigTimer = new Timer(SetOutputParameter, null, Timeout.Infinite, Timeout.Infinite);
+        LightsColor = _lightsColorConfig.CurrentColor;
         IsGentle = _outputParameterConfig.IsGentle;
         StrengthLimitA = _strengthInfo.StrengthLimitA;
         StrengthLimitB = _strengthInfo.StrengthLimitB;
@@ -152,6 +157,7 @@ public sealed partial class CoyoteBleItem : CoyoteItemBase
         _strengthInfo.StrengthChanged += OnCurrentStrengthChanged;
         _batteryInfo.BatteryLevelChanged += OnBatteryLevelChanged;
 
+        _parameterConfigCooldownTime = 1500;
         _isConstructed = true;
     }
 
@@ -169,6 +175,11 @@ public sealed partial class CoyoteBleItem : CoyoteItemBase
         _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionSuccessfulStateText;
     private string ConnectionCanceledStateText =>
         _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionCanceledStateText;
+
+    public static LightsColor[] LightsColors => Enum.GetValues<LightsColor>();
+
+    [ObservableProperty]
+    public partial LightsColor LightsColor { get; set; }
 
     [ObservableProperty]
     public partial bool IsGentle { get; set; }
@@ -275,6 +286,22 @@ public sealed partial class CoyoteBleItem : CoyoteItemBase
         _queueService.TryEnqueue(() => BatteryLevel = e.BatteryLevel);
     }
 
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+        if (_isDisposed)
+            return;
+
+        if (disposing)
+        {
+            _strengthInfo.StrengthChanged -= OnCurrentStrengthChanged;
+            _batteryInfo.BatteryLevelChanged -= OnBatteryLevelChanged;
+            _outputParameterConfigTimer.Dispose();
+        }
+
+        _isDisposed = true;
+    }
+
     async partial void OnConnectionSwitchValueChanged(bool value)
     {
         if (!_isConstructed)
@@ -317,30 +344,20 @@ public sealed partial class CoyoteBleItem : CoyoteItemBase
         }
     }
 
-    protected override void Dispose(bool disposing)
+    partial void OnLightsColorChanged(LightsColor value)
     {
-        base.Dispose(disposing);
-        if (_isDisposed)
-            return;
-
-        if (disposing)
-        {
-            _strengthInfo.StrengthChanged -= OnCurrentStrengthChanged;
-            _batteryInfo.BatteryLevelChanged -= OnBatteryLevelChanged;
-            _outputParameterConfigTimer.Dispose();
-        }
-
-        _isDisposed = true;
+        if (_isConstructed)
+            _lightsColorConfig.SetLightsColorAsync(value);
     }
 
     partial void OnStrengthLimitAChanged(double value)
     {
-        _outputParameterConfigTimer.Change(ParameterConfigCooldownTime, Timeout.Infinite);
+        _outputParameterConfigTimer.Change(_parameterConfigCooldownTime, Timeout.Infinite);
     }
 
     partial void OnStrengthLimitBChanged(double value)
     {
-        _outputParameterConfigTimer.Change(ParameterConfigCooldownTime, Timeout.Infinite);
+        _outputParameterConfigTimer.Change(_parameterConfigCooldownTime, Timeout.Infinite);
     }
 
     partial void OnIsGentleChanged(bool value)
@@ -350,22 +367,22 @@ public sealed partial class CoyoteBleItem : CoyoteItemBase
 
     partial void OnFrequencyBalanceAChanged(double value)
     {
-        _outputParameterConfigTimer.Change(ParameterConfigCooldownTime, Timeout.Infinite);
+        _outputParameterConfigTimer.Change(_parameterConfigCooldownTime, Timeout.Infinite);
     }
 
     partial void OnFrequencyBalanceBChanged(double value)
     {
-        _outputParameterConfigTimer.Change(ParameterConfigCooldownTime, Timeout.Infinite);
+        _outputParameterConfigTimer.Change(_parameterConfigCooldownTime, Timeout.Infinite);
     }
 
     partial void OnIntensityBalanceAChanged(double value)
     {
-        _outputParameterConfigTimer.Change(ParameterConfigCooldownTime, Timeout.Infinite);
+        _outputParameterConfigTimer.Change(_parameterConfigCooldownTime, Timeout.Infinite);
     }
 
     partial void OnIntensityBalanceBChanged(double value)
     {
-        _outputParameterConfigTimer.Change(ParameterConfigCooldownTime, Timeout.Infinite);
+        _outputParameterConfigTimer.Change(_parameterConfigCooldownTime, Timeout.Infinite);
     }
 }
 

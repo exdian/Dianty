@@ -71,6 +71,8 @@ public sealed class DevicesPageText
     public string DefaultDeviceNameLabel { get; set; } = "新设备";
     public string DetailsMenuPath { get; set; } = "详细信息";
     public string DeviceNameCardHeader { get; set; } = "设备名称";
+    public string DeviceLightsColorCardHeader { get; set; } = "灯光颜色";
+    public string CoyoteLightsColorCardDescription { get; set; } = "设置狼眼灯颜色";
     public string ConnectionStatusCardHeader { get; set; } = "连接状态";
     public string ConnectionStatusCardBluetoothDescription { get; set; } = "此设备通过蓝牙连接";
     public string ConnectionStatusCardWebSocketDescription { get; set; } = "此设备通过WebSocket连接";
