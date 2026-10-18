@@ -27,10 +27,20 @@ public sealed partial class CoyoteBleDetailCards : UserControl
             SettingsCardHelper.StretchContent(settingsCard);
     }
 
+    private void OnColorSplitButtonClick(SplitButton sender, SplitButtonClickEventArgs args)
+    {
+        sender.Flyout.ShowAt(sender);
+    }
+
     private void OnLightsColorSelectionItemClick(object sender, ItemClickEventArgs e)
     {
         if (e.ClickedItem is LightsColor lightsColor)
+        {
             ViewModel.LightsColor = lightsColor;
+            var command = ViewModel.SetLightsColorCommand;
+            if (command is not null && command.CanExecute(lightsColor))
+                command.Execute(lightsColor);
+        }
         _lightsColorFlyout.Hide();
     }
 }

@@ -19,11 +19,13 @@
     <converters:BoolNegationConverter x:Key="BoolNegationConverter"/>
     <converters:BoolToVisibilityConverter x:Key="VisibleIfTrueConverter" TrueValue="Visible" FalseValue="Collapsed"/>
     <converters:BoolToVisibilityConverter x:Key="VisibleIfFalseConverter" TrueValue="Collapsed" FalseValue="Visible"/>
+    
     <cvt:ConnectionKindIconConverter x:Key="ConnectionKindIconConverter"/>
     <cvt:DeviceLightsColorBrushConverter x:Key="DeviceLightsColorBrushConverter"/>
     <cvt:IntToBatteryIconConverter x:Key="IntToBatteryIconConverter"/>
     <cvt:IntToBatteryPercentageConverter x:Key="IntToBatteryPercentageConverter"/>
     <cvt:SvgPathConverter x:Key="SvgPathConverter"/>
+    <cvt:VisibleIfBluetoothConverter x:Key="VisibleIfBluetoothConverter"/>
     <cvt:WaveformIntervalConverter x:Key="WaveformIntervalConverter"/>
     <cvt:WebSocketFeedbackConverter x:Key="WebSocketFeedbackConverter"/>
 

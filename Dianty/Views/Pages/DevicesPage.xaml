@@ -12,10 +12,12 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-        <DataTemplate x:Key="NormalCoyoteItemTemplate" x:DataType="vm:CoyoteItemBase">
+        <!-- 使用模板选择器会导致拖动数据项排序时，从其他位置拖动到第一行的插入动画会丢失。
+        这可能不是模板选择器的问题，而是列表控件对同一个数据项多次调用模板选择器的原因 -->
+        <DataTemplate x:Key="CoyoteItemTemplate" x:DataType="vm:CoyoteItemBase">
             <toolkit:SettingsCard
                 Header="{x:Bind Name}"
-                IsClickEnabled="True" Click="OnDeviceItemCardClick" Margin="0,0,0,4">
+                IsClickEnabled="{x:Bind IsClickEnabled, Mode=OneWay}" Click="OnDeviceItemCardClick" Margin="0,0,0,4">
                 <toolkit:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="{x:Bind ConnectionKind, Converter={StaticResource ConnectionKindIconConverter}}"/>
                 </toolkit:SettingsCard.HeaderIcon>
@@ -24,26 +26,42 @@
                         <Run Text="{x:Bind ConnectionKindDescription, Mode=OneWay}"/><Run Text=" - "/><Run Text="{x:Bind ConnectionMessage, Mode=OneWay}"/>
                     </TextBlock>
                 </toolkit:SettingsCard.Description>
-                <ToggleSwitch
-                    IsOn="{x:Bind IsEnabled, Mode=TwoWay}"
-                    OffContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OffText, Mode=OneWay}"
-                    OnContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OnText, Mode=OneWay}"/>
-            </toolkit:SettingsCard>
-        </DataTemplate>
-        <DataTemplate x:Key="SortCoyoteItemTemplate" x:DataType="vm:CoyoteItemBase">
-            <toolkit:SettingsCard Header="{x:Bind Name}" Margin="0,0,0,4">
-                <toolkit:SettingsCard.HeaderIcon>
-                    <FontIcon Glyph="{x:Bind ConnectionKind, Converter={StaticResource ConnectionKindIconConverter}}"/>
-                </toolkit:SettingsCard.HeaderIcon>
-                <toolkit:SettingsCard.Description>
-                    <TextBlock>
-                        <Run Text="{x:Bind ConnectionKindDescription, Mode=OneWay}"/><Run Text=" - "/><Run Text="{x:Bind ConnectionMessage, Mode=OneWay}"/>
-                    </TextBlock>
-                </toolkit:SettingsCard.Description>
-                <ToggleSwitch
-                    IsOn="{x:Bind IsEnabled, Mode=TwoWay}"
-                    OffContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OffText, Mode=OneWay}"
-                    OnContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OnText, Mode=OneWay}"/>
+                <StackPanel Orientation="Horizontal" Spacing="16">
+                    <SplitButton
+                        Padding="0" Visibility="{x:Bind ConnectionKind, Converter={StaticResource VisibleIfBluetoothConverter}}"
+                        Click="OnColorSplitButtonClick">
+                        <Border
+                            Width="{ThemeResource SplitButtonPrimaryButtonSize}" Height="32"
+                            Background="{x:Bind LightsColor, Mode=OneWay, Converter={StaticResource DeviceLightsColorBrushConverter}}"
+                            CornerRadius="4,0,0,4" BorderThickness="{ThemeResource SplitButtonBorderThemeThickness}"/>
+                        <SplitButton.Flyout>
+                            <Flyout Placement="Bottom">
+                                <GridView
+                                    ItemsSource="{x:Bind vm:CoyoteItemBase.LightsColors}" SelectedItem="{x:Bind LightsColor, Mode=OneWay}"
+                                    IsItemClickEnabled="True" ItemClick="OnLightsColorSelectionItemClick" Padding="0">
+                                    <GridView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Rectangle
+                                                Fill="{Binding Converter={StaticResource DeviceLightsColorBrushConverter}}"
+                                                Width="28" Height="28" RadiusX="4" RadiusY="4"/>
+                                        </DataTemplate>
+                                    </GridView.ItemTemplate>
+                                    <GridView.ItemContainerStyle>
+                                        <Style TargetType="GridViewItem" BasedOn="{StaticResource DefaultGridViewItemStyle}">
+                                            <Setter Property="Margin" Value="2"/>
+                                            <Setter Property="MinWidth" Value="36"/>
+                                            <Setter Property="MinHeight" Value="36"/>
+                                        </Style>
+                                    </GridView.ItemContainerStyle>
+                                </GridView>
+                            </Flyout>
+                        </SplitButton.Flyout>
+                    </SplitButton>
+                    <ToggleSwitch
+                        IsOn="{x:Bind IsEnabled, Mode=TwoWay}"
+                        OffContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OffText, Mode=OneWay}"
+                        OnContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OnText, Mode=OneWay}"/>
+                </StackPanel>
             </toolkit:SettingsCard>
         </DataTemplate>
     </Page.Resources>
@@ -54,12 +72,12 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <TextBlock
-            x:Name="_pageHeader" Style="{StaticResource TitleTextBlockStyle}" Margin="12,6,12,12"
+            x:Name="PageHeader" Style="{StaticResource TitleTextBlockStyle}" Margin="12,6,12,12"
             Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.MenuDevices, Mode=OneWay}"/>
         <ListView
-            x:Name="_pageContent" Grid.Row="1" Padding="12,0,12,20" SelectionMode="None" CanReorderItems="True" AllowDrop="True"
+            x:Name="PageContent" Grid.Row="1" Padding="12,0,12,20" SelectionMode="None" CanReorderItems="True" AllowDrop="True"
             ItemsSource="{x:Bind ViewModel.CoyoteItems}" ItemContainerStyle="{StaticResource StretchListViewItemStyle}"
-            ItemTemplate="{StaticResource NormalCoyoteItemTemplate}">
+            ItemTemplate="{StaticResource CoyoteItemTemplate}">
             <ListView.Header>
                 <Grid Margin="0,0,0,8">
                     <Grid.RowDefinitions>
@@ -110,7 +128,8 @@
                         </ContentControl>
                     </StackPanel>
                     <ToggleButton
-                        x:Name="_sortButton" Grid.Row="1" Click="OnSortButtonClick" HorizontalAlignment="Left" Margin="0,5,0,0"
+                        x:Name="_sortButton" Grid.Row="1" HorizontalAlignment="Left" Margin="0,5,0,0"
+                        Command="{x:Bind ViewModel.SwitchSortingCommand}" Unloaded="OnSortButtonUnloaded"
                         Content="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.SortButtonText, Mode=OneWay}"/>
                 </Grid>
             </ListView.Header>
@@ -127,8 +146,8 @@
                         <AdaptiveTrigger MinWindowWidth="{StaticResource MinimalModeThresholdWidth}" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="_pageHeader.Margin" Value="24,12"/>
-                        <Setter Target="_pageContent.Padding" Value="24,0,24,20"/>
+                        <Setter Target="PageHeader.Margin" Value="24,12"/>
+                        <Setter Target="PageContent.Padding" Value="24,0,24,20"/>
                         <Setter Target="_sortButton.HorizontalAlignment" Value="Right"/>
                         <Setter Target="_sortButton.Margin" Value="0"/>
                         <Setter Target="_sortButton.(Grid.Row)" Value="0"/>

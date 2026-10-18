@@ -26,15 +26,15 @@
             <toolkit:SettingsCard.HeaderIcon>
                 <FontIcon Glyph="&#xE781;"/>
             </toolkit:SettingsCard.HeaderIcon>
-            <SplitButton Padding="0">
+            <SplitButton Padding="0" Click="OnColorSplitButtonClick">
                 <Border
                     Width="{ThemeResource SplitButtonPrimaryButtonSize}" Height="32"
                     Background="{x:Bind ViewModel.LightsColor, Mode=OneWay, Converter={StaticResource DeviceLightsColorBrushConverter}}"
                     CornerRadius="4,0,0,4" BorderThickness="{ThemeResource SplitButtonBorderThemeThickness}"/>
                 <SplitButton.Flyout>
-                    <Flyout x:Name="_lightsColorFlyout">
+                    <Flyout x:Name="_lightsColorFlyout" Placement="Bottom">
                         <GridView
-                            ItemsSource="{x:Bind vm:CoyoteBleItem.LightsColors}" SelectedItem="{x:Bind ViewModel.LightsColor, Mode=OneWay}"
+                            ItemsSource="{x:Bind vm:CoyoteItemBase.LightsColors}" SelectedItem="{x:Bind ViewModel.LightsColor, Mode=OneWay}"
                             IsItemClickEnabled="True" ItemClick="OnLightsColorSelectionItemClick" Padding="0">
                             <GridView.ItemTemplate>
                                 <DataTemplate>

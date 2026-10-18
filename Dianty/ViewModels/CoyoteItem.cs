@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Dianty.EventArguments;
 using Dianty.Services;
 using Dianty.Utils;
@@ -32,9 +33,14 @@ public abstract partial class CoyoteItemBase : ObservableObject, IDisposable
         _localizationService.CurrentLanguageChanged += OnCurrentLanguageChanged;
     }
 
+    public static LightsColor[] LightsColors => Enum.GetValues<LightsColor>();
+
     public DeviceId Id => _deviceInfo.Id;
 
     public ConnectionKind ConnectionKind => _deviceInfo.ConnectionKind;
+
+    [ObservableProperty]
+    public partial LightsColor LightsColor { get; set; }
 
     [ObservableProperty]
     public partial string Name { get; set; } = string.Empty;
@@ -50,6 +56,9 @@ public abstract partial class CoyoteItemBase : ObservableObject, IDisposable
 
     [ObservableProperty]
     public partial bool IsEnabled { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsClickEnabled { get; set; } = true;
 
     public void Dispose()
     {
@@ -189,11 +198,6 @@ public sealed partial class CoyoteBleItem : CoyoteItemBase
     private string ConnectionCanceledStateText =>
         _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionCanceledStateText;
 
-    public static LightsColor[] LightsColors => Enum.GetValues<LightsColor>();
-
-    [ObservableProperty]
-    public partial LightsColor LightsColor { get; set; }
-
     [ObservableProperty]
     public partial bool IsGentle { get; set; }
 
@@ -229,6 +233,12 @@ public sealed partial class CoyoteBleItem : CoyoteItemBase
 
     [ObservableProperty]
     public partial bool ConnectionSwitchValue { get; set; }
+
+    [RelayCommand]
+    private void SetLightsColor(LightsColor color)
+    {
+        _lightsColorConfig.SetLightsColorAsync(color);
+    }
 
     private void SetOutputParameter(object? state)
     {
@@ -355,12 +365,6 @@ public sealed partial class CoyoteBleItem : CoyoteItemBase
         {
             await _deviceConnectionService.DisconnectAsync(Id, CancellationToken.None).ConfigureAwait(false);
         }
-    }
-
-    partial void OnLightsColorChanged(LightsColor value)
-    {
-        if (_isConstructed)
-            _lightsColorConfig.SetLightsColorAsync(value);
     }
 
     partial void OnStrengthLimitAChanged(double value)

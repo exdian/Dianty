@@ -23,6 +23,7 @@ public sealed partial class DevicesPageViewModel : ObservableObject, IDisposable
     private readonly ICoyoteItemBaseFactory _coyoteItemBaseFactory;
     private readonly IQueueService _queueService;
     private readonly ILocalizationService _localizationService;
+    private bool _isSorting;
     private IDeviceInfo? _connectingCoyote;
     private ConnectionState _connectionState = ConnectionState.Unknown;
     private CancellationTokenSource? _cts;
@@ -55,6 +56,7 @@ public sealed partial class DevicesPageViewModel : ObservableObject, IDisposable
 #if DEBUG
         IReadOnlyList<IDeviceInfo> debugDevices =
             [_deviceManager.Create(ConnectionKind.BLE),
+            _deviceManager.Create(ConnectionKind.BLE),
             _deviceManager.Create(ConnectionKind.WebSocket),
             _deviceManager.Create(ConnectionKind.WebSocket)];
 
@@ -65,6 +67,7 @@ public sealed partial class DevicesPageViewModel : ObservableObject, IDisposable
             CoyoteItems[0].Name = "debug";
             CoyoteItems[1].Name = "debug0";
             CoyoteItems[2].Name = "debug1";
+            CoyoteItems[3].Name = "debug2";
         });
 #endif
     }
@@ -228,6 +231,19 @@ public sealed partial class DevicesPageViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
+    private void SwitchSorting()
+    {
+        if (_isDisposed)
+            return;
+
+        _isSorting = !_isSorting;
+        for (int i = 0; i < CoyoteItems.Count; i++)
+        {
+            CoyoteItems[i].IsClickEnabled = !_isSorting;
+        }
+    }
+
+    [RelayCommand]
     private void DeleteCoyote(CoyoteItemBase coyoteItem)
     {
         _deviceManager.Destroy(coyoteItem.Id);
@@ -285,6 +301,7 @@ public sealed partial class DevicesPageViewModel : ObservableObject, IDisposable
                     continue;
                 }
                 coyoteItem.Name = DefaultDeviceNameLabel;
+                coyoteItem.IsClickEnabled = !_isSorting;
                 CoyoteItems.Insert(index, coyoteItem);
                 index++;
             }

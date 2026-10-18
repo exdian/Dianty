@@ -80,7 +80,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <TextBlock
-            x:Name="_pageHeader" Style="{StaticResource TitleTextBlockStyle}" Margin="12,6,12,12"
+            x:Name="PageHeader" Style="{StaticResource TitleTextBlockStyle}" Margin="12,6,12,12"
             Text="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.MenuWaveforms, Mode=OneWay}"/>
         <ListView
             x:Name="_pageContent" Grid.Row="1" Padding="12,0,12,20" SelectionMode="None" CanReorderItems="True" AllowDrop="True"
@@ -143,7 +143,7 @@
                         <AdaptiveTrigger MinWindowWidth="{StaticResource MinimalModeThresholdWidth}" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="_pageHeader.Margin" Value="24,12"/>
+                        <Setter Target="PageHeader.Margin" Value="24,12"/>
                         <Setter Target="_pageContent.Padding" Value="24,0,24,20"/>
                     </VisualState.Setters>
                 </VisualState>
