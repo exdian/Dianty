@@ -4,7 +4,7 @@ using System;
 
 namespace Dianty.Utils.Converters;
 
-public sealed partial class ConnectionKindConverter : IValueConverter
+public sealed partial class ConnectionKindIconConverter : IValueConverter
 {
     private const string Unknown = "\uE9CE";
     private const string BLE = "\uE702";

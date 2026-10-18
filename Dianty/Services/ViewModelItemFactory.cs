@@ -10,6 +10,7 @@ public sealed class ViewModelItemFactory : ICoyoteItemBaseFactory, IWaveformItem
     private readonly IRegistryReader<DeviceId, IStrengthInfo> _strengthInfoRegistryReader;
     private readonly IRegistryReader<DeviceId, IOutputParameterConfig> _outputParameterConfigRegistryReader;
     private readonly IRegistryReader<DeviceId, IBatteryInfo> _batteryInfoRegistryReader;
+    private readonly IRegistryReader<DeviceId, ILightsColorConfig> _lightsColorConfigRegistryReader;
     private readonly IRegistryReader<DeviceId, IClientInfo> _clientInfoRegistryReader;
     private readonly IDeviceConnectionService _deviceConnectionService;
     private readonly IQueueService _queueService;
@@ -26,6 +27,7 @@ public sealed class ViewModelItemFactory : ICoyoteItemBaseFactory, IWaveformItem
         IRegistryReader<DeviceId, IStrengthInfo> strengthInfoRegistryReader,
         IRegistryReader<DeviceId, IOutputParameterConfig> outputParameterConfigRegistryReader,
         IRegistryReader<DeviceId, IBatteryInfo> batteryInfoRegistryReader,
+        IRegistryReader<DeviceId, ILightsColorConfig> lightsColorConfigRegistryReader,
         IRegistryReader<DeviceId, IClientInfo> clientInfoRegistryReader,
         IDeviceConnectionService deviceConnectionService,
         IQueueService queueService,
@@ -41,6 +43,7 @@ public sealed class ViewModelItemFactory : ICoyoteItemBaseFactory, IWaveformItem
         _strengthInfoRegistryReader = strengthInfoRegistryReader;
         _outputParameterConfigRegistryReader = outputParameterConfigRegistryReader;
         _batteryInfoRegistryReader = batteryInfoRegistryReader;
+        _lightsColorConfigRegistryReader = lightsColorConfigRegistryReader;
         _clientInfoRegistryReader = clientInfoRegistryReader;
         _deviceConnectionService = deviceConnectionService;
         _queueService = queueService;
@@ -65,9 +68,10 @@ public sealed class ViewModelItemFactory : ICoyoteItemBaseFactory, IWaveformItem
                 var id = deviceInfo.Id;
                 if (_strengthInfoRegistryReader.TryGetValue(id, out var strengthInfo)
                     && _outputParameterConfigRegistryReader.TryGetValue(id, out var outputParameterConfig)
-                    && _batteryInfoRegistryReader.TryGetValue(id, out var batteryInfo))
+                    && _batteryInfoRegistryReader.TryGetValue(id, out var batteryInfo)
+                    && _lightsColorConfigRegistryReader.TryGetValue(id, out var lightsColorConfig))
                 {
-                    return new CoyoteBleItem(deviceInfo, strengthInfo, outputParameterConfig, batteryInfo, _deviceConnectionService, _queueService, _localizationService);
+                    return new CoyoteBleItem(deviceInfo, strengthInfo, outputParameterConfig, batteryInfo, lightsColorConfig, _deviceConnectionService, _queueService, _localizationService);
                 }
                 break;
             case ConnectionKind.WebSocket:

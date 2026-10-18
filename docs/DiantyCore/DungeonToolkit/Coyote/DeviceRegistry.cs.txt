@@ -7,6 +7,7 @@ public sealed class DeviceRegistry : RegistryBase<DeviceId, IRegisterableDevice>
     IRegistryReader<DeviceId, IStrengthInfo>,
     IRegistryReader<DeviceId, IOutputParameterConfig>,
     IRegistryReader<DeviceId, IBatteryInfo>,
+    IRegistryReader<DeviceId, ILightsColorConfig>,
     IDataSource<IDeviceInfo>,
     IDataSource<IWaveformOutputDevice>,
     IDataSource<IConnectableDevice>,
@@ -24,5 +25,7 @@ public sealed class DeviceRegistry : RegistryBase<DeviceId, IRegisterableDevice>
         DeviceId key, [MaybeNullWhen(false)] out IOutputParameterConfig value);
     bool IRegistryReader<DeviceId, IBatteryInfo>.TryGetValue(
         DeviceId key, [MaybeNullWhen(false)] out IBatteryInfo value);
+    bool IRegistryReader<DeviceId, ILightsColorConfig>.TryGetValue(
+        DeviceId key, [MaybeNullWhen(false)] out ILightsColorConfig value);
 }
 

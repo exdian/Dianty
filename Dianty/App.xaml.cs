@@ -167,7 +167,7 @@ public partial class App : Application
         var gtaVcGameIntegration = new GtaVcGameIntegration(gtaVcMonitor);
         var gameIntegrationManager = new GameIntegrationManager([gtaVcGameIntegration], waveformPusher);
         var waveformNameRegistry = new NameRegistry<WaveformId>();
-        var viewModelItemFactory = new ViewModelItemFactory(deviceRegistry, deviceRegistry, deviceRegistry, deviceManager, deviceManager, queueService, localizationService, waveformNameRegistry, waveformPlayerA, waveformPlayerB, waveformDecoderRegistryA, waveformDecoderRegistryB, waveformPlayerA, waveformPlayerB);
+        var viewModelItemFactory = new ViewModelItemFactory(deviceRegistry, deviceRegistry, deviceRegistry, deviceRegistry, deviceManager, deviceManager, queueService, localizationService, waveformNameRegistry, waveformPlayerA, waveformPlayerB, waveformDecoderRegistryA, waveformDecoderRegistryB, waveformPlayerA, waveformPlayerB);
         var coyoteCollection = new CoyoteCollection();
 
         var homePageViewModel = new HomePageViewModel(deviceRegistry, deviceManager, waveformPlayerA, waveformPlayerB, waveformNameRegistry, waveformPusher, gameIntegrationManager, queueService, localizationService);

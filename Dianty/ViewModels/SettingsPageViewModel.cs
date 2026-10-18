@@ -33,7 +33,7 @@ public sealed partial class SettingsPageViewModel : ObservableObject, IDisposabl
         AppThemeSelectionItems = AppThemeSelectionItem.GetSelectionItems(_localizationService);
         _queueService.TryEnqueue(() =>
             SelectedAppTheme = AppThemeSelectionItems.FirstOrDefault(t => t.Theme == _windowThemeService.ColorTheme));
-        _ = InitializeLanguageSelectionItems();
+        _ = InitializeLanguageSelectionItemsAsync();
 
         _localizationService.CurrentLanguageChanged += OnCurrentLanguageChanged;
     }
@@ -71,7 +71,7 @@ public sealed partial class SettingsPageViewModel : ObservableObject, IDisposabl
         _isDisposed = true;
     }
 
-    private async Task InitializeLanguageSelectionItems()
+    private async Task InitializeLanguageSelectionItemsAsync()
     {
         var languages = await _localizationService.GetAvailableLanguagesAsync().ConfigureAwait(false);
         var languageSelectionItems = languages.Select(l => new LanguageSelectionItem(l.Key, l.Value)).ToArray();

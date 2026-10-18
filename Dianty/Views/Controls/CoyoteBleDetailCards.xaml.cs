@@ -1,6 +1,7 @@
 using CommunityToolkit.WinUI.Controls;
 using Dianty.Utils;
 using Dianty.ViewModels;
+using DungeonToolkit;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System.Windows.Input;
@@ -24,5 +25,22 @@ public sealed partial class CoyoteBleDetailCards : UserControl
     {
         if (sender is SettingsCard settingsCard)
             SettingsCardHelper.StretchContent(settingsCard);
+    }
+
+    private void OnColorSplitButtonClick(SplitButton sender, SplitButtonClickEventArgs args)
+    {
+        sender.Flyout.ShowAt(sender);
+    }
+
+    private void OnLightsColorSelectionItemClick(object sender, ItemClickEventArgs e)
+    {
+        if (e.ClickedItem is LightsColor lightsColor)
+        {
+            ViewModel.LightsColor = lightsColor;
+            var command = ViewModel.SetLightsColorCommand;
+            if (command is not null && command.CanExecute(lightsColor))
+                command.Execute(lightsColor);
+        }
+        _lightsColorFlyout.Hide();
     }
 }

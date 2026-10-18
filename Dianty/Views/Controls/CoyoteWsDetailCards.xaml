@@ -21,7 +21,7 @@
         </toolkit:SettingsCard>
         <toolkit:SettingsCard
             Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionStatusCardHeader, Mode=OneWay}"
-            HeaderIcon="Link" Description="{x:Bind ViewModel.ConnectionKindDescription, Mode=OneWay}">
+            HeaderIcon="Link" Description="{x:Bind ViewModel.ConnectionKindNote, Mode=OneWay}">
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource CommonControlSpacing}">
                 <ProgressRing IsActive="{x:Bind ViewModel.IsConnecting, Mode=OneWay}"/>
                 <ContentControl Content="{x:Bind ViewModel.ConnectionMessage, Mode=OneWay}" VerticalAlignment="Center">
@@ -86,6 +86,13 @@
                         <FontIcon Glyph="&#xF094;"/>
                     </toolkit:SettingsCard.HeaderIcon>
                     <TextBlock Text="{x:Bind ViewModel.StrengthLimitB, Mode=OneWay}"/>
+                </toolkit:SettingsCard>
+                <toolkit:SettingsCard
+                    Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.WebSocketFeedbackCardHeader, Mode=OneWay}">
+                    <toolkit:SettingsCard.HeaderIcon>
+                        <PathIcon Data="{x:Bind ViewModel.FeedbackCode, Mode=OneWay, Converter={StaticResource WebSocketFeedbackConverter}}"/>
+                    </toolkit:SettingsCard.HeaderIcon>
+                    <TextBlock Text="{x:Bind ViewModel.FeedbackText, Mode=OneWay}"/>
                 </toolkit:SettingsCard>
             </toolkit:SettingsExpander.Items>
         </toolkit:SettingsExpander>

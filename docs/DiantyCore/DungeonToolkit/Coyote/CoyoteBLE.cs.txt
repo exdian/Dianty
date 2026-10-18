@@ -6,7 +6,8 @@ public sealed class CoyoteBLE : IDisposable,
     IRegisterableDevice,
     IStrengthInfo,
     IOutputParameterConfig,
-    IBatteryInfo 
+    IBatteryInfo,
+    ILightsColorConfig 
 {
     public CoyoteBLE(DeviceId id, ICoyoteBleDetector bleDetector);
     public DeviceId Id { get; }
@@ -20,6 +21,7 @@ public sealed class CoyoteBLE : IDisposable,
     public byte BatteryLevel { get; }
     public bool IsGentle { get; set; }
     public OutputParameter CurrentParameter { get; }
+    public LightsColor CurrentColor { get; }
     public event EventHandler<ConnectionStatusChangedEventArgs>? ConnectionStatusChanged;
     public event EventHandler<StrengthChangedEventArgs>? StrengthChanged;
     public event EventHandler<BatteryLevelChangedEventArgs>? BatteryLevelChanged;
@@ -31,7 +33,7 @@ public sealed class CoyoteBLE : IDisposable,
         IReadOnlyList<PulseData> waveformA, IReadOnlyList<PulseData> waveformB, int strengthA, int strengthB);
     public async Task CancelOutputAsync();
     public async Task UpdateBatteryLevelAsync();
-    public async Task<bool> SetEyeColorAsync(LightColor color);
+    public async Task<bool> SetLightsColorAsync(LightsColor color);
     public void Dispose();
 }
 

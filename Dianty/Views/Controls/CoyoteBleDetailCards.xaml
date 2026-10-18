@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
     xmlns:local="using:Dianty.Views.Controls"
+    xmlns:vm="using:Dianty.ViewModels"
     xmlns:txt="using:Dianty.Localization"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -19,9 +20,66 @@
             HeaderIcon="Tag">
             <TextBox Text="{x:Bind ViewModel.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         </toolkit:SettingsCard>
+        <toolkit:SettingsExpander
+            Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.DeviceLightsColorCardHeader, Mode=OneWay}"
+            Description="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.CoyoteLightsColorCardDescription, Mode=OneWay}">
+            <toolkit:SettingsExpander.HeaderIcon>
+                <FontIcon Glyph="&#xE781;"/>
+            </toolkit:SettingsExpander.HeaderIcon>
+            <SplitButton Padding="0" Click="OnColorSplitButtonClick">
+                <Border
+                    Width="{ThemeResource SplitButtonPrimaryButtonSize}" Height="32"
+                    Background="{x:Bind ViewModel.LightsColor, Mode=OneWay, Converter={StaticResource DeviceLightsColorBrushConverter}}"
+                    CornerRadius="4,0,0,4" BorderThickness="{ThemeResource SplitButtonBorderThemeThickness}"/>
+                <SplitButton.Flyout>
+                    <Flyout x:Name="_lightsColorFlyout" Placement="Bottom">
+                        <GridView
+                            ItemsSource="{x:Bind vm:CoyoteItemBase.LightsColors}" SelectedItem="{x:Bind ViewModel.LightsColor, Mode=OneWay}"
+                            IsItemClickEnabled="True" ItemClick="OnLightsColorSelectionItemClick" Padding="0">
+                            <GridView.ItemTemplate>
+                                <DataTemplate>
+                                    <Rectangle
+                                        Fill="{Binding Converter={StaticResource DeviceLightsColorBrushConverter}}"
+                                        Width="28" Height="28" RadiusX="4" RadiusY="4"/>
+                                </DataTemplate>
+                            </GridView.ItemTemplate>
+                            <GridView.ItemContainerStyle>
+                                <Style TargetType="GridViewItem" BasedOn="{StaticResource DefaultGridViewItemStyle}">
+                                    <Setter Property="Margin" Value="2"/>
+                                    <Setter Property="MinWidth" Value="36"/>
+                                    <Setter Property="MinHeight" Value="36"/>
+                                </Style>
+                            </GridView.ItemContainerStyle>
+                        </GridView>
+                    </Flyout>
+                </SplitButton.Flyout>
+            </SplitButton>
+            <toolkit:SettingsExpander.Items>
+                <toolkit:SettingsCard ContentAlignment="Vertical" HorizontalContentAlignment="Left">
+                    <GridView
+                        ItemsSource="{x:Bind vm:CoyoteItemBase.LightsColors}" SelectedItem="{x:Bind ViewModel.LightsColor, Mode=OneWay}"
+                        IsItemClickEnabled="True" ItemClick="OnLightsColorSelectionItemClick" Padding="0">
+                        <GridView.ItemTemplate>
+                            <DataTemplate>
+                                <Rectangle
+                                    Fill="{Binding Converter={StaticResource DeviceLightsColorBrushConverter}}"
+                                    Width="28" Height="28" RadiusX="4" RadiusY="4"/>
+                            </DataTemplate>
+                        </GridView.ItemTemplate>
+                        <GridView.ItemContainerStyle>
+                            <Style TargetType="GridViewItem" BasedOn="{StaticResource DefaultGridViewItemStyle}">
+                                <Setter Property="Margin" Value="2"/>
+                                <Setter Property="MinWidth" Value="36"/>
+                                <Setter Property="MinHeight" Value="36"/>
+                            </Style>
+                        </GridView.ItemContainerStyle>
+                    </GridView>
+                </toolkit:SettingsCard>
+            </toolkit:SettingsExpander.Items>
+        </toolkit:SettingsExpander>
         <toolkit:SettingsCard
             Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionStatusCardHeader, Mode=OneWay}"
-            HeaderIcon="Link" Description="{x:Bind ViewModel.ConnectionKindDescription, Mode=OneWay}">
+            HeaderIcon="Link" Description="{x:Bind ViewModel.ConnectionKindNote, Mode=OneWay}">
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource CommonControlSpacing}">
                 <ProgressRing IsActive="{x:Bind ViewModel.IsConnecting, Mode=OneWay}"/>
                 <ContentControl Content="{x:Bind ViewModel.ConnectionMessage, Mode=OneWay}" VerticalAlignment="Center">

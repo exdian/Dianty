@@ -40,6 +40,8 @@
         "DefaultDeviceNameLabel": "New device",
         "DetailsMenuPath": "Details",
         "DeviceNameCardHeader": "Device Name",
+        "DeviceLightsColorCardHeader": "Lights Color",
+        "CoyoteLightsColorCardDescription": "Set the coyote eyes color",
         "ConnectionStatusCardHeader": "Connection Status",
         "ConnectionStatusCardBluetoothDescription": "This device is connected via Bluetooth",
         "ConnectionStatusCardWebSocketDescription": "This device is connected via WebSocket",
@@ -59,7 +61,18 @@
         "CurrentChannelBStrengthCardHeader": "Current Channel B Strength",
         "BatteryLevelCardHeader": "Battery Level",
         "ChannelAStrengthLimitCardHeader": "Channel A Strength Limit",
-        "ChannelBStrengthLimitCardHeader": "Channel B Strength Limit"
+        "ChannelBStrengthLimitCardHeader": "Channel B Strength Limit",
+        "WebSocketFeedbackCardHeader": "Feedback",
+        "FeedbackCircleA": "A feels so round",
+        "FeedbackTriangleA": "A feels very stable",
+        "FeedbackSquareA": "A feels so square",
+        "FeedbackPentagramA": "A is twinkling brightly",
+        "FeedbackHexagonA": "A says there are lots of obtuse angles",
+        "FeedbackCircleB": "B feels so round",
+        "FeedbackTriangleB": "B feels very stable",
+        "FeedbackSquareB": "B feels so square",
+        "FeedbackPentagramB": "B is twinkling brightly",
+        "FeedbackHexagonB": "B says there are lots of obtuse angles"
       },
       "WaveformsPageText": {
         "ChannelAPlaylistSwitchHeader": "Channel A",

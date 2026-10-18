@@ -40,6 +40,8 @@
         "DefaultDeviceNameLabel": "新设备",
         "DetailsMenuPath": "详细信息",
         "DeviceNameCardHeader": "设备名称",
+        "DeviceLightsColorCardHeader": "灯光颜色",
+        "CoyoteLightsColorCardDescription": "设置狼眼灯颜色",
         "ConnectionStatusCardHeader": "连接状态",
         "ConnectionStatusCardBluetoothDescription": "此设备通过蓝牙连接",
         "ConnectionStatusCardWebSocketDescription": "此设备通过WebSocket连接",
@@ -59,7 +61,18 @@
         "CurrentChannelBStrengthCardHeader": "当前B通道强度",
         "BatteryLevelCardHeader": "电池电量",
         "ChannelAStrengthLimitCardHeader": "A通道强度上限",
-        "ChannelBStrengthLimitCardHeader": "B通道强度上限"
+        "ChannelBStrengthLimitCardHeader": "B通道强度上限",
+        "WebSocketFeedbackCardHeader": "反馈",
+        "WebSocketFeedbackCircleA": "A感到很圆",
+        "WebSocketFeedbackTriangleA": "A觉得很稳",
+        "WebSocketFeedbackSquareA": "A感觉很方",
+        "WebSocketFeedbackPentagramA": "A一闪一闪亮晶晶",
+        "WebSocketFeedbackHexagonA": "A表示很多钝角",
+        "WebSocketFeedbackCircleB": "B感到很圆",
+        "WebSocketFeedbackTriangleB": "B觉得很稳",
+        "WebSocketFeedbackSquareB": "B感觉很方",
+        "WebSocketFeedbackPentagramB": "B一闪一闪亮晶晶",
+        "WebSocketFeedbackHexagonB": "B表示很多钝角"
       },
       "WaveformsPageText": {
         "ChannelAPlaylistSwitchHeader": "A通道开关",

@@ -24,7 +24,7 @@
                 <toolkit:SettingsCard
                     Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.WaveformsPageText.WaveformNameCardHeader, Mode=OneWay}"
                     HeaderIcon="Tag">
-                    <TextBox Text="{x:Bind WaveformItem.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox Text="{x:Bind WaveformItem.Name, Mode=TwoWay}"/>
                 </toolkit:SettingsCard>
                 <toolkit:SettingsCard
                     Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.WaveformsPageText.WaveformDescriptionCardHeader, Mode=OneWay}">

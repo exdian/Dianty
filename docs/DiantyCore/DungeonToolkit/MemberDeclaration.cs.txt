@@ -2,7 +2,7 @@
 
 namespace DungeonToolkit;
 
-public enum LightColor 
+public enum LightsColor 
 {
     None,
     Yellow,
@@ -50,6 +50,11 @@ public interface IIdPool<T>
 {
     T Rent();
     void Return(T id);
+}
+public interface ILightsColorConfig  
+{
+    LightsColor CurrentColor { get; }
+    Task<bool> SetLightsColorAsync(LightsColor color);
 }
 public sealed class RegistryChangedEventArgs(RegistryChangedAction changedAction) : EventArgs 
 {

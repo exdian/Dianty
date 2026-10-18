@@ -9,14 +9,11 @@ public sealed partial class SvgPathConverter : IValueConverter
 {
     public object? Convert(object value, Type targetType, object parameter, string language)
     {
-        if (value is string svgPath)
+        try
         {
-            try
-            {
-                return XamlBindingHelper.ConvertValue(typeof(Geometry), svgPath);
-            }
-            catch { }
+            return XamlBindingHelper.ConvertValue(typeof(Geometry), value);
         }
+        catch { }
 
         return null;
     }
