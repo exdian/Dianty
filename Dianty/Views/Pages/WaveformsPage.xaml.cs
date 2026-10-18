@@ -58,8 +58,13 @@ public sealed partial class WaveformsPage : Page
 
     private void OnWaveformItemCardClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not FrameworkElement element || _queueService is null || _localizationService is null)
+        if (sender is not FrameworkElement element
+            || element.DataContext is not WaveformItemBase waveformItem
+            || _queueService is null
+            || _localizationService is null)
+        {
             return;
+        }
 
         var options = new FrameNavigationOptions
         {
@@ -69,15 +74,12 @@ public sealed partial class WaveformsPage : Page
                 Effect = SlideNavigationTransitionEffect.FromRight
             }
         };
-        if (element.DataContext is WaveformItemBase waveformItem)
-        {
-            Func<ILocalizationService, string>[] pathGetters =
-                [s => s.AppText.MainWindowText.MainViewText.MenuWaveforms,
-                s => s.AppText.MainWindowText.MainViewText.WaveformsPageText.DetailsMenuPath];
-            var pathBarParameter = new PathBar.RequiredParameter(_queueService, _localizationService, pathGetters);
-            var requiredParameter = new WaveformSettingsPage.RequiredParameter(pathBarParameter, waveformItem);
-            WeakReferenceMessenger.Default.Send(new NavigationRequest(typeof(WaveformSettingsPage), requiredParameter, options));
-        }
+        Func<ILocalizationService, string>[] pathGetters =
+            [s => s.AppText.MainWindowText.MainViewText.MenuWaveforms,
+            s => s.AppText.MainWindowText.MainViewText.WaveformsPageText.DetailsMenuPath];
+        var pathBarParameter = new PathBar.RequiredParameter(_queueService, _localizationService, pathGetters);
+        var requiredParameter = new WaveformSettingsPage.RequiredParameter(pathBarParameter, waveformItem);
+        WeakReferenceMessenger.Default.Send(new NavigationRequest(typeof(WaveformSettingsPage), requiredParameter, options));
     }
 
     private void OnSortButtonClick(object sender, RoutedEventArgs e)

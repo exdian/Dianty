@@ -21,7 +21,7 @@
         </toolkit:SettingsCard>
         <toolkit:SettingsCard
             Header="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionStatusCardHeader, Mode=OneWay}"
-            HeaderIcon="Link" Description="{x:Bind ViewModel.ConnectionKindDescription, Mode=OneWay}">
+            HeaderIcon="Link" Description="{x:Bind ViewModel.ConnectionKindNote, Mode=OneWay}">
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource CommonControlSpacing}">
                 <ProgressRing IsActive="{x:Bind ViewModel.IsConnecting, Mode=OneWay}"/>
                 <ContentControl Content="{x:Bind ViewModel.ConnectionMessage, Mode=OneWay}" VerticalAlignment="Center">

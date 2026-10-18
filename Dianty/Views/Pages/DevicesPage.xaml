@@ -14,11 +14,16 @@
     <Page.Resources>
         <DataTemplate x:Key="NormalCoyoteItemTemplate" x:DataType="vm:CoyoteItemBase">
             <toolkit:SettingsCard
-                Header="{x:Bind Name}" Description="{x:Bind ConnectionMessage, Mode=OneWay}"
+                Header="{x:Bind Name}"
                 IsClickEnabled="True" Click="OnDeviceItemCardClick" Margin="0,0,0,4">
                 <toolkit:SettingsCard.HeaderIcon>
-                    <FontIcon Glyph="{x:Bind ConnectionKind, Converter={StaticResource ConnectionKindConverter}}"/>
+                    <FontIcon Glyph="{x:Bind ConnectionKind, Converter={StaticResource ConnectionKindIconConverter}}"/>
                 </toolkit:SettingsCard.HeaderIcon>
+                <toolkit:SettingsCard.Description>
+                    <TextBlock>
+                        <Run Text="{x:Bind ConnectionKindDescription, Mode=OneWay}"/><Run Text=" - "/><Run Text="{x:Bind ConnectionMessage, Mode=OneWay}"/>
+                    </TextBlock>
+                </toolkit:SettingsCard.Description>
                 <ToggleSwitch
                     IsOn="{x:Bind IsEnabled, Mode=TwoWay}"
                     OffContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OffText, Mode=OneWay}"
@@ -26,10 +31,15 @@
             </toolkit:SettingsCard>
         </DataTemplate>
         <DataTemplate x:Key="SortCoyoteItemTemplate" x:DataType="vm:CoyoteItemBase">
-            <toolkit:SettingsCard Header="{x:Bind Name}" Description="{x:Bind ConnectionMessage, Mode=OneWay}" Margin="0,0,0,4">
+            <toolkit:SettingsCard Header="{x:Bind Name}" Margin="0,0,0,4">
                 <toolkit:SettingsCard.HeaderIcon>
-                    <FontIcon Glyph="{x:Bind ConnectionKind, Converter={StaticResource ConnectionKindConverter}}"/>
+                    <FontIcon Glyph="{x:Bind ConnectionKind, Converter={StaticResource ConnectionKindIconConverter}}"/>
                 </toolkit:SettingsCard.HeaderIcon>
+                <toolkit:SettingsCard.Description>
+                    <TextBlock>
+                        <Run Text="{x:Bind ConnectionKindDescription, Mode=OneWay}"/><Run Text=" - "/><Run Text="{x:Bind ConnectionMessage, Mode=OneWay}"/>
+                    </TextBlock>
+                </toolkit:SettingsCard.Description>
                 <ToggleSwitch
                     IsOn="{x:Bind IsEnabled, Mode=TwoWay}"
                     OffContent="{x:Bind txt:Localizer.Instance.AppText.MainWindowText.ToggleSwitchText.OffText, Mode=OneWay}"

@@ -23,7 +23,7 @@ public abstract partial class CoyoteItemBase : ObservableObject, IDisposable
         _queueService = queueService;
         _localizationService = localizationService;
 
-        UpdateConnectionKindDescription();
+        UpdateConnectionKindText();
         UpdateConnectionState(_deviceInfo.ConnectionStatus);
         UpdateConnectionMessage();
         IsEnabled = _deviceInfo.IsEnabled;
@@ -41,6 +41,9 @@ public abstract partial class CoyoteItemBase : ObservableObject, IDisposable
 
     [ObservableProperty]
     public partial string ConnectionKindDescription { get; private set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string ConnectionKindNote { get; private set; } = string.Empty;
 
     [ObservableProperty]
     public partial string ConnectionMessage { get; protected set; } = string.Empty;
@@ -80,20 +83,30 @@ public abstract partial class CoyoteItemBase : ObservableObject, IDisposable
 
     protected virtual void OnCurrentLanguageChanged(object? sender, CurrentLanguageChangedEventArgs e)
     {
-        UpdateConnectionKindDescription();
+        UpdateConnectionKindText();
         UpdateConnectionMessage();
     }
 
-    private void UpdateConnectionKindDescription()
+    private void UpdateConnectionKindText()
     {
         _queueService.TryEnqueue(() =>
         {
-            ConnectionKindDescription = ConnectionKind switch
+            switch (ConnectionKind)
             {
-                ConnectionKind.BLE => _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionStatusCardBluetoothDescription,
-                ConnectionKind.WebSocket => _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionStatusCardWebSocketDescription,
-                _ or ConnectionKind.Unknown => string.Empty,
-            };
+                default:
+                case ConnectionKind.Unknown:
+                    ConnectionKindDescription = string.Empty;
+                    ConnectionKindNote = string.Empty;
+                    break;
+                case ConnectionKind.BLE:
+                    ConnectionKindDescription = _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.BluetoothLabel;
+                    ConnectionKindNote = _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionStatusCardBluetoothDescription;
+                    break;
+                case ConnectionKind.WebSocket:
+                    ConnectionKindDescription = _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.SocketLabel;
+                    ConnectionKindNote = _localizationService.AppText.MainWindowText.MainViewText.DevicesPageText.ConnectionStatusCardWebSocketDescription;
+                    break;
+            }
         });
     }
 

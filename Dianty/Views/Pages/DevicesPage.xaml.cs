@@ -36,8 +36,14 @@ public sealed partial class DevicesPage : Page
 
     private void OnDeviceItemCardClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not FrameworkElement element || ViewModel is null || _queueService is null || _localizationService is null)
+        if (sender is not FrameworkElement element
+            || element.DataContext is not CoyoteItemBase coyoteItem
+            || ViewModel is null
+            || _queueService is null
+            || _localizationService is null)
+        {
             return;
+        }
 
         var options = new FrameNavigationOptions
         {
@@ -47,15 +53,12 @@ public sealed partial class DevicesPage : Page
                 Effect = SlideNavigationTransitionEffect.FromRight
             }
         };
-        if (element.DataContext is CoyoteItemBase coyoteItem)
-        {
-            Func<ILocalizationService, string>[] pathGetters =
-                [s => s.AppText.MainWindowText.MainViewText.MenuDevices,
-                s => s.AppText.MainWindowText.MainViewText.DevicesPageText.DetailsMenuPath];
-            var pathBarParameter = new PathBar.RequiredParameter(_queueService, _localizationService, pathGetters);
-            var requiredParameter = new CoyoteDetailPage.RequiredParameter(pathBarParameter, ViewModel, coyoteItem, _queueService);
-            WeakReferenceMessenger.Default.Send(new NavigationRequest(typeof(CoyoteDetailPage), requiredParameter, options));
-        }
+        Func<ILocalizationService, string>[] pathGetters =
+            [s => s.AppText.MainWindowText.MainViewText.MenuDevices,
+            s => s.AppText.MainWindowText.MainViewText.DevicesPageText.DetailsMenuPath];
+        var pathBarParameter = new PathBar.RequiredParameter(_queueService, _localizationService, pathGetters);
+        var requiredParameter = new CoyoteDetailPage.RequiredParameter(pathBarParameter, ViewModel, coyoteItem, _queueService);
+        WeakReferenceMessenger.Default.Send(new NavigationRequest(typeof(CoyoteDetailPage), requiredParameter, options));
     }
 
     private void OnSortButtonClick(object sender, RoutedEventArgs e)
